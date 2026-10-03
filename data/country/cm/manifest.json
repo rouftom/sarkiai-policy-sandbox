@@ -183,6 +183,18 @@
       "sourceUrl": "https://hal.science/hal-05411779v1"
     },
     {
+      "id": "cm-interconnection-decree-2023",
+      "title": "Décret fixant les conditions d'interconnexion et d'accès aux réseaux de communications électroniques (2023)",
+      "authority": "Primature / ART",
+      "docType": "regulation",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "collaboration"],
+      "status": "present",
+      "priority": "medium",
+      "file": "decret_2023_interconnexion.pdf",
+      "sourceUrl": "https://www.art.cm/"
+    },
+    {
       "id": "cm-health-sr-pf-standards",
       "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
       "authority": "Ministère de la Santé Publique",
