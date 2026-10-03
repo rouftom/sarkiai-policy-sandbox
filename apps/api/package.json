@@ -18,6 +18,7 @@
     "@sps/citations": "workspace:*",
     "@sps/kb": "workspace:*",
     "@sps/readiness": "workspace:*",
+    "@sps/report": "workspace:*",
     "@sps/retrieval": "workspace:*",
     "@sps/scenarios": "workspace:*",
     "@sps/shared": "workspace:*",

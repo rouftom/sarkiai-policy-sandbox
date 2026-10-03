@@ -8,6 +8,29 @@ security**, with an **ML sandbox** for validation.
 This document maps every stage to a concrete file in this repo so evaluators can
 verify the architecture instead of taking it on faith.
 
+## Node vocabulary (normative)
+
+Y.3172 models the pipeline as **named nodes**, not generic stages:
+`SRC → C (Collector) → PP (Preprocessor) → M (Model) → P (Policy) → D (Distributor) → SINK`,
+orchestrated by the **MLFO** (ML Function Orchestrator), with the **ML sandbox**
+as the validation environment. We use these exact symbols.
+
+| Node | Meaning | Our component | File |
+|------|---------|---------------|------|
+| `SRC` | data sources | country/global corpora, media | `data/**`, `services/transcription` |
+| `C` | Collector | ingest API + client | `services/ingestion/.../routes.py`, `packages/kb` |
+| `PP` | Preprocessor | structure-aware chunking + OCR + embeddings | `services/ingestion/.../chunker.py`, `.../embeddings.py`, `services/ocr` |
+| `M` | Model | hybrid retrieval + LLM agents | `packages/retrieval`, `packages/agents/src/model.ts` |
+| `P` | Policy | citation-mandatory prompts, gap engine, workflow profiles | `packages/agents/src/prompt.ts`, `packages/readiness`, `packages/shared/src/workflows.ts` |
+| `D` | Distributor | API surface + web console + report/dossier | `apps/api`, `apps/web`, `packages/report` |
+| `SINK` | consumers/actors | institutional agents + joint situation report | `packages/agents/src/coordinator.ts` |
+| `MLFO` | orchestration | engine composition per lens | `apps/api/src/engine.ts` |
+| `ML sandbox` | validation env | sandbox deployment + fine-tuning | `deploy/sandbox/` |
+
+The per-node mapping of the concrete use case (with requirements → policy
+documents) is in [`docs/USE-CASE-MAPPING.md`](./USE-CASE-MAPPING.md), as required
+by the hackathon submission template.
+
 ## At a glance
 
 | Y.3172 stage | Repo module | Key files |
@@ -65,9 +88,11 @@ verify the architecture instead of taking it on faith.
 | Mandated agent run (retrieve → ground → generate → trace) | `packages/agents/src/orchestrator.ts` | `PolicyOrchestrator.runAgent` |
 | Grounded system prompt + mandatory-citation directive | `packages/agents/src/prompt.ts` | `buildSystemPrompt`, `citationDirective` |
 | Progressive, chunked error-scenario engine | `packages/scenarios/src/index.ts` | `ScenarioEngine.release()` (async generator) |
-| ITU Readiness gap engine (8 dimensions) | `packages/readiness/src/index.ts` | `ReadinessEngine.assess`, `renderReadinessMarkdown` |
+| ITU Readiness gap engine (13 dimensions / 6 factors) | `packages/readiness/src/index.ts` | `ReadinessEngine.assess`, `renderReadinessMarkdown` |
+| Multi-agent coordination & reconciliation | `packages/agents/src/coordinator.ts` | `MultiAgentCoordinator.runTick/reconcile` |
 | Source attribution / citation formatting | `packages/citations/src/index.ts` | `citationFromChunk`, `hasGroundedCitation` |
 | Institutional mandates registry | `packages/shared/src/agents.ts` | `INSTITUTIONS`, `institutionsForDomain` |
+| Auditable run dossier (audit + CoT + reports + citations) | `packages/report/src/index.ts` | `buildRunDossier`, `renderDossierMarkdown`, `ReportStore` |
 
 ## 6. Management & orchestration
 
@@ -75,7 +100,7 @@ verify the architecture instead of taking it on faith.
 |---------|------|-------|
 | Declarative lens profiles (simulation / readiness / hybrid) | `packages/shared/src/workflows.ts` | `WORKFLOW_PROFILES`, `getWorkflowProfile` |
 | Composition of packages per lens | `apps/api/src/engine.ts` | `createEngine`, `createScenario` |
-| HTTP surface | `apps/api/src/routes/index.ts` | `/v1/agents/ask`, `/v1/scenarios/:id/release`, `/v1/readiness/report`, `/v1/audit/*` |
+| HTTP surface | `apps/api/src/routes/index.ts` | `/v1/agents/ask`, `/v1/scenarios/:id/release`, `/v1/scenarios/run`, `/v1/readiness/report`, `/v1/audit/*`, `/v1/audit/dossier/:runId` |
 | UI lens selector + readiness console | `apps/web/src/app/page.tsx`, `apps/web/src/components/lens-selector.tsx` | both lenses visible |
 
 ## 7. Security
@@ -96,18 +121,22 @@ verify the architecture instead of taking it on faith.
 | Sandbox variables | `deploy/sandbox/.env.sandbox.example` | `MONGODB_URI`, keys, registry |
 | Fine-tuning path | `deploy/sandbox/README.md` | uses Lab cloud credits |
 
-## 9. AI Readiness Framework perspectives
+## 9. AI Readiness Framework 2.0 (6 factors / 13 dimensions)
 
-| Perspective (hackathon §Requirements) | Where it is reflected |
-|---------------------------------------|-----------------------|
-| Open data & open-source management | Apache-2.0 `LICENSE`; KB publication; `data/global/itu` |
-| Generative AI content ecosystem | `packages/agents` + `packages/readiness` |
-| Contextualization & regional focus | `country`/`jurisdiction` taxonomy end-to-end |
-| Domain & cross-domain integration | `Domain` type; `INSTITUTIONS` cross-domain mandates |
-| Human interaction & supervision | lens selector, scenario `onBeforeRelease` hook, approvals seam |
-| Policy & implementation opportunity | `ReadinessEngine` gap engine |
-| AI for social inclusion | domain coverage (health, education, public services, agriculture) |
-| Digital infrastructure & energy | readiness dimension `digital_infrastructure_energy`; OTT/telecom expertise |
+The canonical definitions are vendored at `data/global/itu/dimensions.json`
+(6 factors, 13 dimensions, 100+ metrics) and encoded in
+`packages/shared/src/types.ts` (`READINESS_FACTORS`, `READINESS_DIMENSIONS`).
+The readiness engine iterates all 13 dimensions
+(`READINESS_DIMENSION_IDS`) and maps each gap to a dimension + factor.
+
+| Factor | Dimensions |
+|--------|-----------|
+| `data` | D1 Data/Model Marketplace, D2 Generated Content, D3 Cross-Domain, D4 Contextualization |
+| `research` | D4 Contextualization |
+| `deployment` | D4, D6 Human Interface, D10 AI & Policies, D12 Granular Priorities, D13 Digital Infrastructure |
+| `standards` | D3, D5 AI Integration, D6, D7 Strategy Alignment, D8 Collaboration |
+| `opensource` | D1, D2, D8 |
+| `sandbox` | D9 Human Impact, D10, D11 AI for Inclusion |
 
 ## 10. Hackathon §5 — progressive scenario events
 
@@ -122,4 +151,6 @@ each institutional agent receives a different, incomplete picture.
 1. `audit_logs` — hash-chained records (`prevHash` → `hash`) for `verifyChain()`.
 2. `cot_traces` — one document per reasoning step, queryable by `runId`.
 `apps/api/src/routes/index.ts` exposes `GET /v1/audit/chain` and
-`GET /v1/audit/trace/:runId` for reviewer inspection.
+`GET /v1/audit/trace/:runId` for reviewer inspection, and
+`GET /v1/audit/dossier/:runId?format=json|markdown` bundles the whole run
+(audit chain + CoT + joint reports + citations) via `packages/report`.

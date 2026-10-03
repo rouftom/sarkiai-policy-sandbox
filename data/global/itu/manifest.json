@@ -10,7 +10,12 @@
       "authority": "ITU-T",
       "docType": "standard",
       "jurisdiction": "international",
-      "pillar": ["digital_infrastructure_energy", "generative_ai_ecosystem", "policy_implementation_opportunity"],
+      "pillar": [
+        "digital_infrastructure",
+        "generated_content",
+        "ai_policies",
+        "strategy_alignment"
+      ],
       "status": "verified",
       "priority": "critical",
       "sourceUrl": "https://www.itu.int/rec/T-REC-Y.3172/en"
@@ -21,7 +26,12 @@
       "authority": "ITU",
       "docType": "guidance",
       "jurisdiction": "international",
-      "pillar": ["policy_implementation_opportunity", "contextualization_regional", "ai_for_social_inclusion"],
+      "pillar": [
+        "ai_policies",
+        "strategy_alignment",
+        "contextualization",
+        "ai_inclusion"
+      ],
       "status": "verified",
       "priority": "critical",
       "sourceUrl": "https://www.itu.int/dms_pub/itu-t/opb/ai4g/T-AI4G-AI4GOOD-2025-6-PDF-E.pdf"
@@ -32,7 +42,13 @@
       "authority": "World Health Organization",
       "docType": "guidance",
       "jurisdiction": "international",
-      "pillar": ["human_interaction_supervision", "ai_for_social_inclusion", "domain_integration_cross_domain"],
+      "pillar": [
+        "human_interface",
+        "ai_policies",
+        "ai_inclusion",
+        "cross_domain",
+        "ai_integration"
+      ],
       "status": "verified",
       "priority": "critical",
       "sourceUrl": "https://www.who.int/publications/i/item/9789240029200"
@@ -43,7 +59,12 @@
       "authority": "UNESCO",
       "docType": "guidance",
       "jurisdiction": "international",
-      "pillar": ["generative_ai_ecosystem", "human_interaction_supervision", "ai_for_social_inclusion"],
+      "pillar": [
+        "generated_content",
+        "human_interface",
+        "ai_policies",
+        "ai_inclusion"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://unesdoc.unesco.org/ark:/48223/pf0000381137"
@@ -54,7 +75,12 @@
       "authority": "African Union",
       "docType": "treaty",
       "jurisdiction": "regional",
-      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "pillar": [
+        "data_marketplace",
+        "generated_content",
+        "human_interface",
+        "ai_policies"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://au.int/en/treaties"
@@ -65,7 +91,11 @@
       "authority": "OECD",
       "docType": "guidance",
       "jurisdiction": "international",
-      "pillar": ["policy_implementation_opportunity", "generative_ai_ecosystem"],
+      "pillar": [
+        "ai_policies",
+        "strategy_alignment",
+        "generated_content"
+      ],
       "status": "verified",
       "priority": "medium",
       "sourceUrl": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449"

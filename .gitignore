@@ -1,3 +1,7 @@
+# downloaded ITU/hackathon reference resources (never committed)
+.iut/
+.itu/
+
 # dependencies
 node_modules/
 .pnp
@@ -39,6 +43,7 @@ data/country/*/*
 data/global/*/*
 !data/global/*/.gitkeep
 !data/global/**/manifest.json
+!data/global/**/dimensions.json
 *.pdf
 *.docx
 

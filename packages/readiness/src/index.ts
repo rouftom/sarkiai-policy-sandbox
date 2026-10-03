@@ -1,7 +1,7 @@
 /**
  * ITU AI Readiness gap engine.
  *
- * For each of the eight readiness dimensions, compare the country provisions to
+ * For each of the 13 readiness dimensions (Report 2.0, 6 factors), compare the country provisions to
  * a global best-practice corpus and surface concrete gaps (unclear
  * responsibilities, missing standards, legislative gaps, coordination problems,
  * conflicts between objectives). This engine is shared by every lens.
@@ -10,11 +10,16 @@
 import { generateObject, type LanguageModel } from 'ai'
 import { z } from 'zod'
 import {
+  READINESS_DIMENSION_IDS,
   READINESS_DIMENSIONS,
   type Domain,
   type Gap,
   type ReadinessDimension,
 } from '@sps/shared'
+
+function dimensionLabel(dimension: ReadinessDimension): string {
+  return READINESS_DIMENSIONS.find((d) => d.shortName === dimension)?.name ?? dimension
+}
 import type { PolicyRetriever } from '@sps/retrieval'
 import { citationFromChunk } from '@sps/citations'
 import type { KbChunk } from '@sps/shared'
@@ -60,16 +65,17 @@ export class ReadinessEngine {
   ) {}
 
   async assess(input: ReadinessInput): Promise<ReadinessReport> {
-    const dimensions = input.dimensions ?? READINESS_DIMENSIONS
+    const dimensions = input.dimensions ?? READINESS_DIMENSION_IDS
     const globalCountry = input.globalCountry ?? 'global'
     const perDimensionK = input.perDimensionK ?? 5
 
     const results: ReadinessReport['dimensions'] = []
 
     for (const dimension of dimensions) {
+      const query = dimensionLabel(dimension)
       const [countryChunks, globalChunks] = await Promise.all([
-        this.deps.retriever.search({ text: dimension, country: input.country, topK: perDimensionK }),
-        this.deps.retriever.search({ text: dimension, country: globalCountry, topK: perDimensionK }),
+        this.deps.retriever.search({ text: query, country: input.country, topK: perDimensionK }),
+        this.deps.retriever.search({ text: query, country: globalCountry, topK: perDimensionK }),
       ])
 
       const { object } = await generateObject({

@@ -34,27 +34,79 @@ export type AgentRole =
   | 'coordinator'
   | 'innovator'
 
-/** The eight ITU AI Readiness dimensions surfaced by the assessment. */
-export type ReadinessDimension =
-  | 'open_data_open_source'
-  | 'generative_ai_ecosystem'
-  | 'contextualization_regional'
-  | 'domain_integration_cross_domain'
-  | 'human_interaction_supervision'
-  | 'policy_implementation_opportunity'
-  | 'ai_for_social_inclusion'
-  | 'digital_infrastructure_energy'
+/**
+ * ITU AI Readiness Framework, Report 2.0 (January 2026).
+ *
+ * The framework defines 6 factors and 13 dimensions. This replaces the earlier
+ * 8-perspective placeholder and matches the canonical `dimensions.json` shipped
+ * by the ITU reference code.
+ */
+export type ReadinessFactor =
+  | 'data'
+  | 'research'
+  | 'deployment'
+  | 'standards'
+  | 'opensource'
+  | 'sandbox'
 
-export const READINESS_DIMENSIONS: ReadinessDimension[] = [
-  'open_data_open_source',
-  'generative_ai_ecosystem',
-  'contextualization_regional',
-  'domain_integration_cross_domain',
-  'human_interaction_supervision',
-  'policy_implementation_opportunity',
-  'ai_for_social_inclusion',
-  'digital_infrastructure_energy',
+export const READINESS_FACTORS: ReadinessFactor[] = [
+  'data',
+  'research',
+  'deployment',
+  'standards',
+  'opensource',
+  'sandbox',
 ]
+
+export type ReadinessDimension =
+  | 'data_marketplace'
+  | 'generated_content'
+  | 'cross_domain'
+  | 'contextualization'
+  | 'ai_integration'
+  | 'human_interface'
+  | 'strategy_alignment'
+  | 'collaboration'
+  | 'human_impact'
+  | 'ai_policies'
+  | 'ai_inclusion'
+  | 'granular_priorities'
+  | 'digital_infrastructure'
+
+export interface ReadinessDimensionDef {
+  id: number
+  name: string
+  shortName: ReadinessDimension
+  factors: ReadinessFactor[]
+}
+
+export const READINESS_DIMENSIONS: ReadinessDimensionDef[] = [
+  { id: 1, name: 'Data/Model Marketplace', shortName: 'data_marketplace', factors: ['data', 'opensource'] },
+  { id: 2, name: 'Generated Content Marketplace', shortName: 'generated_content', factors: ['data', 'opensource'] },
+  { id: 3, name: 'Cross-Domain Correlation Analysis', shortName: 'cross_domain', factors: ['data', 'standards'] },
+  {
+    id: 4,
+    name: 'Contextualization and Regional Impact',
+    shortName: 'contextualization',
+    factors: ['data', 'research', 'deployment'],
+  },
+  { id: 5, name: 'Level of Integration of AI in Workflows', shortName: 'ai_integration', factors: ['standards'] },
+  { id: 6, name: 'Human Interface', shortName: 'human_interface', factors: ['standards', 'deployment'] },
+  { id: 7, name: 'Strategy Alignment', shortName: 'strategy_alignment', factors: ['standards'] },
+  { id: 8, name: 'Collaboration with AI', shortName: 'collaboration', factors: ['opensource', 'standards'] },
+  { id: 9, name: 'Impacts of Humans in AI Integration', shortName: 'human_impact', factors: ['sandbox'] },
+  { id: 10, name: 'AI & Policies', shortName: 'ai_policies', factors: ['sandbox', 'deployment'] },
+  { id: 11, name: 'AI for Inclusion', shortName: 'ai_inclusion', factors: ['sandbox'] },
+  { id: 12, name: 'Granular Priorities', shortName: 'granular_priorities', factors: ['deployment'] },
+  { id: 13, name: 'Digital Infrastructure', shortName: 'digital_infrastructure', factors: ['deployment'] },
+]
+
+/** Dimension short names in canonical 1..13 order (for iteration/display). */
+export const READINESS_DIMENSION_IDS: ReadinessDimension[] = READINESS_DIMENSIONS.map((d) => d.shortName)
+
+export const DIMENSION_FACTORS: Record<ReadinessDimension, ReadinessFactor[]> = Object.fromEntries(
+  READINESS_DIMENSIONS.map((d) => [d.shortName, d.factors]),
+) as Record<ReadinessDimension, ReadinessFactor[]>
 
 export interface Taxonomy {
   country: string // ISO-3166 alpha-2, or 'global'

@@ -3,8 +3,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { IngestionClient } from '@sps/kb'
+import { buildRunDossier, renderDossierMarkdown } from '@sps/report'
 import { institutionsForDomain } from '@sps/shared'
-import type { Domain, WorkflowLens } from '@sps/shared'
+import type { Domain, JointSituationReport, WorkflowLens } from '@sps/shared'
 import { createEngine, createScenario } from '../engine.js'
 import { healthDataBreach } from '../scenarios.js'
 import { config } from '../config.js'
@@ -96,7 +97,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     const ticks = [...new Set(run.events.map((e) => e.releaseChunk))].sort((a, b) => a - b)
 
     const history: typeof run.events = []
-    const reports = []
+    const reports: JointSituationReport[] = []
     for (const tick of ticks) {
       const events = run.events.filter((e) => e.releaseChunk === tick)
       history.push(...events)
@@ -120,7 +121,16 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       reports.push(report)
     }
 
-    return { runId: run.id, country, domain, ticks: reports }
+    await engine.reports.saveReports(run.id, reports)
+    const dossier = buildRunDossier({
+      runId: run.id,
+      audit: await engine.audit.getAuditForRun(run.id),
+      traces: await engine.audit.getTrace(run.id),
+      reports,
+      integrity: { valid: true },
+    })
+
+    return { runId: run.id, country, domain, ticks: reports, dossier }
   })
 
   // ── Readiness assessment ──────────────────────────────────────────────────
@@ -146,5 +156,24 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
   app.get('/v1/audit/trace/:runId', async (request) => {
     const { runId } = z.object({ runId: z.string() }).parse(request.params)
     return { runId, trace: await engine.audit.getTrace(runId) }
+  })
+
+  // ── Run dossier (audit + CoT + reports + citations) ───────────────────────
+  app.get('/v1/audit/dossier/:runId', async (request, reply) => {
+    const { runId } = z.object({ runId: z.string() }).parse(request.params)
+    const format = z.object({ format: z.enum(['json', 'markdown']).default('json') }).parse(request.query)
+
+    const dossier = buildRunDossier({
+      runId,
+      audit: await engine.audit.getAuditForRun(runId),
+      traces: await engine.audit.getTrace(runId),
+      reports: await engine.reports.getReports(runId),
+      integrity: await engine.audit.verifyChain(),
+    })
+
+    if (format.format === 'markdown') {
+      return reply.type('text/markdown').send(renderDossierMarkdown(dossier))
+    }
+    return dossier
   })
 }

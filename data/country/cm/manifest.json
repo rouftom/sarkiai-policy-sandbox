@@ -10,7 +10,11 @@
       "authority": "République du Cameroun",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": ["policy_implementation_opportunity", "human_interaction_supervision"],
+      "pillar": [
+        "ai_policies",
+        "strategy_alignment",
+        "human_interface"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.prc.cm/"
@@ -21,7 +25,11 @@
       "authority": "Ministère de la Santé Publique",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": ["domain_integration_cross_domain", "ai_for_social_inclusion"],
+      "pillar": [
+        "cross_domain",
+        "ai_integration",
+        "ai_inclusion"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.minsante.cm/"
@@ -32,7 +40,11 @@
       "authority": "Assemblée Nationale",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "pillar": [
+        "digital_infrastructure",
+        "ai_policies",
+        "strategy_alignment"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.antic.cm/"
@@ -43,7 +55,10 @@
       "authority": "Assemblée Nationale",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": ["digital_infrastructure_energy", "contextualization_regional"],
+      "pillar": [
+        "digital_infrastructure",
+        "contextualization"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.art.cm/"
@@ -54,7 +69,12 @@
       "authority": "Assemblée Nationale / autorité de protection des données",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "pillar": [
+        "data_marketplace",
+        "generated_content",
+        "human_interface",
+        "ai_policies"
+      ],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -65,7 +85,11 @@
       "authority": "Autorité de protection des données",
       "docType": "regulation",
       "jurisdiction": "national",
-      "pillar": ["policy_implementation_opportunity", "human_interaction_supervision"],
+      "pillar": [
+        "ai_policies",
+        "strategy_alignment",
+        "human_interface"
+      ],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -76,7 +100,11 @@
       "authority": "ANTIC",
       "docType": "regulation",
       "jurisdiction": "national",
-      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "pillar": [
+        "digital_infrastructure",
+        "ai_policies",
+        "strategy_alignment"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.antic.cm/"
@@ -87,7 +115,12 @@
       "authority": "MINEPAT",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": ["contextualization_regional", "policy_implementation_opportunity", "digital_infrastructure_energy"],
+      "pillar": [
+        "contextualization",
+        "ai_policies",
+        "strategy_alignment",
+        "digital_infrastructure"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.minepat.gov.cm/"
@@ -98,7 +131,10 @@
       "authority": "MINPOSTEL",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": ["digital_infrastructure_energy", "generative_ai_ecosystem"],
+      "pillar": [
+        "digital_infrastructure",
+        "generated_content"
+      ],
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "https://www.minpostel.gov.cm/"
@@ -109,7 +145,11 @@
       "authority": "MINPOSTEL / ANTIC",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "pillar": [
+        "digital_infrastructure",
+        "ai_policies",
+        "strategy_alignment"
+      ],
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": ""
@@ -120,7 +160,12 @@
       "authority": "MINPOSTEL",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": ["generative_ai_ecosystem", "policy_implementation_opportunity", "ai_for_social_inclusion"],
+      "pillar": [
+        "generated_content",
+        "ai_policies",
+        "strategy_alignment",
+        "ai_inclusion"
+      ],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -131,7 +176,13 @@
       "authority": "Ministère de la Santé Publique",
       "docType": "policy",
       "jurisdiction": "national",
-      "pillar": ["domain_integration_cross_domain", "ai_for_social_inclusion", "human_interaction_supervision"],
+      "pillar": [
+        "cross_domain",
+        "ai_integration",
+        "ai_inclusion",
+        "human_interface",
+        "ai_policies"
+      ],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -142,7 +193,10 @@
       "authority": "OAPI / Ministère de la Justice",
       "docType": "law",
       "jurisdiction": "regional",
-      "pillar": ["open_data_open_source", "generative_ai_ecosystem"],
+      "pillar": [
+        "data_marketplace",
+        "generated_content"
+      ],
       "status": "to_confirm",
       "priority": "medium",
       "sourceUrl": "https://www.oapi.int/"
@@ -153,7 +207,12 @@
       "authority": "Union Africaine",
       "docType": "treaty",
       "jurisdiction": "regional",
-      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "pillar": [
+        "data_marketplace",
+        "generated_content",
+        "human_interface",
+        "ai_policies"
+      ],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://au.int/en/treaties"

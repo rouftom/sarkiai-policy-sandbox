@@ -66,7 +66,8 @@ sarkiai-policy-sandbox/
 │  ├─ agents/         # roles, mandates, orchestrator (AI SDK ToolLoopAgent)
 │  ├─ scenarios/      # progressive event engine (chunked release)
 │  ├─ readiness/      # gap engine + ITU readiness dimensions
-│  └─ audit/          # immutable audit log + persisted CoT traces
+│  ├─ audit/          # immutable audit log + persisted CoT traces
+│  └─ report/         # run dossier: audit + CoT + reports + citations
 ├─ services/          # Python microservices
 │  ├─ ingestion/      # structure-aware legal chunking + embeddings + Qdrant store
 │  ├─ ocr/            # scanned gazette OCR (Tesseract)

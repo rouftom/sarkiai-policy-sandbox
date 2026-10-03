@@ -34,6 +34,32 @@ export interface AssessmentDto {
   confidence: number
 }
 
+export interface MandateConflictDto {
+  id: string
+  between: [string, string]
+  summary: string
+  positions: Array<{ agentId: string; position: string }>
+  severity: 'low' | 'medium' | 'high' | 'critical'
+}
+
+export interface JointReportDto {
+  runId: string
+  tick: number
+  summary: string
+  agreements: string[]
+  conflicts: MandateConflictDto[]
+  openQuestions: string[]
+  assessments: AssessmentDto[]
+}
+
+export interface RunResultDto {
+  runId: string
+  country: string
+  domain: string
+  ticks: JointReportDto[]
+  dossier: { citationCount: number; conflictCount: number; traces: unknown[] }
+}
+
 export const api = {
   ask: (body: {
     institutionId: string
@@ -46,10 +72,16 @@ export const api = {
   readiness: (body: { country: string; domain: string; globalCountry?: string }) =>
     request<ReadinessReportDto>('/v1/readiness/report', { method: 'POST', body: JSON.stringify(body) }),
 
+  runScenario: (body: { id?: string; country: string; domain: string }) =>
+    request<RunResultDto>('/v1/scenarios/run', { method: 'POST', body: JSON.stringify(body) }),
+
   auditChain: () => request<{ valid: boolean; brokenAt?: string }>('/v1/audit/chain'),
 
+  dossierUrl: (runId: string, format: 'json' | 'markdown' = 'markdown') =>
+    `${API_URL}/v1/audit/dossier/${runId}?format=${format}`,
+
   /** Opens the progressive scenario SSE stream. */
-  releaseScenario(id: string, domain: string, country: string): EventSource {
-    return new EventSource(`${API_URL}/v1/scenarios/${id}/release?domain=${domain}&country=${country}`)
+  releaseScenario(id: string, country: string): EventSource {
+    return new EventSource(`${API_URL}/v1/scenarios/${id}/release?country=${country}`)
   },
 }

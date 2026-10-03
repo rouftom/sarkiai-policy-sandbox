@@ -87,9 +87,6 @@ export class IngestionClient {
   }
 }
 
-export const DEFAULT_PILLARS: ReadinessDimension[] = [
-  'open_data_open_source',
-  'policy_implementation_opportunity',
-]
+export const DEFAULT_PILLARS: ReadinessDimension[] = ['data_marketplace', 'ai_policies']
 
 export type { DocType, Jurisdiction, Taxonomy }

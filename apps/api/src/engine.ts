@@ -6,6 +6,7 @@ import { MultiAgentCoordinator } from '@sps/agents'
 import { PolicyRetriever } from '@sps/retrieval'
 import { ReadinessEngine } from '@sps/readiness'
 import { AuditService } from '@sps/audit'
+import { ReportStore } from '@sps/report'
 import { ScenarioEngine, type ScenarioDefinition } from '@sps/scenarios'
 import { getWorkflowProfile, institutionsForDomain, type Domain, type WorkflowLens } from '@sps/shared'
 import { config } from './config.js'
@@ -25,11 +26,12 @@ export function createEngine() {
   })
 
   const audit = new AuditService({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })
+  const reports = new ReportStore({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })
   const orchestrator = new PolicyOrchestrator({ model, retriever, audit })
   const coordinator = new MultiAgentCoordinator({ model, orchestrator, audit })
   const readiness = new ReadinessEngine({ model, retriever })
 
-  return { model, retriever, audit, orchestrator, coordinator, readiness }
+  return { model, retriever, audit, reports, orchestrator, coordinator, readiness }
 }
 
 export function createScenario(definition: ScenarioDefinition, lens: WorkflowLens) {

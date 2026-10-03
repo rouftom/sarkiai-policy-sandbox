@@ -87,6 +87,12 @@ export class AuditService {
     return docs.map((doc) => doc as unknown as CoTTrace)
   }
 
+  async getAuditForRun(runId: string): Promise<AuditRecord[]> {
+    const { audit } = await this.db()
+    const docs = await audit.find({ runId }).sort({ ts: 1 }).toArray()
+    return docs as unknown as AuditRecord[]
+  }
+
   /** Verify the hash chain end-to-end; returns the first broken record, if any. */
   async verifyChain(): Promise<{ valid: boolean; brokenAt?: string }> {
     const { audit } = await this.db()

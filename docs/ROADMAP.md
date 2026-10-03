@@ -20,7 +20,7 @@
 - `[x]` Hybrid retrieval + RRF + rerank package.
 - `[x]` Agent registry, orchestrator, mandatory-citation prompt.
 - `[x]` Progressive scenario engine.
-- `[x]` Readiness gap engine (8 dimensions).
+- `[x]` Readiness gap engine (13 dimensions / 6 factors, Report 2.0).
 - `[x]` Hash-chained audit + persisted CoT traces.
 
 ### Sprint 1 — the Cameroon health corpus
@@ -34,9 +34,10 @@
 - `[ ]` Implement the coordinator reconciliation step (joint situation report).
 - `[ ]` Add the `onBeforeRelease` facilitator hook in the web console.
 
-### Sprint 3 — auditability & evidence
+### Sprint 3 — auditability & evidence (in progress)
+- `[x]` Export a run dossier (audit + CoT + reports + citations) — `packages/report`, `GET /v1/audit/dossier/:runId`.
+- `[x]` Multi-agent coordinator + conflict visualization in the web console.
 - `[ ]` Surface `verifyChain()` + trace viewer in the web app.
-- `[ ]` Export a run dossier (audit + CoT + citations) as the demo artifact.
 
 ### Sprint 4 — report & demo
 - `[ ]` Generate the ≤5-page technical report from `docs/` + a real run.

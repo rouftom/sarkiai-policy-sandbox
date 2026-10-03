@@ -67,7 +67,7 @@ store never dictates vector-search capabilities.
 
 ## Readiness lens
 
-`ReadinessEngine.assess()` iterates the eight ITU dimensions, retrieves the
+`ReadinessEngine.assess()` iterates the 13 ITU dimensions (Report 2.0, 6 factors), retrieves the
 country provisions **and** the global best-practice corpus from Qdrant, and asks
 the model to emit structured gaps. Output: a `ReadinessReport` (JSON + Markdown).
 

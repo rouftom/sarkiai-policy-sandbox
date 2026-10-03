@@ -36,11 +36,11 @@ Chaque entrée a un `status` :
 
 | Catégorie (`docType`) | Dimensions principalement informées |
 |-----------------------|-------------------------------------|
-| `law` | policy_implementation_opportunity, human_interaction_supervision |
-| `strategy` | contextualization_regional, digital_infrastructure_energy |
-| `regulation` | policy_implementation_opportunity, human_interaction_supervision |
-| `policy` | domain_integration_cross_domain, ai_for_social_inclusion |
-| `treaty` | open_data_open_source, human_interaction_supervision |
+| `law` | ai_policies, human_interface |
+| `strategy` | contextualization, digital_infrastructure |
+| `regulation` | ai_policies, human_interface |
+| `policy` | cross_domain, ai_integration |
+| `treaty` | data_marketplace, human_interface |
 | `guidance` / `standard` (global) | toutes — référence d'écart |
 
 ## 4. Procédure d'ingestion

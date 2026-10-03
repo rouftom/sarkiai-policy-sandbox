@@ -5,6 +5,7 @@ import { Activity, FileCheck2, Moon, Sun } from 'lucide-react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@sps/ui'
 import { WORKFLOW_PROFILES, type Domain, type WorkflowLens } from '@sps/shared'
 import { LensSelector } from '@/components/lens-selector'
+import { ScenarioConsole } from '@/components/scenario-console'
 import { FloatingAssistant } from '@/components/floating-assistant'
 import { useTheme } from '@/components/theme-provider'
 import { api, type ReadinessReportDto } from '@/lib/api'
@@ -136,6 +137,12 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </div>
+
+      {profile.stages.scenario && (
+        <div className="mt-4">
+          <ScenarioConsole country={country} domain={domain} />
+        </div>
+      )}
 
       <FloatingAssistant lens={lens} country={country} domain={domain} />
     </main>
