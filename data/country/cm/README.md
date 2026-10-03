@@ -1,36 +1,57 @@
 # Corpus Cameroun (CM)
 
-Base de connaissances nationale pour le domaine **santé** (puis multi-domaine).
+Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichiers
+**normalisés** (ASCII, snake_case) pour une ingestion fiable.
 
-## Contenu présent (copié localement)
+## Présent (copié localement)
 
-| Fichier | Type | Domaine |
-|---------|------|---------|
-| `penal_code_2016.pdf` | law | fondements juridiques |
-| `normes_standards_sr_pf_sante.pdf` | guidance | santé |
-| `cameroon_id_cr_ecosystem_diagnostic.txt` | report | services publics / identité |
+| Fichier | Type | OCR ? | Contenu |
+|---------|------|-------|---------|
+| `loi_2024_protection_donnees_personnelles.pdf` | law | — | Loi protection des données (23 déc. 2024) — **cœur** |
+| `actualite_strategie_ia_cameroun.pdf` | report | — | Article presse sur la stratégie IA nationale |
+| `plan_strategique_cameroun_numerique_2020.pdf` | strategy | — | Plan stratégique Cameroun Numérique |
+| `psnsn_sante_numerique_2026_2030.pdf` | policy | **oui** | Plan Stratégique National de Santé Numérique (114 p.) |
+| `compact_national_sante_2023.pdf` | policy | **oui** | Compact national santé / CSU (police partiellement non-unicode) |
+| `systeme_de_sante_camerounais.pdf` | report | — | Description du système de santé |
+| `resume_snd30.pdf` | strategy | — | Résumé SND30 |
+| `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
+| `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
+| `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |
 
-Les payloads (PDF/TXT) sont **exclus de git** (cf. `.gitignore`) ; seul
-`manifest.json` est versionné. Voir la checklist `status: to_confirm` pour les
-instruments à collecter (loi protection des données, stratégie IA, politique
-e-santé…).
+Les payloads (PDF/TXT) sont **hors git** (`.gitignore`) ; seuls `manifest.json`
+et ce README sont versionnés.
 
-> L'ingestion ne lit que **PDF et TXT** : les `.docx`/`.pptx` doivent être
-> convertis en `.txt` au préalable (ex. `unzip -p X.docx word/document.xml`
-> puis suppression des balises).
+## OCR
+
+4 PDF sont **scannés sans couche texte** (`needsOcr: true`). L'ingestion appelle
+automatiquement le service `ocr` (Tesseract) quand le texte extrait est
+insuffisant. Pour les volumineux (PSNSN 114 p., normes 164 p., code pénal 139 p.)
+prévoir le profil `full`/`ocr` et de la patience, ou un OCR hors-ligne en amont.
+
+> L'ingestion ne lit que **PDF/TXT**. Les `.docx`/`.pptx` doivent être convertis
+> en `.txt` (ex. `unzip -p X.docx word/document.xml` puis suppression des balises).
 
 ## Ingest
 
 ```bash
 ./scripts/seed.sh --country cm --doc-type law      --dir data/country/cm
+./scripts/seed.sh --country cm --doc-type strategy --dir data/country/cm
+./scripts/seed.sh --country cm --doc-type policy   --dir data/country/cm
 ./scripts/seed.sh --country cm --doc-type guidance --dir data/country/cm
 ./scripts/seed.sh --country cm --doc-type report   --dir data/country/cm
 ```
 
-(le `docType` est passé par lot ; ajuster selon le fichier, ou utiliser l'API
-`/v1/kb/ingest` avec le `docType` exact par document.)
+Ou via l'API par document, pour un `docType` exact :
 
-## Règle de qualité
+```bash
+curl -X POST "$INGESTION/v1/ingest/file" -H "X-API-Key: $SERVICE_API_KEY" \
+  -F file=@data/country/cm/loi_2024_protection_donnees_personnelles.pdf \
+  -F country=cm -F jurisdiction=national -F docType=law
+```
 
-Ne jamais ingérer une entrée `to_confirm` sans confirmation (numéro, version en
-vigueur, URL officielle). Voir `docs/CORPUS-CM.md`.
+## À collecter (voir `manifest.json` → `to_confirm`)
+
+Loi-cadre santé 96/03 · loi cybersécurité 2010/012 · loi communications
+électroniques 2010/013 · décret de l'autorité de protection des données ·
+mandat ANTIC · stratégie nationale de cybersécurité · **document officiel** de la
+stratégie IA (nous n'avons qu'un article de presse) · constitution.
