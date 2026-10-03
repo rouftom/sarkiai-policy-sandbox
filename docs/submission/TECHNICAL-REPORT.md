@@ -93,6 +93,22 @@ Global best-practice references (for gap analysis): ITU AI Readiness Report 2.0,
 ITU-T Y.3172, WHO *Ethics and governance of AI for health*, UNESCO AI Ethics,
 AU Continental AI Strategy 2024, Kigali Declaration 2025.
 
+### 4.1 Knowledge base (Cameroon corpus)
+
+The reference taxonomy is the canonical ITU `dimensions.json` (6 factors, 13
+dimensions, 100+ metrics). The Cameroon corpus currently holds **21 curated
+documents**: the data-protection law (23 Dec 2024), cybersecurity law
+2010/012, electronic-communications law, e-commerce law 2010/021, penal code,
+the MINPOSTEL legal-texts **compendium 2023** and the ART **telecom compendium
+2018** (486 pp.), SND30 (full + summary), the national digital strategy, the
+national **digital-health strategic plan (PSNSN 2026-2030)**, an e-certification
+decree, an interconnection decree, and the CEMAC users-rights directive. Each
+chunk carries a jurisdiction taxonomy (`country`, `jurisdiction`, `docType`,
+`pillar`) plus the legal breadcrumbs `headingPath` / `articleNumber`
+(`TITRE > CHAPITRE > ARTICLE`). Scanned documents (7) are routed to a local OCR
+fallback. Global/regional best-practice corpora (ITU, WHO, UNESCO, AU) are
+ingested alongside for gap analysis.
+
 ## 5. Error scenarios
 
 The engine releases events in **sequenced blocks**, with different agents receiving
@@ -170,7 +186,41 @@ on a 0–5 maturity scale** (weighted composite) and projects **causal what-if**
 effects across interdependent dimensions, so the same artifact supports both the
 error-scenario exercise and a structured readiness assessment.
 
-## 9. Team
+### 8.1 Multimodal questions (optional)
+
+A user may attach up to three images to a question (e.g. a photographed legal
+excerpt, a schedule, a dashboard). Attachments are stored in a local object
+bucket (MinIO, content-addressed by SHA-256) and enabled by the local multimodal
+model (`qwen3.5:9b`). **Guardrails:** an attachment is *untrusted context, never a
+legal source* — citations still come only from the knowledge base, and text
+inside an image is treated as data, never as instructions. The attachment hashes
+are recorded in the audit trail.
+
+### 8.2 Auditability
+
+Every run produces a **run dossier**: a hash-chained audit log (tamper-evident),
+persisted chain-of-thought traces, the reconciled joint situation reports, and
+every citation. The bundle is exportable as JSON or Markdown, and the chain can
+be re-verified end-to-end — making reasoning and policy references transparent
+and reviewable.
+
+## 9. Evaluation-criteria alignment
+
+| Criterion | How the solution addresses it |
+|-----------|-------------------------------|
+| **Knowledge-base quality** | 21-document Cameroon corpus, jurisdiction-scoped, structure-aware chunking (`TITRE/CHAPITRE/ARTICLE`), OCR fallback, canonical ITU taxonomy; hybrid retrieval (dense + sparse RRF, optional local rerank) |
+| **Agent capability** | Mandated institutional agents (legal adviser, ministry, DPA, cyber agency, coordinator) with mandatory article-level citations; information asymmetry; coordinator reconciliation |
+| **Policy/strategy/standards gap identification** | Shared gap engine comparing country provisions to global best practice across the 13 dimensions; explicit gaps (unclear responsibilities, missing standards, conflicting objectives) |
+| **Auditability** | Hash-chained audit log, persisted chain-of-thought traces, source attribution, exportable run dossier; chain re-verification |
+| **ITU-standards alignment** | Node-by-node Y.3172 mapping (`SRC → … → SINK`, MLFO, ML sandbox); AI Readiness Framework 2.0 (6 factors / 13 dimensions); 0–5 maturity scoring + causal what-if |
+
+**Engineering & reproducibility.** The repository is a TypeScript/Python
+monorepo with type-checking, a build, and a test suite (unit tests run without
+infrastructure; integration and end-to-end tests are environment-gated). The full
+stack runs with a single `docker compose up` and local models pulled by
+`make models`; no cloud provider is used.
+
+## 10. Team
 
 | Role | Member |
 |------|--------|

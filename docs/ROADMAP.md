@@ -49,9 +49,10 @@
 - `[x]` Readiness 0–5 scoring + causal what-if in the web console.
 
 ### Sprint 4 — report & demo
-- `[ ]` Generate the ≤5-page technical report from `docs/` + a real run.
+- `[x]` Technical report (≤5 pp.) drafted — `docs/submission/TECHNICAL-REPORT.{md,docx}` (team fields to fill).
 - `[ ]` Record the ≤7-minute demo video.
 - `[ ]` Finalize README, license, and the public KB in the ITU AI for Good Lab.
+- `[ ]` Complete the submission checklist — `docs/submission/CHECKLIST.md`.
 
 ### Sprint 5 — multi-country & fine-tuning (post-shortlist)
 - `[ ]` Add UAE (`data/country/ae/`) for the cross-national narrative.
