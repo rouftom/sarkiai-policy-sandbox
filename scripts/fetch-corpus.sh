@@ -3,20 +3,20 @@
 #
 # The manifests (data/**/manifest.json) are versioned; the large public PDFs are
 # not. This script restores the payloads from a local copy of the ITU reference
-# repo (`.iut/ITUAIReadiness-main/...`) when present, otherwise prints sources.
+# repo (`.itu/ITUAIReadiness-main/...`) when present, otherwise prints sources.
 #
 #   ./scripts/fetch-corpus.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SRC="$ROOT/.iut/ITUAIReadiness-main/simulation/server/knowledge/InputDocs/AI_Strategies"
+SRC="$ROOT/.itu/ITUAIReadiness-main/simulation/server/knowledge/InputDocs/AI_Strategies"
 AFRICA="$ROOT/data/global/africa"
 
 if [[ ! -d "$SRC" ]]; then
   echo "Local reference repo not found at: $SRC"
   echo
   echo "Either:"
-  echo "  1. Download the ITU reference repo into .iut/ (see docs/ALIGNMENT-ITU.md), or"
+  echo "  1. Download the ITU reference repo into .itu/, or"
   echo "  2. Obtain the documents from their official sources listed in"
   echo "     data/global/africa/manifest.json (field: sourceUrl)."
   exit 1

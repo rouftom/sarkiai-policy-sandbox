@@ -27,10 +27,6 @@ as the validation environment. We use these exact symbols.
 | `MLFO` | orchestration | engine composition per lens | `apps/api/src/engine.ts` |
 | `ML sandbox` | validation env | sandbox deployment + fine-tuning | `deploy/sandbox/` |
 
-The per-node mapping of the concrete use case (with requirements → policy
-documents) is in [`docs/USE-CASE-MAPPING.md`](./USE-CASE-MAPPING.md), as required
-by the hackathon submission template.
-
 ## At a glance
 
 | Y.3172 stage | Repo module | Key files |
