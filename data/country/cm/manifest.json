@@ -1,0 +1,162 @@
+{
+  "country": "cm",
+  "jurisdiction": "national",
+  "generated": "2026-10-03",
+  "note": "Checklist du corpus Cameroun pour le SarkiAI Policy Sandbox. Les entrées avec status='to_confirm' DOIVENT être vérifiées (numéro exact, intitulé, version en vigueur, URL officielle) avant ingestion. Toute erreur factuelle dans la KB se propage aux réponses des agents.",
+  "documents": [
+    {
+      "id": "cm-constitution-1996",
+      "title": "Constitution de la République du Cameroun (loi n° 96/06 du 18 janvier 1996, modifiée)",
+      "authority": "République du Cameroun",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["policy_implementation_opportunity", "human_interaction_supervision"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.prc.cm/"
+    },
+    {
+      "id": "cm-health-framework-1996",
+      "title": "Loi n° 96/03 du 4 janvier 1996 portant loi-cadre dans le domaine de la santé",
+      "authority": "Ministère de la Santé Publique",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["domain_integration_cross_domain", "ai_for_social_inclusion"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.minsante.cm/"
+    },
+    {
+      "id": "cm-cybersecurity-2010",
+      "title": "Loi n° 2010/012 du 21 décembre 2010 relative à la cybersécurité et à la cybercriminalité au Cameroun",
+      "authority": "Assemblée Nationale",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.antic.cm/"
+    },
+    {
+      "id": "cm-electronic-comms-2010",
+      "title": "Loi n° 2010/013 du 21 décembre 2010 régissant les communications électroniques au Cameroun",
+      "authority": "Assemblée Nationale",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure_energy", "contextualization_regional"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.art.cm/"
+    },
+    {
+      "id": "cm-data-protection-law",
+      "title": "Loi camerounaise relative à la protection des données à caractère personnel (numéro et année à confirmer)",
+      "authority": "Assemblée Nationale / autorité de protection des données",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "status": "to_confirm",
+      "priority": "critical",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-data-protection-authority-mandate",
+      "title": "Mandat et attributions de l'autorité de protection des données (décret de création à confirmer)",
+      "authority": "Autorité de protection des données",
+      "docType": "regulation",
+      "jurisdiction": "national",
+      "pillar": ["policy_implementation_opportunity", "human_interaction_supervision"],
+      "status": "to_confirm",
+      "priority": "critical",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-antic-mandate",
+      "title": "Mandat de l'Agence Nationale des Technologies de l'Information et de la Communication (ANTIC)",
+      "authority": "ANTIC",
+      "docType": "regulation",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.antic.cm/"
+    },
+    {
+      "id": "cm-nds30",
+      "title": "Stratégie Nationale de Développement 2030 (SND30)",
+      "authority": "MINEPAT",
+      "docType": "strategy",
+      "jurisdiction": "national",
+      "pillar": ["contextualization_regional", "policy_implementation_opportunity", "digital_infrastructure_energy"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://www.minepat.gov.cm/"
+    },
+    {
+      "id": "cm-digital-strategy",
+      "title": "Stratégie nationale de développement du numérique (intitulé/année à confirmer)",
+      "authority": "MINPOSTEL",
+      "docType": "strategy",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure_energy", "generative_ai_ecosystem"],
+      "status": "to_confirm",
+      "priority": "high",
+      "sourceUrl": "https://www.minpostel.gov.cm/"
+    },
+    {
+      "id": "cm-national-cyber-strategy",
+      "title": "Stratégie nationale de cybersécurité (à confirmer)",
+      "authority": "MINPOSTEL / ANTIC",
+      "docType": "strategy",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure_energy", "policy_implementation_opportunity"],
+      "status": "to_confirm",
+      "priority": "high",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-ai-strategy",
+      "title": "Stratégie / feuille de route nationale sur l'intelligence artificielle (existence à confirmer)",
+      "authority": "MINPOSTEL",
+      "docType": "strategy",
+      "jurisdiction": "national",
+      "pillar": ["generative_ai_ecosystem", "policy_implementation_opportunity", "ai_for_social_inclusion"],
+      "status": "to_confirm",
+      "priority": "critical",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-health-digital-policy",
+      "title": "Politique nationale de santé numérique / e-santé (à confirmer)",
+      "authority": "Ministère de la Santé Publique",
+      "docType": "policy",
+      "jurisdiction": "national",
+      "pillar": ["domain_integration_cross_domain", "ai_for_social_inclusion", "human_interaction_supervision"],
+      "status": "to_confirm",
+      "priority": "critical",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-ip-law",
+      "title": "Régime camerounais de la propriété intellectuelle (OAPI / loi nationale à confirmer)",
+      "authority": "OAPI / Ministère de la Justice",
+      "docType": "law",
+      "jurisdiction": "regional",
+      "pillar": ["open_data_open_source", "generative_ai_ecosystem"],
+      "status": "to_confirm",
+      "priority": "medium",
+      "sourceUrl": "https://www.oapi.int/"
+    },
+    {
+      "id": "cm-malabo-convention",
+      "title": "Convention de Malabo sur la cybersécurité et la protection des données à caractère personnel (2014)",
+      "authority": "Union Africaine",
+      "docType": "treaty",
+      "jurisdiction": "regional",
+      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://au.int/en/treaties"
+    }
+  ]
+}

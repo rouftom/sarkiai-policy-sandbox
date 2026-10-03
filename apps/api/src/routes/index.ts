@@ -5,7 +5,8 @@ import { z } from 'zod'
 import { IngestionClient } from '@sps/kb'
 import { institutionsForDomain } from '@sps/shared'
 import type { Domain, WorkflowLens } from '@sps/shared'
-import { createEngine, createScenario, agentsFor } from '../engine.js'
+import { createEngine, createScenario } from '../engine.js'
+import { healthDataBreach } from '../scenarios.js'
 import { config } from '../config.js'
 
 const engine = createEngine()
@@ -66,29 +67,60 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
   // ── Scenario: progressive event release (SSE) ─────────────────────────────
   app.get('/v1/scenarios/:id/release', async (request, reply) => {
     const params = z.object({ id: z.string() }).parse(request.params)
-    const query = z.object({ domain: z.string().default('health'), country: z.string().default('cm') }).parse(request.query)
+    const query = z.object({ country: z.string().default('cm') }).parse(request.query)
 
-    const definition = {
-      id: params.id,
-      domain: (query.domain as Domain) ?? 'health',
-      country: query.country,
-      title: 'Health-data breach in a public hospital',
-      lens: 'simulation' as const,
-      agents: agentsFor(query.country, query.domain as Domain).map((a) => a.id),
-      events: [
-        { sequence: 1, releaseChunk: 0, title: 'Incident reported', payload: 'Anomalous access to the e-health platform is detected.', visibleTo: ['ministry_health', 'cyber_agency'] },
-        { sequence: 2, releaseChunk: 1, title: 'Scope widens', payload: 'Patient records may have been exfiltrated to an external host.', visibleTo: ['ministry_health', 'data_protection_authority', 'cyber_agency'] },
-        { sequence: 3, releaseChunk: 2, title: 'Regulatory pressure', payload: 'Media reports surface; a notification deadline may apply.', visibleTo: ['data_protection_authority', 'coordinator'] },
-      ],
-    }
-
-    const scenario = createScenario(definition, 'simulation')
+    const scenario = createScenario(healthDataBreach(query.country), 'simulation')
     reply.raw.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' })
     for await (const batch of scenario.release({ chunkDelayMs: 800 })) {
       reply.raw.write(`data: ${JSON.stringify(batch)}\n\n`)
     }
     reply.raw.write('event: done\ndata: {}\n\n')
     reply.raw.end()
+  })
+
+  // ── Scenario: run all ticks + multi-agent reconciliation ──────────────────
+  app.post('/v1/scenarios/run', async (request, reply) => {
+    const body = z
+      .object({
+        id: z.string().default('health-data-breach'),
+        country: z.string().length(2).default('cm'),
+        domain: z.enum(['health', 'education', 'telecom', 'public_services', 'agriculture']).default('health'),
+      })
+      .safeParse(request.body ?? {})
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
+
+    const { country, domain } = body.data
+    const scenario = createScenario(healthDataBreach(country), 'simulation')
+    const run = scenario.toRun()
+    const institutions = institutionsForDomain(domain as Domain)
+    const ticks = [...new Set(run.events.map((e) => e.releaseChunk))].sort((a, b) => a - b)
+
+    const history: typeof run.events = []
+    const reports = []
+    for (const tick of ticks) {
+      const events = run.events.filter((e) => e.releaseChunk === tick)
+      history.push(...events)
+      const assessments = await engine.coordinator.runTick({
+        runId: run.id,
+        tick,
+        country,
+        domain: domain as Domain,
+        lens: 'simulation',
+        institutions,
+        events,
+        history: [...history],
+      })
+      const report = await engine.coordinator.reconcile({
+        runId: run.id,
+        tick,
+        country,
+        domain: domain as Domain,
+        assessments,
+      })
+      reports.push(report)
+    }
+
+    return { runId: run.id, country, domain, ticks: reports }
   })
 
   // ── Readiness assessment ──────────────────────────────────────────────────

@@ -32,11 +32,13 @@ venv/
 !.env.example
 !.env.*.example
 
-# local data payloads (corpora can be large; keep structure via .gitkeep)
+# local data payloads (corpora can be large; keep structure via .gitkeep + manifests)
 data/country/*/*
 !data/country/*/.gitkeep
+!data/country/**/manifest.json
 data/global/*/*
 !data/global/*/.gitkeep
+!data/global/**/manifest.json
 *.pdf
 *.docx
 

@@ -1,0 +1,74 @@
+{
+  "country": "global",
+  "jurisdiction": "international",
+  "generated": "2026-10-03",
+  "note": "Corpus de bonnes pratiques mondiales utilisé comme référence d'écart par le moteur readiness. Les entrées to_confirm doivent être vérifiées avant ingestion.",
+  "documents": [
+    {
+      "id": "itu-y3172",
+      "title": "ITU-T Y.3172 — Architectural framework for machine learning in future networks including IMT-2020",
+      "authority": "ITU-T",
+      "docType": "standard",
+      "jurisdiction": "international",
+      "pillar": ["digital_infrastructure_energy", "generative_ai_ecosystem", "policy_implementation_opportunity"],
+      "status": "verified",
+      "priority": "critical",
+      "sourceUrl": "https://www.itu.int/rec/T-REC-Y.3172/en"
+    },
+    {
+      "id": "itu-ai-readiness",
+      "title": "ITU AI Readiness Framework (AI for Good)",
+      "authority": "ITU",
+      "docType": "guidance",
+      "jurisdiction": "international",
+      "pillar": ["policy_implementation_opportunity", "contextualization_regional", "ai_for_social_inclusion"],
+      "status": "verified",
+      "priority": "critical",
+      "sourceUrl": "https://www.itu.int/dms_pub/itu-t/opb/ai4g/T-AI4G-AI4GOOD-2025-6-PDF-E.pdf"
+    },
+    {
+      "id": "who-ai-health-ethics",
+      "title": "WHO — Ethics and governance of artificial intelligence for health",
+      "authority": "World Health Organization",
+      "docType": "guidance",
+      "jurisdiction": "international",
+      "pillar": ["human_interaction_supervision", "ai_for_social_inclusion", "domain_integration_cross_domain"],
+      "status": "verified",
+      "priority": "critical",
+      "sourceUrl": "https://www.who.int/publications/i/item/9789240029200"
+    },
+    {
+      "id": "unesco-ai-ethics",
+      "title": "UNESCO Recommendation on the Ethics of Artificial Intelligence (2021)",
+      "authority": "UNESCO",
+      "docType": "guidance",
+      "jurisdiction": "international",
+      "pillar": ["generative_ai_ecosystem", "human_interaction_supervision", "ai_for_social_inclusion"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://unesdoc.unesco.org/ark:/48223/pf0000381137"
+    },
+    {
+      "id": "au-malabo-convention",
+      "title": "African Union Convention on Cyber Security and Personal Data Protection (Malabo, 2014)",
+      "authority": "African Union",
+      "docType": "treaty",
+      "jurisdiction": "regional",
+      "pillar": ["open_data_open_source", "human_interaction_supervision"],
+      "status": "verified",
+      "priority": "high",
+      "sourceUrl": "https://au.int/en/treaties"
+    },
+    {
+      "id": "oecd-ai-principles",
+      "title": "OECD Recommendation of the Council on Artificial Intelligence",
+      "authority": "OECD",
+      "docType": "guidance",
+      "jurisdiction": "international",
+      "pillar": ["policy_implementation_opportunity", "generative_ai_ecosystem"],
+      "status": "verified",
+      "priority": "medium",
+      "sourceUrl": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449"
+    }
+  ]
+}

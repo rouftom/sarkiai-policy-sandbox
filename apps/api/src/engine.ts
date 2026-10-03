@@ -2,6 +2,7 @@
 
 import { createModel } from '@sps/agents'
 import { PolicyOrchestrator } from '@sps/agents'
+import { MultiAgentCoordinator } from '@sps/agents'
 import { PolicyRetriever } from '@sps/retrieval'
 import { ReadinessEngine } from '@sps/readiness'
 import { AuditService } from '@sps/audit'
@@ -25,9 +26,10 @@ export function createEngine() {
 
   const audit = new AuditService({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })
   const orchestrator = new PolicyOrchestrator({ model, retriever, audit })
+  const coordinator = new MultiAgentCoordinator({ model, orchestrator, audit })
   const readiness = new ReadinessEngine({ model, retriever })
 
-  return { model, retriever, audit, orchestrator, readiness }
+  return { model, retriever, audit, orchestrator, coordinator, readiness }
 }
 
 export function createScenario(definition: ScenarioDefinition, lens: WorkflowLens) {
