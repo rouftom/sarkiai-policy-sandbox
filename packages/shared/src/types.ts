@@ -108,6 +108,42 @@ export const DIMENSION_FACTORS: Record<ReadinessDimension, ReadinessFactor[]> = 
   READINESS_DIMENSIONS.map((d) => [d.shortName, d.factors]),
 ) as Record<ReadinessDimension, ReadinessFactor[]>
 
+/** A single dimension scored on the ITU 0–5 maturity scale. */
+export interface DimensionScore {
+  dimension: ReadinessDimension
+  dimensionId: number
+  dimensionName: string
+  score: number // 0..5
+  maturity: string
+  evidence: string[]
+  gaps: string[]
+  recommendations: string[]
+  confidence: number // 0..1
+  /** Set when the value moved due to causal propagation. */
+  causalEffect?: number
+}
+
+export interface ReadinessScenario {
+  country: string
+  domain: Domain
+  generatedAt: string
+  dimensions: DimensionScore[]
+  overall: number
+  composite: number
+  weights?: Partial<Record<ReadinessDimension, number>>
+}
+
+export interface WhatIfResult {
+  country: string
+  domain: Domain
+  changes: Partial<Record<ReadinessDimension, number>>
+  original: DimensionScore[]
+  projected: DimensionScore[]
+  effects: Partial<Record<ReadinessDimension, number>>
+  narrative: string
+  generatedAt: string
+}
+
 export interface Taxonomy {
   country: string // ISO-3166 alpha-2, or 'global'
   jurisdiction: Jurisdiction

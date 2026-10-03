@@ -3,6 +3,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { IngestionClient } from '@sps/kb'
+import { whatIf } from '@sps/readiness'
 import { buildRunDossier, renderDossierMarkdown } from '@sps/report'
 import { institutionsForDomain } from '@sps/shared'
 import type { Domain, JointSituationReport, WorkflowLens } from '@sps/shared'
@@ -148,6 +149,31 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       country: body.data.country,
       domain: body.data.domain as Domain,
       globalCountry: body.data.globalCountry,
+    })
+  })
+
+  // ── Readiness what-if (causal propagation across dimensions) ──────────────
+  app.post('/v1/readiness/whatif', async (request, reply) => {
+    const body = z
+      .object({
+        country: z.string().length(2),
+        domain: z.enum(['health', 'education', 'telecom', 'public_services', 'agriculture']),
+        changes: z.record(z.string(), z.number()),
+        /** Optional baseline; if omitted, a full assessment is run first. */
+        scores: z.array(z.any()).optional(),
+      })
+      .safeParse(request.body)
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
+
+    const baseline =
+      (body.data.scores as Parameters<typeof whatIf>[0]['scores'] | undefined) ??
+      (await engine.readiness.assess({ country: body.data.country, domain: body.data.domain as Domain })).scores
+
+    return whatIf({
+      country: body.data.country,
+      domain: body.data.domain as Domain,
+      scores: baseline,
+      changes: body.data.changes as Parameters<typeof whatIf>[0]['changes'],
     })
   })
 

@@ -21,6 +21,9 @@
 - `[x]` Agent registry, orchestrator, mandatory-citation prompt.
 - `[x]` Progressive scenario engine.
 - `[x]` Readiness gap engine (13 dimensions / 6 factors, Report 2.0).
+- `[x]` 0–5 maturity scoring + weighted composite (`packages/readiness/src/scoring.ts`).
+- `[x]` Causal what-if propagation across dimensions (`packages/readiness/src/causal.ts`).
+- `[x]` African/regional reference corpus (`data/global/africa/`, `scripts/fetch-corpus.sh`).
 - `[x]` Hash-chained audit + persisted CoT traces.
 
 ### Sprint 1 — the Cameroon health corpus
