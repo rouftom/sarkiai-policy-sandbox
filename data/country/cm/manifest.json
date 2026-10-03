@@ -95,6 +95,30 @@
       "sourceUrl": "https://www.minepat.gov.cm/"
     },
     {
+      "id": "cm-snd30-full",
+      "title": "Stratégie Nationale de Développement 2020-2030 (SND30) — document complet",
+      "authority": "MINEPAT",
+      "docType": "strategy",
+      "jurisdiction": "national",
+      "pillar": ["contextualization", "ai_policies", "digital_infrastructure"],
+      "status": "present",
+      "priority": "high",
+      "file": "snd30_complet_2020_2030.pdf",
+      "sourceUrl": "https://minepat.gov.cm/"
+    },
+    {
+      "id": "cm-cemac-users-rights-directive",
+      "title": "CEMAC — Directive fixant le cadre juridique de la protection des droits des utilisateurs (télécoms)",
+      "authority": "CEMAC / ART",
+      "docType": "regulation",
+      "jurisdiction": "regional",
+      "pillar": ["human_interface", "collaboration", "digital_infrastructure"],
+      "status": "present",
+      "priority": "medium",
+      "file": "cemac_protection_droits_utilisateurs.pdf",
+      "sourceUrl": "https://www.art.cm/"
+    },
+    {
       "id": "cm-health-sr-pf-standards",
       "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
       "authority": "Ministère de la Santé Publique",

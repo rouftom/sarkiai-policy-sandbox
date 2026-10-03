@@ -14,6 +14,8 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 | `compact_national_sante_2023.pdf` | policy | **oui** | Compact national santé / CSU (police partiellement non-unicode) |
 | `systeme_de_sante_camerounais.pdf` | report | — | Description du système de santé |
 | `resume_snd30.pdf` | strategy | — | Résumé SND30 |
+| `snd30_complet_2020_2030.pdf` | strategy | — | SND30 complet (collecté en ligne) |
+| `cemac_protection_droits_utilisateurs.pdf` | regulation | — | Directive CEMAC droits des utilisateurs (télécoms) |
 | `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
 | `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |
@@ -48,6 +50,14 @@ curl -X POST "$INGESTION/v1/ingest/file" -H "X-API-Key: $SERVICE_API_KEY" \
   -F file=@data/country/cm/loi_2024_protection_donnees_personnelles.pdf \
   -F country=cm -F jurisdiction=national -F docType=law
 ```
+
+## Collecte en ligne
+
+Un petit collecteur de documents publics est maintenu **hors du projet** :
+`../cm-corpus-tools/` (Python stdlib + fallback curl). Voir son `README.md` pour
+le dry-run, les sources officielles et les résultats (SND30 complet, directive
+CEMAC récupérés ; recueil ART 66 Mo à récupérer séparément). Maathis :
+résumés publics seulement (texte intégral derrière compte gratuit).
 
 ## À collecter (voir `manifest.json` → `to_confirm`)
 
