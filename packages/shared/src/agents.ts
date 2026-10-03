@@ -6,7 +6,7 @@
  * an independent assessment.
  */
 
-import type { AgentRole, Domain } from './types.js'
+import type { AgentRole, Domain } from './types'
 
 export interface InstitutionSpec {
   id: string

@@ -1,6 +1,6 @@
 /** Browser-chrome theming (theme-color metas, app tile, OS color-scheme). */
 
-import type { ThemePack } from './types.js'
+import type { ThemePack } from './types'
 
 export type ThemeMode = 'light' | 'dark'
 

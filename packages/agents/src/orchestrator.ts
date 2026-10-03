@@ -17,7 +17,7 @@ import type {
 import type { PolicyRetriever } from '@sps/retrieval'
 import { citationFromChunk, hasGroundedCitation } from '@sps/citations'
 import type { AuditService } from '@sps/audit'
-import { attachmentGuardrail, buildSystemPrompt, citationDirective } from './prompt.js'
+import { attachmentGuardrail, buildSystemPrompt, citationDirective } from './prompt'
 
 export interface Attachment {
   mime: string

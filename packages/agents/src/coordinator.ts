@@ -21,7 +21,7 @@ import type {
   WorkflowLens,
 } from '@sps/shared'
 import type { AuditService } from '@sps/audit'
-import type { PolicyOrchestrator } from './orchestrator.js'
+import type { PolicyOrchestrator } from './orchestrator'
 
 export interface CoordinatorDeps {
   model: LanguageModel

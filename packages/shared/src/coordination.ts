@@ -1,6 +1,6 @@
 /** Multi-agent coordination artifacts. */
 
-import type { AgentAssessment, Citation, Gap } from './types.js'
+import type { AgentAssessment, Citation, Gap } from './types'
 
 /** A genuine conflict detected between two institutional assessments. */
 export interface MandateConflict {

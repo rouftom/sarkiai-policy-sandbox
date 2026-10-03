@@ -23,11 +23,11 @@ import {
 import type { PolicyRetriever } from '@sps/retrieval'
 import { citationFromChunk } from '@sps/citations'
 import type { KbChunk } from '@sps/shared'
-import { applyPropagation } from './causal.js'
-import { buildScenario, maturityLabel } from './scoring.js'
+import { applyPropagation } from './causal'
+import { buildScenario, maturityLabel } from './scoring'
 
-export * from './causal.js'
-export * from './scoring.js'
+export * from './causal'
+export * from './scoring'
 
 export interface ReadinessInput {
   country: string

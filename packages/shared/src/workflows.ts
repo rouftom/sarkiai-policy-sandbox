@@ -6,7 +6,7 @@
  * evaluation capability.
  */
 
-import type { WorkflowLens } from './types.js'
+import type { WorkflowLens } from './types'
 
 export interface WorkflowProfile {
   lens: WorkflowLens

@@ -1,3 +1,3 @@
-export { cn } from './lib/cn.js'
-export * from './components/button.js'
-export * from './components/card.js'
+export { cn } from './lib/cn'
+export * from './components/button'
+export * from './components/card'

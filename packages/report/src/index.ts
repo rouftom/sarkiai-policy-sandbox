@@ -13,7 +13,7 @@ import type {
   JointSituationReport,
 } from '@sps/shared'
 
-export * from './store.js'
+export * from './store'
 
 
 export interface RunDossierInput {

@@ -1,6 +1,6 @@
 /** Builds the `data-theme-pack` CSS rules injected at runtime / build time. */
 
-import type { ThemePack } from './types.js'
+import type { ThemePack } from './types'
 
 function declarations(tokens: Record<string, string> | undefined): string {
   if (!tokens) return ''

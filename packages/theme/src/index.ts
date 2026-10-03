@@ -8,7 +8,7 @@ import green from './packs/green.json'
 import ocean from './packs/ocean.json'
 import sunset from './packs/sunset.json'
 import mono from './packs/mono.json'
-import type { ThemePack } from './types.js'
+import type { ThemePack } from './types'
 
 const rawPacks: ThemePack[] = [fada, green, ocean, sunset, mono] as ThemePack[]
 
@@ -29,6 +29,6 @@ export function isThemePackId(id?: string | null): boolean {
 export const THEME_PACK_STORAGE_KEY = 'sps-theme-pack'
 export const MODE_STORAGE_KEY = 'sps-theme-mode'
 
-export * from './types.js'
-export * from './generate-css.js'
-export * from './chrome.js'
+export * from './types'
+export * from './generate-css'
+export * from './chrome'
