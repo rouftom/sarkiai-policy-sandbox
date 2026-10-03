@@ -145,6 +145,44 @@
       "sourceUrl": "https://www.art.cm/"
     },
     {
+      "id": "cm-cybersecurity-law-2010",
+      "title": "Loi n° 2010/012 du 21 décembre 2010 relative à la cybersécurité et à la cybercriminalité au Cameroun",
+      "authority": "Assemblée Nationale / MINPOSTEL",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "ai_policies"],
+      "status": "present",
+      "priority": "critical",
+      "file": "loi_2010_012_cybersecurite_cybercriminalite.pdf",
+      "sourceUrl": "https://www.minpostel.gov.cm/"
+    },
+    {
+      "id": "cm-electronic-comms-law",
+      "title": "Loi régissant les communications électroniques au Cameroun (réf. source 2013/013)",
+      "authority": "Assemblée Nationale / MINPOSTEL",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "contextualization"],
+      "status": "present",
+      "priority": "high",
+      "file": "loi_2013_013_communications_electroniques.pdf",
+      "note": "Référence de la source : Loi_2013-013 (numéro/année à confirmer).",
+      "sourceUrl": "https://www.minpostel.gov.cm/"
+    },
+    {
+      "id": "cm-ai-adoption-local-authorities",
+      "title": "Stratégie d'adoption de l'IA dans la transformation numérique des Collectivités Territoriales Décentralisées du Cameroun",
+      "authority": "Recherche (HAL / auteurs)",
+      "docType": "report",
+      "jurisdiction": "national",
+      "pillar": ["ai_policies", "contextualization", "ai_inclusion"],
+      "status": "present",
+      "priority": "high",
+      "file": "strategie_ia_collectivites_territoriales.pdf",
+      "note": "Papier de recherche (approche DSR). Le dépôt HAL équivalent n'a pas été dupliqué.",
+      "sourceUrl": "https://hal.science/hal-05411779v1"
+    },
+    {
       "id": "cm-health-sr-pf-standards",
       "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
       "authority": "Ministère de la Santé Publique",

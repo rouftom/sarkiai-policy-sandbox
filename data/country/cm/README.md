@@ -18,6 +18,9 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 | `cemac_protection_droits_utilisateurs.pdf` | regulation | — | Directive CEMAC droits des utilisateurs (télécoms) |
 | `loi_2010_021_commerce_electronique.pdf` | law | **oui** | Loi n° 2010/021 commerce électronique (14 p. scanné) |
 | `art_observatoire_marche_telecom_2016.pdf` | report | — | Observatoire ART marché télécoms 2016 |
+| `loi_2010_012_cybersecurite_cybercriminalite.pdf` | law | — | Loi cybersécurité/cybercriminalité 2010/012 |
+| `loi_2013_013_communications_electroniques.pdf` | law | — | Loi communications électroniques |
+| `strategie_ia_collectivites_territoriales.pdf` | report | — | Papier : adoption IA collectivités territoriales |
 | `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
 | `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |
