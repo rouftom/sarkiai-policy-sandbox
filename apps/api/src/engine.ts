@@ -7,6 +7,7 @@ import { PolicyRetriever } from '@sps/retrieval'
 import { ReadinessEngine } from '@sps/readiness'
 import { AuditService } from '@sps/audit'
 import { ReportStore } from '@sps/report'
+import { ObjectStore } from '@sps/storage'
 import { ScenarioEngine, type ScenarioDefinition } from '@sps/scenarios'
 import { getWorkflowProfile, institutionsForDomain, type Domain, type WorkflowLens } from '@sps/shared'
 import { config } from './config.js'
@@ -32,8 +33,14 @@ export function createEngine() {
   const orchestrator = new PolicyOrchestrator({ model, retriever, audit })
   const coordinator = new MultiAgentCoordinator({ model, orchestrator, audit })
   const readiness = new ReadinessEngine({ model, retriever })
+  const storage = new ObjectStore({
+    endpoint: config.s3.endpoint,
+    bucket: config.s3.bucket,
+    accessKey: config.s3.accessKey,
+    secretKey: config.s3.secretKey,
+  })
 
-  return { model, retriever, audit, reports, orchestrator, coordinator, readiness }
+  return { model, retriever, audit, reports, orchestrator, coordinator, readiness, storage }
 }
 
 export function createScenario(definition: ScenarioDefinition, lens: WorkflowLens) {

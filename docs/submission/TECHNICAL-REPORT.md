@@ -25,7 +25,7 @@ and (d) produces **auditable** joint situation reports with hash-chained logs an
 persisted chain-of-thought traces.
 
 The solution is designed **local-first and sovereign**: all language and embedding
-models run on-premise (Ollama: `qwen2.5:14b` + `bge-m3`); no data leaves the
+models run on-premise (Ollama: `qwen3.5:9b` + `bge-m3`); no data leaves the
 infrastructure. This directly raises the ITU Readiness dimensions **D10 AI &
 Policies** (`d10_m10` Data Sovereignty) and **D11 AI for Inclusion** (`d11_m06`
 Edge Privacy). The architecture is mapped node-by-node to **ITU-T Y.3172**
@@ -151,7 +151,7 @@ SRC → C → PP → M → P → D → SINK      (orchestrated by MLFO; validate
   structure-aware legal chunking (TITRE/CHAPITRE/ARTICLE, FR/EN), OCR fallback for
   scanned gazettes, and **local `bge-m3` embeddings**.
 - **Model (M)**: hybrid retrieval (dense + BM25 sparse, RRF fusion, optional local
-  TEI reranker) and **local `qwen2.5:14b`** agents.
+  TEI reranker) and **local `qwen3.5:9b`** agents.
 - **Policy (P)**: citation-mandatory prompts, a gap engine and declarative
   workflow profiles (simulation / readiness / hybrid).
 - **Distributor (D)** and **SINK**: a Fastify API + Next.js console; institutional

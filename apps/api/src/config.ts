@@ -26,10 +26,10 @@ export const config = {
     apiKey: env('SERVICE_API_KEY'),
   },
 
-  // Local LLM (Ollama, OpenAI-compatible).
+  // Local LLM (Ollama, OpenAI-compatible). qwen3.5:9b is multimodal (text+image).
   ollama: {
     baseUrl: env('OLLAMA_BASE_URL', 'http://localhost:11434'),
-    model: env('OLLAMA_MODEL', 'qwen2.5:14b'),
+    model: env('OLLAMA_MODEL', 'qwen3.5:9b'),
   },
 
   // Local embeddings (Ollama).
@@ -42,5 +42,13 @@ export const config = {
   rerank: {
     url: env('RERANK_URL'),
     model: env('RERANK_MODEL', 'BAAI/bge-reranker-v2-m3'),
+  },
+
+  // Object storage (MinIO / S3) for assistant image attachments.
+  s3: {
+    endpoint: env('S3_ENDPOINT', 'http://localhost:9000'),
+    bucket: env('S3_BUCKET', 'sps-attachments'),
+    accessKey: env('S3_ACCESS_KEY', 'sps-minio'),
+    secretKey: env('S3_SECRET_KEY', 'sps-minio-secret'),
   },
 } as const

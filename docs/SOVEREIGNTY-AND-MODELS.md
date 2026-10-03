@@ -61,7 +61,7 @@ C'est exactement là que se joue la question.
 ## 5. Options envisageables (sans implémentation)
 
 ### A. Inférence locale via Ollama (miroir du repo ITU)
-- LLM : `qwen2.5:14b`, `llama3.1:8b`, `mistral`, `gemma2`.
+- LLM : `qwen3.5:9b` (multimodal texte+image), `qwen2.5:14b`, `llama3.1:8b`, `gemma3:12b`, `mistral`.
 - Embeddings : `nomic-embed-text`, **`bge-m3`** (multilingue, excellent FR — préférable pour nos corpus FR/EN).
 - Pros : egress 0, gratuit, offline, déployable dans la sandbox. Cons : ~16 Go
   RAM, latence, qualité < frontier, opérations.
@@ -137,7 +137,7 @@ Choix retenu : **local-first, cloud entièrement retiré.**
 
 | Élément | Décision |
 |---------|----------|
-| LLM | **`qwen2.5:14b`** via Ollama (parité repo ITU) ; `qwen2.5:7b` en option env |
+| LLM | **`qwen3.5:9b`** via Ollama (multimodal texte+image, 6,6 Go) ; alternatives `qwen2.5:14b`/`qwen2.5:7b` par env |
 | Embeddings | **`bge-m3`** (Ollama) — 1024-dim, multilingue FR |
 | Rerank | **TEI local** (`BAAI/bge-reranker-v2-m3`), profil compose `rerank` ; sinon RRF |
 | Transcription | **faster-whisper** local (profil `full`/`media`) |

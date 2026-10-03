@@ -23,6 +23,7 @@ This repo is the standalone monorepo for that system. It is **not** built on our
 `agentic-ui-harness` (IP-protected, unpatented) — the hackathon scope is backend orchestration, so we
 reimplement the agent runtime with the public Vercel AI SDK.
 
+- **Fully local & sovereign:** Ollama `qwen3.5:9b` (multimodal, text + image), `bge-m3` embeddings, local OCR/Whisper — no cloud call. The assistant accepts **image attachments** (stored in MinIO, content-addressed) as untrusted context.
 - **Primary country:** Cameroon (MINPOSTEL-aligned), then multi-country (UAE → …).
 - **Primary domain:** healthcare, with cross-domain spillover (data protection, telecom, cybersecurity).
 - **Open by design:** permissive license so the knowledge base can be published in the ITU AI for Good Lab.
@@ -69,7 +70,8 @@ sarkiai-policy-sandbox/
 │  ├─ audit/          # immutable audit log + persisted CoT traces
 │  ├─ report/         # run dossier: audit + CoT + reports + citations
 │  ├─ ui/             # shared components (SarkiAI Compact charter)
-│  └─ theme/          # admin theme packs (fada, green, ocean, sunset, mono)
+│  ├─ theme/          # admin theme packs (fada, green, ocean, sunset, mono)
+│  └─ storage/        # MinIO/S3 client (content-addressed attachments)
 ├─ services/          # Python microservices
 │  ├─ ingestion/      # structure-aware legal chunking + embeddings + Qdrant store
 │  ├─ ocr/            # scanned gazette OCR (Tesseract)
@@ -84,14 +86,14 @@ sarkiai-policy-sandbox/
 ## Quick start
 
 > **Sovereign / local-only**: all models run locally via Ollama. No API keys,
-> no cloud calls. First run pulls ~9 GB (qwen2.5:14b) + ~2 GB (bge-m3).
+> no cloud calls. First run pulls ~9 GB (qwen3.5:9b) + ~2 GB (bge-m3).
 
 ### Everything at once
 
 ```bash
 cp .env.example .env
 docker compose up --build -d
-make models                # pull qwen2.5:14b + bge-m3 into Ollama
+make models                # pull qwen3.5:9b + bge-m3 into Ollama
 ```
 
 Then:

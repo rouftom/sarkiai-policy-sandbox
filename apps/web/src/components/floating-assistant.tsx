@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Bot, Scale, Send, Shield, X } from 'lucide-react'
+import { Bot, ImagePlus, Scale, Send, Shield, X } from 'lucide-react'
 import { Button, cn } from '@sps/ui'
 import { institutionsForDomain, type Domain, type WorkflowLens } from '@sps/shared'
 import { api, type AssessmentDto } from '@/lib/api'
@@ -12,6 +12,12 @@ interface Message {
   content: string
   citations?: AssessmentDto['citations']
   agentId?: string
+}
+
+interface Attachment {
+  mime: string
+  dataBase64: string
+  url: string
 }
 
 /**
@@ -33,6 +39,32 @@ export function FloatingAssistant({
   const [input, setInput] = React.useState('')
   const [busy, setBusy] = React.useState(false)
   const [messages, setMessages] = React.useState<Message[]>([])
+  const [attachments, setAttachments] = React.useState<Attachment[]>([])
+  const fileRef = React.useRef<HTMLInputElement>(null)
+
+  const addFiles = async (files: FileList | null) => {
+    if (!files) return
+    const room = 3 - attachments.length
+    const picked = Array.from(files)
+      .filter((f) => f.type.startsWith('image/'))
+      .slice(0, Math.max(0, room))
+    const next: Attachment[] = []
+    for (const file of picked) {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+      const commaIndex = dataUrl.indexOf(',')
+      if (commaIndex < 0) continue
+      const meta = dataUrl.slice(0, commaIndex)
+      const base64 = dataUrl.slice(commaIndex + 1)
+      const mime = meta.slice(meta.indexOf(':') + 1, meta.indexOf(';'))
+      next.push({ mime, dataBase64: base64, url: dataUrl })
+    }
+    setAttachments((prev) => [...prev, ...next].slice(0, 3))
+  }
 
   const institutions = React.useMemo(() => institutionsForDomain(domain), [domain])
   const [institutionId, setInstitutionId] = React.useState(institutions[0]?.id ?? 'legal_advisor')
@@ -48,8 +80,17 @@ export function FloatingAssistant({
     setInput('')
     setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'user', content: question }])
     setBusy(true)
+    const payload = attachments.map((a) => ({ mime: a.mime, dataBase64: a.dataBase64 }))
     try {
-      const result = await api.ask({ institutionId, question, country, domain, lens })
+      const result = await api.ask({
+        institutionId,
+        question,
+        country,
+        domain,
+        lens,
+        attachments: payload.length ? payload : undefined,
+      })
+      setAttachments([])
       setMessages((prev) => [
         ...prev,
         {
@@ -74,6 +115,15 @@ export function FloatingAssistant({
 
   return (
     <>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        multiple
+        hidden
+        onChange={(e) => addFiles(e.target.files)}
+      />
+
       {/* Backdrop */}
       {open && !minimized && (
         <div
@@ -155,28 +205,61 @@ export function FloatingAssistant({
             {busy && <div className="text-xs text-muted-foreground">Recherche de la disposition applicable…</div>}
           </div>
 
-          <form onSubmit={send} className="flex shrink-0 items-center gap-2 border-t border-border p-2">
-            <select
-              value={institutionId}
-              onChange={(e) => setInstitutionId(e.target.value)}
-              className="h-8 rounded-xl border border-border bg-transparent px-2 text-[11px]"
-              aria-label="Agent"
-            >
-              {institutions.map((inst) => (
-                <option key={inst.id} value={inst.id}>
-                  {inst.name}
-                </option>
-              ))}
-            </select>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Posez une question de politique publique…"
-              className="h-8 flex-1 rounded-xl border border-border bg-transparent px-3 text-sm"
-            />
-            <Button type="submit" size="icon" aria-label="Envoyer" disabled={busy || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
+          <form onSubmit={send} className="shrink-0 border-t border-border p-2">
+            {attachments.length > 0 && (
+              <div className="mb-2 flex gap-2">
+                {attachments.map((attachment, index) => (
+                  <div key={index} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={attachment.url}
+                      alt=""
+                      className="h-12 w-12 rounded-lg border border-border object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== index))}
+                      className="absolute -right-1 -top-1 rounded-full bg-destructive p-0.5 text-white"
+                      aria-label="Retirer l'image"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <select
+                value={institutionId}
+                onChange={(e) => setInstitutionId(e.target.value)}
+                className="h-8 rounded-xl border border-border bg-transparent px-2 text-[11px]"
+                aria-label="Agent"
+              >
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>
+                    {inst.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Posez une question (texte + image)…"
+                className="h-8 flex-1 rounded-xl border border-border bg-transparent px-3 text-sm"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Joindre une image"
+                onClick={() => fileRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
+              <Button type="submit" size="icon" aria-label="Envoyer" disabled={busy || !input.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </form>
         </div>
       )}
@@ -207,6 +290,15 @@ export function FloatingAssistant({
                 placeholder="Interroger un agent institutionnel…"
                 className="h-8 flex-1 bg-transparent px-3 text-sm"
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Joindre une image"
+                onClick={() => fileRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </Button>
               <Button type="submit" size="icon" aria-label="Envoyer" disabled={busy || !input.trim()}>
                 <Send className="h-4 w-4" />
               </Button>

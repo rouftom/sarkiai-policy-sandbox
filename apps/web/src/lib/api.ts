@@ -126,6 +126,7 @@ export const api = {
     country: string
     domain: string
     lens: string
+    attachments?: Array<{ mime: string; dataBase64: string }>
   }) => request<AssessmentDto>('/v1/agents/ask', { method: 'POST', body: JSON.stringify(body) }),
 
   readiness: (body: { country: string; domain: string; globalCountry?: string }) =>

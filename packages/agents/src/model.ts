@@ -28,5 +28,5 @@ export function createModel(config: ModelConfig = {}): LanguageModel {
     baseURL: ollamaBase(config),
     apiKey: config.apiKey ?? 'ollama',
   })
-  return provider.chatModel(config.model ?? process.env.OLLAMA_MODEL ?? 'qwen2.5:14b')
+  return provider.chatModel(config.model ?? process.env.OLLAMA_MODEL ?? 'qwen3.5:9b')
 }

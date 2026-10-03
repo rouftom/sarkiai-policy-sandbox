@@ -5,8 +5,9 @@ import { z } from 'zod'
 import { IngestionClient } from '@sps/kb'
 import { whatIf } from '@sps/readiness'
 import { buildRunDossier, renderDossierMarkdown } from '@sps/report'
+import { sha256Hex } from '@sps/storage'
 import { institutionsForDomain } from '@sps/shared'
-import type { Domain, InstitutionSpec, JointSituationReport, ScenarioEvent, WorkflowLens } from '@sps/shared'
+import type { DocType, Domain, InstitutionSpec, JointSituationReport, ScenarioEvent, WorkflowLens } from '@sps/shared'
 import { createEngine, createScenario } from '../engine.js'
 import { healthDataBreach } from '../scenarios.js'
 import { config } from '../config.js'
@@ -50,11 +51,11 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       .safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
 
-    const result = await ingestion.ingestText(body.data)
+    const result = await ingestion.ingestText({ ...body.data, docType: body.data.docType as DocType })
     return result
   })
 
-  // ── Single mandated agent ─────────────────────────────────────────────────
+  // ── Single mandated agent (text, optionally multimodal) ───────────────────
   app.post('/v1/agents/ask', async (request, reply) => {
     const body = z
       .object({
@@ -64,12 +65,35 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
         domain: z.enum(['health', 'education', 'telecom', 'public_services', 'agriculture']),
         lens: lensSchema.default('hybrid'),
         runId: z.string().optional(),
+        // Untrusted user images (context only, never citable).
+        attachments: z
+          .array(z.object({ mime: z.string(), dataBase64: z.string() }))
+          .max(3)
+          .optional(),
       })
       .safeParse(request.body)
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
 
     const institution = institutionsForDomain(body.data.domain as Domain).find((i) => i.id === body.data.institutionId)
     if (!institution) return reply.status(404).send({ error: `Unknown institution "${body.data.institutionId}"` })
+
+    // Persist attachments (content-addressed, best-effort: works without MinIO).
+    const attachmentMeta = []
+    for (const attachment of body.data.attachments ?? []) {
+      if (!attachment.mime.startsWith('image/')) {
+        return reply.status(415).send({ error: `Unsupported attachment type: ${attachment.mime}` })
+      }
+      const data = Buffer.from(attachment.dataBase64, 'base64')
+      if (data.byteLength > 5 * 1024 * 1024) {
+        return reply.status(413).send({ error: 'Attachment too large (max 5 MB).' })
+      }
+      try {
+        const stored = await engine.storage.putContentAddressed(data, attachment.mime)
+        attachmentMeta.push({ sha256: stored.sha256, mime: stored.mime, size: stored.size, key: stored.key })
+      } catch {
+        attachmentMeta.push({ sha256: sha256Hex(data), mime: attachment.mime, size: data.byteLength, key: '' })
+      }
+    }
 
     return engine.orchestrator.runAgent({
       institution,
@@ -78,6 +102,8 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       domain: body.data.domain as Domain,
       lens: body.data.lens as WorkflowLens,
       runId: body.data.runId,
+      attachments: body.data.attachments,
+      attachmentMeta,
     })
   })
 

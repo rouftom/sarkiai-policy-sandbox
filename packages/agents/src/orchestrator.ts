@@ -6,7 +6,7 @@
  * is the single-agent unit it composes.
  */
 
-import { generateText, type LanguageModel } from 'ai'
+import { generateText, type LanguageModel, type UserContent } from 'ai'
 import type {
   AgentAssessment,
   Citation,
@@ -17,7 +17,19 @@ import type {
 import type { PolicyRetriever } from '@sps/retrieval'
 import { citationFromChunk, hasGroundedCitation } from '@sps/citations'
 import type { AuditService } from '@sps/audit'
-import { buildSystemPrompt, citationDirective } from './prompt.js'
+import { attachmentGuardrail, buildSystemPrompt, citationDirective } from './prompt.js'
+
+export interface Attachment {
+  mime: string
+  dataBase64: string
+}
+
+export interface AttachmentMeta {
+  sha256: string
+  mime: string
+  size: number
+  key: string
+}
 
 export interface AgentRunInput {
   institution: InstitutionSpec
@@ -28,6 +40,10 @@ export interface AgentRunInput {
   lens: WorkflowLens
   runId?: string
   topK?: number
+  /** Optional user-supplied images (untrusted context). */
+  attachments?: Attachment[]
+  /** Storage/audit metadata for the attachments (hashes, keys). */
+  attachmentMeta?: AttachmentMeta[]
 }
 
 export interface OrchestratorDeps {
@@ -58,33 +74,57 @@ export class PolicyOrchestrator {
       agentId: institution.id,
       step: 0,
       thought: `Retrieved ${chunks.length} provisions for "${question}" in ${country}.`,
-      toolCalls: [{ name: 'retrieve', input: { question, country }, output: citations.map((c) => c.filename) }],
+      toolCalls: [
+        {
+          name: 'retrieve',
+          input: { question, country, attachments: input.attachmentMeta ?? [] },
+          output: citations.map((c) => c.filename),
+        },
+      ],
       model: 'n/a',
     })
 
-    // 3. Generate the grounded answer.
-    const system = `${buildSystemPrompt({ institution, country, domain, chunks })}\n\n${citationDirective()}`
+    // 3. Generate the grounded answer (multimodal when attachments are present).
+    const hasAttachments = (input.attachments?.length ?? 0) > 0
+    const system = [
+      buildSystemPrompt({ institution, country, domain, chunks }),
+      citationDirective(),
+      hasAttachments ? attachmentGuardrail() : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n')
+
+    const content: UserContent = [{ type: 'text', text: question }]
+    for (const attachment of input.attachments ?? []) {
+      content.push({
+        type: 'image',
+        image: `data:${attachment.mime};base64,${attachment.dataBase64}`,
+        mediaType: attachment.mime,
+      })
+    }
+
     const { text, reasoning } = await generateText({
       model: this.deps.model,
       system,
-      prompt: question,
+      ...(hasAttachments ? { messages: [{ role: 'user' as const, content }] } : { prompt: question }),
     })
 
     const grounded = hasGroundedCitation(text, citations)
 
     // 4. Persist chain-of-thought + audit.
+    const reasoningText = (reasoning ?? []).map((part) => part.text).join('\n')
     await this.deps.audit?.traceStep({
       runId,
       agentId: institution.id,
       step: 1,
-      thought: reasoning ?? text,
+      thought: reasoningText || text,
       toolCalls: [{ name: 'generate', input: { question }, output: { grounded } }],
       model: 'configured',
     })
     await this.deps.audit?.logAction({
       actor: institution.id,
       action: 'agent.assessment',
-      target: domain,
+      target: input.attachmentMeta?.length ? `${domain};attachments:${input.attachmentMeta.map((a) => a.sha256).join(',')}` : domain,
       lens,
       citations,
       runId,

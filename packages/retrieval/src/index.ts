@@ -122,33 +122,36 @@ export class PolicyRetriever {
     const dense = await embedQuery(this.cfg, query.text)
     const filter = buildFilter(query)
 
+    const sparseQuery = { text: query.text, model: this.cfg.sparseModel } as Record<string, unknown>
+
     let points: QdrantPoint[] = []
     try {
-      points = (await this.client.query(this.cfg.collectionName, {
+      // Hybrid: dense + BM25 sparse, fused server-side with RRF.
+      const res = await this.client.query(this.cfg.collectionName, {
         prefetch: [
           { query: dense, using: this.cfg.denseVectorName, limit: topK * 3, filter },
-          {
-            query: { text: query.text, model: this.cfg.sparseModel } as unknown as number[],
-            using: this.cfg.sparseVectorName,
-            limit: topK * 3,
-            filter,
-          },
+          { query: sparseQuery, using: this.cfg.sparseVectorName, limit: topK * 3, filter },
         ],
         query: { fusion: 'rrf' },
         limit: topK * 2,
         with_payload: true,
-      })) as unknown as QdrantPoint[]
+      })
+      points = (res.points ?? []) as unknown as QdrantPoint[]
     } catch {
-      points = (await this.client.search(this.cfg.collectionName, {
-        vector: { name: this.cfg.denseVectorName, vector: dense },
+      // Dense-only fallback (universal query endpoint).
+      const res = await this.client.query(this.cfg.collectionName, {
+        query: dense,
+        using: this.cfg.denseVectorName,
         filter,
         limit: topK * 2,
         with_payload: true,
-      })) as unknown as QdrantPoint[]
+      })
+      points = (res.points ?? []) as unknown as QdrantPoint[]
     }
 
     const chunks = points.map(toChunk)
-    return this.rerank(query.text, chunks).slice(0, topK)
+    const reranked = await this.rerank(query.text, chunks)
+    return reranked.slice(0, topK)
   }
 
   async upsert(points: Array<{ id: string; vector: Record<string, unknown>; payload: Taxonomy & Record<string, unknown> }>): Promise<void> {
@@ -172,8 +175,11 @@ export class PolicyRetriever {
         : ((payload as { results?: Array<{ index: number; score: number }> }).results ?? [])
       if (rows.length === 0) return chunks
       return rows
-        .map((row) => ({ ...chunks[row.index]!, score: row.score }))
-        .filter((chunk): chunk is KbChunk => Boolean(chunk))
+        .map((row) => {
+          const chunk = chunks[row.index]
+          return chunk ? ({ ...chunk, score: row.score } as KbChunk) : null
+        })
+        .filter((chunk): chunk is KbChunk => chunk !== null)
     } catch {
       return chunks
     }

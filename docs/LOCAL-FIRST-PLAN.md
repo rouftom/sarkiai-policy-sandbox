@@ -1,6 +1,6 @@
 # Plan « Local-first » (souveraineté D10/D11) — VALIDÉ & IMPLÉMENTÉ
 
-> Décisions verrouillées : LLM **qwen2.5:14b** (comme le repo ITU) · embeddings
+> Décisions verrouillées : LLM **qwen3.5:9b** (multimodal texte+image, 6,6 Go) · embeddings
 > **bge-m3** (1024-dim, multilingue FR) · reranker **TEI local** ·
 > transcription **faster-whisper locale** · **suppression totale** des providers
 > cloud · fine-tuning **unsloth** (documenté).
@@ -47,7 +47,7 @@ alignement direct avec les métriques ITU **`d10_m10` Data Sovereignty** (D10) e
                         │           │
               ┌─────────▼───┐   ┌───▼───────────────┐
               │  Ollama     │   │ services/ingestion │
-              │  • qwen2.5  │◀──│  embeddings bge-m3 │
+              │  • qwen3.5  │◀──│  embeddings bge-m3 │
               │  • bge-m3   │   └───────────────────┘
               └─────────────┘   ┌───────────────────┐
                                 │ services/ocr (loc.)│
@@ -65,7 +65,7 @@ Aucun appel sortant. `ollama` est le **seul** fournisseur de modèles.
 
 | Rôle | Modèle | Justification |
 |------|--------|---------------|
-| LLM raisonnement | **`qwen2.5:14b`** (Ollama) | parité repo ITU ; solide en FR ; ~9 Go disque, ~16 Go RAM |
+| LLM raisonnement | **`qwen3.5:9b`** (Ollama) | multimodal (texte+image) ; 201 langues ; 256K contexte ; ~6,6 Go disque, ~8–10 Go RAM |
 | LLM léger (option) | `qwen2.5:7b` via `OLLAMA_MODEL` | portabilité sandbox sans GPU |
 | Embeddings | **`bge-m3`** (Ollama) | multilingue (FR excellent), **dense 1024 = notre dimension Qdrant** (aucun changement de schéma) |
 | Sparse (hybride) | BM25 (Qdrant, serveur) | inchangé |
@@ -81,7 +81,7 @@ Qdrant actuelle → **pas de migration vectorielle**.
 # Modèles locaux (souveraineté — défaut)
 LLM_PROVIDER=local
 OLLAMA_BASE_URL=http://ollama:11434
-OLLAMA_MODEL=qwen2.5:14b
+OLLAMA_MODEL=qwen3.5:9b
 EMBEDDING_PROVIDER=local
 EMBEDDING_MODEL=bge-m3
 EMBEDDING_DIMENSION=1024
@@ -94,7 +94,7 @@ WHISPER_MODEL=large-v3
 ## 6. Docker
 
 - Nouveau service **`ollama`** (`ollama/ollama`), volume `ollama-data`, GPU NVIDIA optionnel (comme le repo ITU).
-- Nouvelle cible **`make models`** → `ollama pull qwen2.5:14b` + `ollama pull bge-m3`.
+- Nouvelle cible **`make models`** → `ollama pull qwen3.5:9b` + `ollama pull bge-m3`.
 - Service **`rerank`** (TEI) sous profil `rerank` (optionnel).
 - `transcription` passe en faster-whisper (profil `media`/`full`).
 - `depends_on` : `ingestion` et `api` attendent `ollama` healthy.
@@ -105,7 +105,7 @@ Chaîne **100 % locale**, dataset jamais exporté :
 
 1. **Export du dataset** : paires (contexte KB + question → réponse citée) depuis
    Mongo (`cot_traces`, `joint_reports`, sorties readiness).
-2. **Entraînement LoRA/QLoRA** : `peft` + `trl` (ou `unsloth`) sur `qwen2.5` open-weight (Apache-2.0).
+2. **Entraînement LoRA/QLoRA** : `peft` + `trl` (ou `unsloth`) sur `qwen3.5` open-weight (Apache-2.0).
 3. **Conversion** : merge LoRA → `llama.cpp` → **GGUF**.
 4. **Déploiement** : `ollama create sps-qwen` puis `OLLAMA_MODEL=sps-qwen`.
 5. **Alternative sandbox ITU** : entraîner **dans** la sandbox avec les crédits,
@@ -117,7 +117,7 @@ Documenté dans `docs/ROADMAP.md` + section README ; pas de code tant que non re
 
 | Risque | Mitigation |
 |--------|-----------|
-| RAM ~16 Go (14B) | option `OLLAMA_MODEL=qwen2.5:7b` (env) ; doc prérequis |
+| RAM ~10 Go (9B) | option `OLLAMA_MODEL=qwen2.5:7b` (env) ; doc prérequis |
 | 1er pull ~5-9 Go | `make models` documenté ; volume persistant |
 | `generateObject` moins fiable en local | mode JSON Ollama + retry + fallback ; tester |
 | Qualité < frontier | acceptable pour la démo ; fine-tuning possible |
@@ -132,7 +132,7 @@ Documenté dans `docs/ROADMAP.md` + section README ; pas de code tant que non re
 
 ## 10. Questions de validation
 
-1. **LLM par défaut** : `qwen2.5:14b` (qualité, 16 Go RAM) — avec `qwen2.5:7b` en option env. OK ?
+1. **LLM par défaut** : `qwen3.5:9b` (qualité, 16 Go RAM) — avec `qwen2.5:7b` en option env. OK ?
 2. **Embeddings** : `bge-m3` (1024, FR) — confirmé ?
 3. **Rerank** : on **supprime** Voyage et on met un **reranker TEI local optionnel** (sinon RRF) — OK, ou RRF seul sans TEI ?
 4. **Transcription** : passer à **faster-whisper local** (profil optionnel) — OK ?
