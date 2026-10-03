@@ -45,6 +45,7 @@ age.key
 data/country/*/*
 !data/country/*/.gitkeep
 !data/country/**/manifest.json
+!data/country/**/README.md
 data/global/*/*
 !data/global/*/.gitkeep
 !data/global/**/manifest.json

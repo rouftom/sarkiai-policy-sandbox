@@ -2,19 +2,50 @@
   "country": "cm",
   "jurisdiction": "national",
   "generated": "2026-10-03",
-  "note": "Checklist du corpus Cameroun pour le SarkiAI Policy Sandbox. Les entrées avec status='to_confirm' DOIVENT être vérifiées (numéro exact, intitulé, version en vigueur, URL officielle) avant ingestion. Toute erreur factuelle dans la KB se propage aux réponses des agents.",
+  "note": "Corpus Cameroun. Les entrées status='present' sont copiées localement (payloads non versionnés, cf. .gitignore) ; status='to_confirm' = instrument à collecter puis vérifier (numéro exact, intitulé, version en vigueur, URL officielle) avant ingestion. Toute erreur factuelle se propage aux réponses des agents.",
   "documents": [
+    {
+      "id": "cm-penal-code-2016",
+      "title": "Code pénal du Cameroun (édition 2016)",
+      "authority": "République du Cameroun",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["ai_policies", "human_interface"],
+      "status": "present",
+      "file": "penal_code_2016.pdf",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-health-sr-pf-standards",
+      "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
+      "authority": "Ministère de la Santé Publique",
+      "docType": "guidance",
+      "jurisdiction": "national",
+      "pillar": ["ai_integration", "ai_inclusion", "human_interface"],
+      "status": "present",
+      "file": "normes_standards_sr_pf_sante.pdf",
+      "sourceUrl": ""
+    },
+    {
+      "id": "cm-id-cr-ecosystem-diagnostic",
+      "title": "Cameroon ID and Civil Registration Ecosystem Diagnostic (FR)",
+      "authority": "ID4D / Government of Cameroon",
+      "docType": "report",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "ai_policies", "ai_inclusion"],
+      "status": "present",
+      "file": "cameroon_id_cr_ecosystem_diagnostic.txt",
+      "note": "Converti depuis .docx (l'ingestion ne lit que PDF/TXT).",
+      "sourceUrl": ""
+    },
+
     {
       "id": "cm-constitution-1996",
       "title": "Constitution de la République du Cameroun (loi n° 96/06 du 18 janvier 1996, modifiée)",
       "authority": "République du Cameroun",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": [
-        "ai_policies",
-        "strategy_alignment",
-        "human_interface"
-      ],
+      "pillar": ["ai_policies", "human_interface"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.prc.cm/"
@@ -25,11 +56,7 @@
       "authority": "Ministère de la Santé Publique",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": [
-        "cross_domain",
-        "ai_integration",
-        "ai_inclusion"
-      ],
+      "pillar": ["ai_integration", "ai_inclusion"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.minsante.cm/"
@@ -40,11 +67,7 @@
       "authority": "Assemblée Nationale",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "ai_policies",
-        "strategy_alignment"
-      ],
+      "pillar": ["digital_infrastructure", "ai_policies"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.antic.cm/"
@@ -55,10 +78,7 @@
       "authority": "Assemblée Nationale",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "contextualization"
-      ],
+      "pillar": ["digital_infrastructure", "contextualization"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.art.cm/"
@@ -69,12 +89,7 @@
       "authority": "Assemblée Nationale / autorité de protection des données",
       "docType": "law",
       "jurisdiction": "national",
-      "pillar": [
-        "data_marketplace",
-        "generated_content",
-        "human_interface",
-        "ai_policies"
-      ],
+      "pillar": ["data_marketplace", "human_interface"],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -85,11 +100,7 @@
       "authority": "Autorité de protection des données",
       "docType": "regulation",
       "jurisdiction": "national",
-      "pillar": [
-        "ai_policies",
-        "strategy_alignment",
-        "human_interface"
-      ],
+      "pillar": ["ai_policies", "human_interface"],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -100,11 +111,7 @@
       "authority": "ANTIC",
       "docType": "regulation",
       "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "ai_policies",
-        "strategy_alignment"
-      ],
+      "pillar": ["digital_infrastructure", "ai_policies"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.antic.cm/"
@@ -115,12 +122,7 @@
       "authority": "MINEPAT",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": [
-        "contextualization",
-        "ai_policies",
-        "strategy_alignment",
-        "digital_infrastructure"
-      ],
+      "pillar": ["contextualization", "ai_policies", "digital_infrastructure"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://www.minepat.gov.cm/"
@@ -131,10 +133,7 @@
       "authority": "MINPOSTEL",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "generated_content"
-      ],
+      "pillar": ["digital_infrastructure", "generated_content"],
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "https://www.minpostel.gov.cm/"
@@ -145,11 +144,7 @@
       "authority": "MINPOSTEL / ANTIC",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "ai_policies",
-        "strategy_alignment"
-      ],
+      "pillar": ["digital_infrastructure", "ai_policies"],
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": ""
@@ -160,12 +155,7 @@
       "authority": "MINPOSTEL",
       "docType": "strategy",
       "jurisdiction": "national",
-      "pillar": [
-        "generated_content",
-        "ai_policies",
-        "strategy_alignment",
-        "ai_inclusion"
-      ],
+      "pillar": ["generated_content", "ai_policies", "ai_inclusion"],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
@@ -176,30 +166,10 @@
       "authority": "Ministère de la Santé Publique",
       "docType": "policy",
       "jurisdiction": "national",
-      "pillar": [
-        "cross_domain",
-        "ai_integration",
-        "ai_inclusion",
-        "human_interface",
-        "ai_policies"
-      ],
+      "pillar": ["ai_integration", "ai_inclusion", "human_interface"],
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": ""
-    },
-    {
-      "id": "cm-ip-law",
-      "title": "Régime camerounais de la propriété intellectuelle (OAPI / loi nationale à confirmer)",
-      "authority": "OAPI / Ministère de la Justice",
-      "docType": "law",
-      "jurisdiction": "regional",
-      "pillar": [
-        "data_marketplace",
-        "generated_content"
-      ],
-      "status": "to_confirm",
-      "priority": "medium",
-      "sourceUrl": "https://www.oapi.int/"
     },
     {
       "id": "cm-malabo-convention",
@@ -207,12 +177,7 @@
       "authority": "Union Africaine",
       "docType": "treaty",
       "jurisdiction": "regional",
-      "pillar": [
-        "data_marketplace",
-        "generated_content",
-        "human_interface",
-        "ai_policies"
-      ],
+      "pillar": ["data_marketplace", "human_interface"],
       "status": "verified",
       "priority": "high",
       "sourceUrl": "https://au.int/en/treaties"
