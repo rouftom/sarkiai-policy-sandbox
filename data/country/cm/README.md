@@ -16,6 +16,8 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 | `resume_snd30.pdf` | strategy | — | Résumé SND30 |
 | `snd30_complet_2020_2030.pdf` | strategy | — | SND30 complet (collecté en ligne) |
 | `cemac_protection_droits_utilisateurs.pdf` | regulation | — | Directive CEMAC droits des utilisateurs (télécoms) |
+| `loi_2010_021_commerce_electronique.pdf` | law | **oui** | Loi n° 2010/021 commerce électronique (14 p. scanné) |
+| `art_observatoire_marche_telecom_2016.pdf` | report | — | Observatoire ART marché télécoms 2016 |
 | `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
 | `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |
