@@ -205,6 +205,13 @@ export function FloatingAssistant({
             {busy && <div className="text-xs text-muted-foreground">Recherche de la disposition applicable…</div>}
           </div>
 
+          <p className="shrink-0 border-t border-border px-3 py-1.5 text-center text-[10px] text-muted-foreground">
+            Made with <span aria-label="love">♥️</span> by{' '}
+            <a href="https://djotta.com" target="_blank" rel="noreferrer" className="font-semibold text-primary hover:underline">
+              Djotta
+            </a>
+          </p>
+
           <form onSubmit={send} className="shrink-0 border-t border-border p-2">
             {attachments.length > 0 && (
               <div className="mb-2 flex gap-2">

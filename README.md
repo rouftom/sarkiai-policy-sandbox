@@ -147,4 +147,15 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 ## License
 
-Apache-2.0 — see [`LICENSE`](LICENSE). The knowledge base content retains the terms of its sources.
+- **Code** — Apache-2.0 (see [`LICENSE`](LICENSE)).
+- **Knowledge base / docs** — CC BY 4.0; source documents retain their own terms.
+
+See [`docs/LICENSING.md`](docs/LICENSING.md) for the rationale and provenance.
+
+---
+
+<div align="center">
+
+Made with ♥️ by [Djotta](https://djotta.com)
+
+</div>

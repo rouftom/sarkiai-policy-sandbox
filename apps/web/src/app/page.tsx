@@ -225,6 +225,20 @@ export default function HomePage() {
         </div>
       )}
 
+      <footer className="container mt-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
+        <p>
+          Made with <span aria-label="love">♥️</span> by{' '}
+          <a
+            href="https://djotta.com"
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-primary hover:underline"
+          >
+            Djotta
+          </a>
+        </p>
+      </footer>
+
       <FloatingAssistant lens={lens} country={country} domain={domain} />
     </main>
   )
