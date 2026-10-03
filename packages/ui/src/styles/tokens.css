@@ -1,138 +1,92 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   SarkiAI Policy Sandbox — design tokens (SarkiAI Compact charter).
-   Tailwind v4 CSS-first: consumers import this file then map tokens in
-   `@theme inline`. Multi-theme is driven at runtime by [data-theme-pack] and
-   `--portal-dark` on <html>, exactly like the main SarkiAI apps.
+   SarkiAI design tokens (admin charter). Base defaults = the `fada` pack so
+   there is no flash before the runtime pack CSS (injected by ThemeProvider)
+   applies. Pack-specific values live in @sps/theme.
    ───────────────────────────────────────────────────────────────────────── */
 
+/* fada — common (charte slots + generic brand) */
 :root {
-  --radius: 0.75rem;
-
-  /* Light surfaces */
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #f8fafc;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-
-  /* Brand (default: "governance" pack — institutional indigo/teal) */
-  --brand-dark: #0b1220;
-  --brand-accent: #0f766e;
+  --charte-primary: #5039fb;
+  --charte-primary-light: #7c6bff;
+  --charte-primary-dark: #3b29d6;
+  --charte-accent: #d4af37;
+  --charte-accent-light: #e2c044;
+  --charte-ink: #0a0b2e;
+  --charte-surface: #f7f8fe;
+  --charte-danger: #ef4444;
+  --brand-dark: #0a0b2e;
+  --brand-accent: #5039fb;
   --brand-highlight: #d4af37;
 
-  --primary: #0f766e;
+  /* fada — light */
+  --background: #f7f8fe;
+  --foreground: #0a0b2e;
+  --card: #ffffff;
+  --card-foreground: #0a0b2e;
+  --popover: #ffffff;
+  --popover-foreground: #0a0b2e;
+  --primary: #5039fb;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #115e59;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #0f766e;
+  --secondary: #e8eafb;
+  --secondary-foreground: #1b1b4b;
+  --muted: #eef0fa;
+  --muted-foreground: #5b5f7a;
+  --accent: #e9eafb;
+  --accent-foreground: #312e81;
+  --border: #d9dcf0;
+  --input: #d9dcf0;
+  --ring: #5039fb;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a0b2e;
+  --sidebar-primary: #5039fb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef0fa;
+  --sidebar-accent-foreground: #1b1b4b;
+  --sidebar-border: #d9dcf0;
+  --sidebar-ring: #5039fb;
+  --chart-1: #5039fb;
+  --chart-2: #0063eb;
+  --chart-3: #d4af37;
+  --chart-4: #104dff;
+  --chart-5: #7c6bff;
+
+  --radius: 0.625rem;
+  --assistant-panel-bg: color-mix(in oklab, var(--charte-primary) 30%, transparent);
+  --app-panel-bg: var(--charte-surface);
 }
 
+/* fada — dark */
 .dark {
-  --background: var(--portal-dark, #0b1220);
-  --foreground: #f8fafc;
-  --card: rgba(255, 255, 255, 0.06);
-  --card-foreground: #f8fafc;
-  --popover: rgba(255, 255, 255, 0.06);
-  --popover-foreground: #f8fafc;
-
-  --primary: #14b8a6;
-  --primary-foreground: #06201d;
-  --secondary: rgba(255, 255, 255, 0.05);
-  --secondary-foreground: #f8fafc;
-  --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: rgba(255, 255, 255, 0.62);
-  --accent: #2dd4bf;
-  --accent-foreground: #06201d;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.14);
-  --ring: #14b8a6;
-}
-
-/* ── Multi-theme packs ─────────────────────────────────────────────────────
-   The admin assistant / settings can switch `data-theme-pack` on <html>.
-   Each pack overrides --primary/--accent/--portal-dark only. */
-
-html[data-theme-pack='governance'] {
-  --primary: #0f766e;
-  --accent: #115e59;
-  --portal-dark: #0b1220;
-  --ring: #0f766e;
-}
-
-html[data-theme-pack='diplomacy'] {
-  --primary: #1d4ed8;
-  --accent: #1e40af;
-  --portal-dark: #0a1128;
-  --ring: #1d4ed8;
-}
-
-html[data-theme-pack='health'] {
-  --primary: #059669;
-  --accent: #047857;
-  --portal-dark: #06140e;
-  --ring: #059669;
-}
-
-html[data-theme-pack='alerts'] {
-  --primary: #dc2626;
-  --accent: #b91c1c;
-  --portal-dark: #1a0a0a;
-  --ring: #dc2626;
-}
-
-/* ── Glass & gradients (SarkiAI premium aesthetics) ───────────────────────── */
-@layer utilities {
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-  }
-  .dark .glass-panel {
-    background: color-mix(in srgb, var(--portal-dark, #0b1220) 80%, transparent);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .text-gradient-brand {
-    background: linear-gradient(
-      135deg,
-      var(--primary) 0%,
-      var(--primary) 50%,
-      color-mix(in srgb, var(--primary) 55%, #000) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--primary) 40%, transparent) transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: color-mix(in srgb, var(--primary) 40%, transparent);
-    border-radius: 9999px;
-  }
-}
-
-/* Square-mode toggle, mirroring the admin console "Bordures du portail". */
-html[data-web-radius='square'] {
-  --radius: 0;
-}
-html[data-web-radius='square'] [class*='rounded']:not([class*='rounded-full']) {
-  border-radius: 0;
+  --background: #080a24;
+  --foreground: #eaebfa;
+  --card: #10123a;
+  --card-foreground: #eaebfa;
+  --popover: #10123a;
+  --popover-foreground: #eaebfa;
+  --primary: #7c6bff;
+  --primary-foreground: #080a24;
+  --secondary: #1b1e4a;
+  --secondary-foreground: #eaebfa;
+  --muted: #1b1e4a;
+  --muted-foreground: #a7aacb;
+  --accent: #1e1b4b;
+  --accent-foreground: #c7d2fe;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #7c6bff;
+  --sidebar: #0b0d2e;
+  --sidebar-foreground: #eaebfa;
+  --sidebar-primary: #7c6bff;
+  --sidebar-primary-foreground: #080a24;
+  --sidebar-accent: #1b1e4a;
+  --sidebar-accent-foreground: #eaebfa;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #7c6bff;
+  --chart-1: #7c6bff;
+  --chart-2: #4d8dff;
+  --chart-3: #d4af37;
+  --chart-4: #104dff;
+  --chart-5: #a79bff;
+  --assistant-panel-bg: color-mix(in oklab, var(--charte-primary-dark) 16%, transparent);
+  --app-panel-bg: color-mix(in oklab, var(--charte-ink) 88%, #000);
 }

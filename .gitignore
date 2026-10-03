@@ -35,6 +35,11 @@ venv/
 .env.*
 !.env.example
 !.env.*.example
+# SOPS-encrypted env is safe to commit; the age private key is not.
+!.env.enc
+secrets/
+*.age.key
+age.key
 
 # local data payloads (corpora can be large; keep structure via .gitkeep + manifests)
 data/country/*/*

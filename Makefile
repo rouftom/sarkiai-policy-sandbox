@@ -5,8 +5,8 @@ COMPOSE      := docker compose
 COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
 
 .DEFAULT_GOAL := help
-.PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo ingestion ocr transcription api web \
-        dev dev-kb dev-app logs ps down clean rebuild seed models sandbox-config
+.PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo up-minio ingestion ocr transcription api web \
+        dev dev-kb dev-app logs ps down clean rebuild seed models sandbox-config secrets-edit secrets-encrypt
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -36,6 +36,9 @@ models: ## Pull the local models (qwen2.5:14b + bge-m3)
 
 up-mongo: ## Launch only MongoDB (audit + CoT, no vectors)
 	$(COMPOSE) up -d mongo
+
+up-minio: ## Launch only MinIO (+ bucket init)
+	$(COMPOSE) up -d minio minio-init
 
 ingestion: ## Launch qdrant + ingestion
 	$(COMPOSE) up -d qdrant ingestion
@@ -81,3 +84,12 @@ seed: ## Ingest the sample Cameroon corpus into the KB
 
 sandbox-config: ## Validate the ITU sandbox compose file
 	docker compose -f deploy/sandbox/docker-compose.sandbox.yml config
+
+secrets-encrypt: ## Encrypt .env -> .env.enc (SOPS + age)
+	sops --encrypt --input-type dotenv --output-type dotenv .env > .env.enc
+
+secrets-edit: ## Edit the encrypted .env.enc in place
+	sops .env.enc
+
+secrets-decrypt: ## Decrypt .env.enc -> .env (local restore)
+	sops --decrypt .env.enc > .env

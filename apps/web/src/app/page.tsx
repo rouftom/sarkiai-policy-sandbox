@@ -70,7 +70,7 @@ export default function HomePage() {
           >
             {packs.map((pack) => (
               <option key={pack.id} value={pack.id}>
-                {pack.label}
+                {pack.name.fr}
               </option>
             ))}
           </select>

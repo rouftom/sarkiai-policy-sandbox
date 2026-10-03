@@ -19,6 +19,11 @@
 |-------|-------|-----|
 | **Qdrant** | vector knowledge base (dense + sparse) | open source, multi-arch, native hybrid RRF, payload filtering |
 | **MongoDB** | audit log + chain-of-thought | operational documents, no vectors — portable anywhere |
+| **MinIO** | assistant image attachments | S3-compatible local bucket, content-addressed (sha256) |
+
+Secrets are versioned with **SOPS + age** (see [`SECRETS.md`](./SECRETS.md)); no
+secret server. The UI follows the admin **SarkiAI Compact** charter via
+`@sps/theme` (theme packs, charte slots).
 
 Splitting them means the retrieval engine is replaceable and the operational
 store never dictates vector-search capabilities.

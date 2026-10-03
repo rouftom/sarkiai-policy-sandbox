@@ -26,6 +26,9 @@
 - `[x]` African/regional reference corpus (`data/global/africa/`, `scripts/fetch-corpus.sh`).
 - `[x]` Hash-chained audit + persisted CoT traces.
 - `[x]` **Local-first / sovereign**: Ollama (qwen2.5:14b) + local bge-m3 embeddings; **all cloud providers removed**; local faster-whisper. See `docs/LOCAL-FIRST-PLAN.md`, `docs/SOVEREIGNTY-AND-MODELS.md`.
+- `[x]` **Admin design system** replicated in `@sps/theme` (packs fada/green/ocean/sunset/mono, fada default) — assistant uses SarkiAI Compact.
+- `[x]` **MinIO** local object bucket (`sps-attachments`) for assistant image attachments.
+- `[x]` **SOPS + age** secrets workflow (`docs/SECRETS.md`, `scripts/gen-age-key.sh`).
 
 ### Sprint 1 — the Cameroon health corpus
 - `[ ]` Collect real CM corpus (health law, data-protection law, national AI/digital strategy, cyber strategy) → `data/country/cm/`.

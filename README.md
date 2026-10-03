@@ -67,7 +67,9 @@ sarkiai-policy-sandbox/
 │  ├─ scenarios/      # progressive event engine (chunked release)
 │  ├─ readiness/      # gap engine + ITU readiness dimensions
 │  ├─ audit/          # immutable audit log + persisted CoT traces
-│  └─ report/         # run dossier: audit + CoT + reports + citations
+│  ├─ report/         # run dossier: audit + CoT + reports + citations
+│  ├─ ui/             # shared components (SarkiAI Compact charter)
+│  └─ theme/          # admin theme packs (fada, green, ocean, sunset, mono)
 ├─ services/          # Python microservices
 │  ├─ ingestion/      # structure-aware legal chunking + embeddings + Qdrant store
 │  ├─ ocr/            # scanned gazette OCR (Tesseract)
@@ -100,6 +102,7 @@ Then:
 - OCR service → http://localhost:8002/docs
 - Qdrant dashboard → http://localhost:6333/dashboard
 - Ollama (local models) → http://localhost:11434
+- MinIO console (attachments) → http://localhost:9001
 - MongoDB (audit + CoT) → `mongodb://localhost:27017`
 
 Optional local reranker (TEI, no cloud):

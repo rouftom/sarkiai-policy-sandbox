@@ -32,6 +32,41 @@ services:
       start_period: 30s
     networks: [sps]
 
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:?set S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:?set S3_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+    expose: ["9000", "9001"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [sps]
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint:
+      - sh
+      - -c
+      - >
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing local/"$$S3_BUCKET"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET:-sps-attachments}
+    restart: "no"
+    networks: [sps]
+
   qdrant:
     image: qdrant/qdrant:v1.12.4
     restart: unless-stopped
@@ -107,6 +142,10 @@ services:
       RERANK_URL: ${RERANK_URL:-}
       RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
       OCR_URL: http://ocr:8000
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_BUCKET: ${S3_BUCKET:-sps-attachments}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
       SERVICE_API_KEY: ${SERVICE_API_KEY}
     ports:
       - "${API_PORT:-8000}:8000"
@@ -133,6 +172,7 @@ services:
 volumes:
   ollama-data:
   qdrant-data:
+  minio-data:
 
 networks:
   sps:
