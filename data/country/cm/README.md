@@ -23,6 +23,8 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 | `strategie_ia_collectivites_territoriales.pdf` | report | — | Papier : adoption IA collectivités territoriales |
 | `decret_2023_interconnexion.pdf` | regulation | — | Décret interconnexion/accès réseaux (2023) |
 | `art_recueil_textes_2018.pdf` | law | — | Recueil des textes télécoms (ART, 486 p.) |
+| `compendium_textes_poste_telecom_tic_2023.pdf` | law | **oui** | Compendium MINPOSTEL 2023 (456 p.) |
+| `decret_certification_electronique.pdf` | regulation | **oui** | Décret certification électronique |
 | `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
 | `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |

@@ -208,6 +208,34 @@
       "sourceUrl": "https://www.art.cm/"
     },
     {
+      "id": "cm-compendium-texts-2023",
+      "title": "Compendium of texts from the Postal, Telecommunications and ICT sector — 2023 Edition",
+      "authority": "MINPOSTEL",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "ai_policies", "human_interface"],
+      "status": "present",
+      "priority": "high",
+      "file": "compendium_textes_poste_telecom_tic_2023.pdf",
+      "needsOcr": true,
+      "note": "456 pages, scanné — OCR requis. Édition 2023 (succède au recueil ART 2018).",
+      "sourceUrl": "https://www.minpostel.gov.cm/"
+    },
+    {
+      "id": "cm-electronic-certification-decree",
+      "title": "Décret relatif à la certification électronique",
+      "authority": "MINPOSTEL / Primature",
+      "docType": "regulation",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "human_interface"],
+      "status": "present",
+      "priority": "medium",
+      "file": "decret_certification_electronique.pdf",
+      "needsOcr": true,
+      "note": "8 pages, scanné — OCR requis.",
+      "sourceUrl": "https://www.minpostel.gov.cm/"
+    },
+    {
       "id": "cm-health-sr-pf-standards",
       "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
       "authority": "Ministère de la Santé Publique",
