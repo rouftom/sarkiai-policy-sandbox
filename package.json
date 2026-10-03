@@ -1,0 +1,30 @@
+{
+  "name": "sarkiai-policy-sandbox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Policy-grounded multi-agent engine for the ITU AI for Good Lab Hackathon (UAE)",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules .turbo"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.1.0"
+  },
+  "packageManager": "bun@1.1.0"
+}

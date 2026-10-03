@@ -1,0 +1,118 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ITU AI for Good Lab Sandbox deployment.
+#
+# Differences from the local stack:
+#   - Vector KB runs on Qdrant (bundled here, or point QDRANT_URL at a managed
+#     instance provided by the Lab).
+#   - Operational store (audit + CoT) points at the Mongo cluster provided by
+#     the Lab (MONGODB_URI is injected by the sandbox).
+#   - Images are pulled from the registry unless built locally.
+#
+#   MONGODB_URI="mongodb+srv://..." QDRANT_URL="https://qdrant.lab" \
+#     docker compose --env-file .env.sandbox \
+#     -f deploy/sandbox/docker-compose.sandbox.yml up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: sps-sandbox
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}
+      QDRANT__LOG_LEVEL: ${QDRANT_LOG_LEVEL:-INFO}
+    # Not exposed publicly by default in the sandbox; internal network only.
+    expose: ["6333", "6334"]
+    networks: [sps]
+
+  ingestion:
+    image: ${SPS_REGISTRY:-ghcr.io/djotta-org}/sps-ingestion:${SPS_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: services/ingestion/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - qdrant
+    environment:
+      PORT: "8000"
+      QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+      QDRANT_COLLECTION: ${QDRANT_COLLECTION:-policy_chunks}
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:?set VOYAGE_API_KEY}
+      OCR_URL: http://ocr:8000
+      SERVICE_API_KEY: ${SERVICE_API_KEY:?set SERVICE_API_KEY}
+    expose: ["8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [sps]
+
+  ocr:
+    image: ${SPS_REGISTRY:-ghcr.io/djotta-org}/sps-ocr:${SPS_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: services/ocr/Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: "8000"
+      OCR_LANGUAGES: ${OCR_LANGUAGES:-fra+eng}
+      SERVICE_API_KEY: ${SERVICE_API_KEY}
+    expose: ["8000"]
+    networks: [sps]
+
+  api:
+    image: ${SPS_REGISTRY:-ghcr.io/djotta-org}/sps-api:${SPS_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+      target: prod
+    restart: unless-stopped
+    depends_on:
+      ingestion:
+        condition: service_healthy
+    environment:
+      PORT: "8000"
+      QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+      QDRANT_COLLECTION: ${QDRANT_COLLECTION:-policy_chunks}
+      MONGODB_URI: ${MONGODB_URI:?set MONGODB_URI to the Lab operational cluster}
+      MONGODB_DB_NAME: ${MONGODB_DB_NAME:-policy_sandbox}
+      INGESTION_URL: http://ingestion:8000
+      OCR_URL: http://ocr:8000
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY}
+      DEFAULT_LLM_PROVIDER: ${DEFAULT_LLM_PROVIDER:-deepseek}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      SERVICE_API_KEY: ${SERVICE_API_KEY}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    networks: [sps]
+
+  web:
+    image: ${SPS_REGISTRY:-ghcr.io/djotta-org}/sps-web:${SPS_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+      target: prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      PORT: "3000"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    networks: [sps]
+
+volumes:
+  qdrant-data:
+
+networks:
+  sps:
+    driver: bridge
