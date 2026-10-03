@@ -1,14 +1,14 @@
 /**
- * Hybrid retrieval over the country-scoped knowledge base, backed by Qdrant.
+ * Hybrid retrieval over the country-scoped knowledge base — LOCAL ONLY.
  *
  * Pipeline (ITU-T Y.3172 "ML model" layer):
- *   1. embed the query (VoyageAI, input_type=query)
- *   2. prefetch dense (Voyage) + sparse (BM25) with the jurisdiction filter
+ *   1. embed the query locally (Ollama, `bge-m3`)
+ *   2. prefetch dense (bge-m3) + sparse (BM25) with the jurisdiction filter
  *   3. Qdrant native fusion (RRF) of both ranked lists
- *   4. optional rerank (Voyage rerank-2)
+ *   4. optional LOCAL rerank via a TEI `/rerank` endpoint (BAAI/bge-reranker-v2-m3)
  *
- * If the Qdrant server has no sparse-inference model, we degrade gracefully to
- * dense-only search (same filter) — hybrid never blocks retrieval.
+ * No cloud call is made: embeddings and rerank stay on-premise
+ * (ITU readiness D10 `data_sovereignty`, D11 `edge_privacy`).
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest'
@@ -21,8 +21,11 @@ export interface RetrievalConfig {
   denseVectorName?: string
   sparseVectorName?: string
   sparseModel?: string
-  voyageApiKey: string
+  /** Ollama base URL for query embeddings. */
+  embeddingsBaseUrl: string
   embeddingModel?: string
+  /** Optional TEI reranker base URL. Empty => RRF only. */
+  rerankUrl?: string
   rerankModel?: string
 }
 
@@ -37,8 +40,8 @@ const DEFAULTS = {
   denseVectorName: 'dense',
   sparseVectorName: 'text',
   sparseModel: 'Qdrant/bm25',
-  embeddingModel: 'voyage-4',
-  rerankModel: 'rerank-2',
+  embeddingModel: 'bge-m3',
+  rerankModel: 'BAAI/bge-reranker-v2-m3',
 }
 
 function buildFilter(query: RetrievalQuery) {
@@ -52,23 +55,18 @@ function buildFilter(query: RetrievalQuery) {
   return { must }
 }
 
+/** Embed the query with the local Ollama server (`/api/embed`). */
 async function embedQuery(config: RetrievalConfig, text: string): Promise<number[]> {
-  const response = await fetch('https://api.voyageai.com/v1/embeddings', {
+  const base = config.embeddingsBaseUrl.replace(/\/$/, '')
+  const response = await fetch(`${base}/api/embed`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.voyageApiKey}`,
-    },
-    body: JSON.stringify({
-      input: [text],
-      model: config.embeddingModel ?? DEFAULTS.embeddingModel,
-      input_type: 'query',
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: config.embeddingModel ?? DEFAULTS.embeddingModel, input: [text] }),
   })
-  if (!response.ok) throw new Error(`Voyage embed failed (${response.status}): ${await response.text()}`)
-  const payload = (await response.json()) as { data: Array<{ embedding: number[] }> }
-  const embedding = payload.data?.[0]?.embedding
-  if (!embedding) throw new Error('Voyage returned no query embedding')
+  if (!response.ok) throw new Error(`Local embed failed (${response.status}): ${await response.text()}`)
+  const payload = (await response.json()) as { embeddings?: number[][] }
+  const embedding = payload.embeddings?.[0]
+  if (!embedding) throw new Error('Local embed returned no vector')
   return embedding
 }
 
@@ -126,7 +124,6 @@ export class PolicyRetriever {
 
     let points: QdrantPoint[] = []
     try {
-      // Hybrid: dense + BM25 sparse, fused server-side with RRF.
       points = (await this.client.query(this.cfg.collectionName, {
         prefetch: [
           { query: dense, using: this.cfg.denseVectorName, limit: topK * 3, filter },
@@ -142,7 +139,6 @@ export class PolicyRetriever {
         with_payload: true,
       })) as unknown as QdrantPoint[]
     } catch {
-      // Dense-only fallback (no server-side sparse inference, etc.).
       points = (await this.client.search(this.cfg.collectionName, {
         vector: { name: this.cfg.denseVectorName, vector: dense },
         filter,
@@ -159,27 +155,25 @@ export class PolicyRetriever {
     await this.client.upsert(this.cfg.collectionName, { points: points as never, wait: true })
   }
 
+  /** Optional local rerank through a TEI `/rerank` endpoint. */
   private async rerank(query: string, chunks: KbChunk[]): Promise<KbChunk[]> {
-    if (chunks.length <= 1) return chunks
+    if (chunks.length <= 1 || !this.cfg.rerankUrl) return chunks
     try {
-      const response = await fetch('https://api.voyageai.com/v1/rerank', {
+      const base = this.cfg.rerankUrl.replace(/\/$/, '')
+      const response = await fetch(`${base}/rerank`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.cfg.voyageApiKey}`,
-        },
-        body: JSON.stringify({
-          query,
-          documents: chunks.map((c) => c.text),
-          model: this.cfg.rerankModel,
-          top_k: chunks.length,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, texts: chunks.map((c) => c.text), truncate: true }),
       })
       if (!response.ok) return chunks
-      const payload = (await response.json()) as { data: Array<{ index: number; relevance_score: number }> }
-      return payload.data
-        .map((row) => ({ ...chunks[row.index]!, score: row.relevance_score }))
-        .filter(Boolean)
+      const payload = (await response.json()) as unknown
+      const rows: Array<{ index: number; score: number }> = Array.isArray(payload)
+        ? (payload as Array<{ index: number; score: number }>)
+        : ((payload as { results?: Array<{ index: number; score: number }> }).results ?? [])
+      if (rows.length === 0) return chunks
+      return rows
+        .map((row) => ({ ...chunks[row.index]!, score: row.score }))
+        .filter((chunk): chunk is KbChunk => Boolean(chunk))
     } catch {
       return chunks
     }

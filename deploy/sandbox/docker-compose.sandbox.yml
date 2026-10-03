@@ -16,6 +16,22 @@
 name: sps-sandbox
 
 services:
+  # Local model server (LLM + embeddings) — the sandbox must also be sovereign.
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    expose: ["11434"]
+    # GPU support: uncomment for NVIDIA on the sandbox host.
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks: [sps]
+
   qdrant:
     image: qdrant/qdrant:v1.12.4
     restart: unless-stopped
@@ -36,12 +52,14 @@ services:
     restart: unless-stopped
     depends_on:
       - qdrant
+      - ollama
     environment:
       PORT: "8000"
       QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
       QDRANT_API_KEY: ${QDRANT_API_KEY:-}
       QDRANT_COLLECTION: ${QDRANT_COLLECTION:-policy_chunks}
-      VOYAGE_API_KEY: ${VOYAGE_API_KEY:?set VOYAGE_API_KEY}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
       OCR_URL: http://ocr:8000
       SERVICE_API_KEY: ${SERVICE_API_KEY:?set SERVICE_API_KEY}
     expose: ["8000"]
@@ -83,10 +101,12 @@ services:
       MONGODB_URI: ${MONGODB_URI:?set MONGODB_URI to the Lab operational cluster}
       MONGODB_DB_NAME: ${MONGODB_DB_NAME:-policy_sandbox}
       INGESTION_URL: http://ingestion:8000
+      OLLAMA_BASE_URL: ${OLLAMA_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:14b}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
+      RERANK_URL: ${RERANK_URL:-}
+      RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
       OCR_URL: http://ocr:8000
-      VOYAGE_API_KEY: ${VOYAGE_API_KEY}
-      DEFAULT_LLM_PROVIDER: ${DEFAULT_LLM_PROVIDER:-deepseek}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
       SERVICE_API_KEY: ${SERVICE_API_KEY}
     ports:
       - "${API_PORT:-8000}:8000"
@@ -111,6 +131,7 @@ services:
     networks: [sps]
 
 volumes:
+  ollama-data:
   qdrant-data:
 
 networks:

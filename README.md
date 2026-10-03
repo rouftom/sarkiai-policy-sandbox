@@ -81,11 +81,15 @@ sarkiai-policy-sandbox/
 
 ## Quick start
 
+> **Sovereign / local-only**: all models run locally via Ollama. No API keys,
+> no cloud calls. First run pulls ~9 GB (qwen2.5:14b) + ~2 GB (bge-m3).
+
 ### Everything at once
 
 ```bash
-cp .env.example .env      # fill VOYAGE_API_KEY and one LLM provider key
-docker compose up --build
+cp .env.example .env
+docker compose up --build -d
+make models                # pull qwen2.5:14b + bge-m3 into Ollama
 ```
 
 Then:
@@ -95,21 +99,29 @@ Then:
 - Ingestion service → http://localhost:8001/docs
 - OCR service → http://localhost:8002/docs
 - Qdrant dashboard → http://localhost:6333/dashboard
+- Ollama (local models) → http://localhost:11434
 - MongoDB (audit + CoT) → `mongodb://localhost:27017`
+
+Optional local reranker (TEI, no cloud):
+
+```bash
+docker compose --profile rerank up -d      # then set RERANK_URL=http://rerank:80 in .env
+```
 
 ### Individual services
 
 ```bash
-docker compose up mongo ingestion ocr     # knowledge-base plane only
-docker compose up api web                 # application plane only
-docker compose up mongo ingestion         # just the KB ingest path
+docker compose up ollama qdrant ingestion ocr   # knowledge-base plane only
+docker compose up api web                        # application plane only
+docker compose up ollama qdrant ingestion        # just the KB ingest path
 ```
 
 Or via the Makefile:
 
 ```bash
 make up            # full stack
-make up-kb         # mongo + ingestion + ocr
+make models        # pull local LLM + embeddings
+make up-kb         # ollama + qdrant + ingestion + ocr
 make up-app        # api + web
 make logs          # follow logs
 make down          # stop

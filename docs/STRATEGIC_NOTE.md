@@ -17,7 +17,7 @@ chain-of-thought persisté).
 
 | Exigence du hackathon | Réponse SarkiAI Policy Sandbox |
 |-----------------------|-------------------------------|
-| Base de connaissances nationale vectorisée | Ingestion **structure-aware** (TITRE/CHAPITRE/ARTICLE, FR/EN), embeddings Voyage, **Qdrant hybride** (dense + sparse BM25, fusion RRF), **scopée par pays** |
+| Base de connaissances nationale vectorisée | Ingestion **structure-aware** (TITRE/CHAPITRE/ARTICLE, FR/EN), embeddings **locales bge-m3**, **Qdrant hybride** (dense + sparse BM25, fusion RRF), **scopée par pays** |
 | Agents : conseiller politique/juridique, acteur institutionnel, coordination multi-agents | Registre de mandats (santé, DPA, régulateur télécom, cyber, coordinateur) + citations obligatoires |
 | Scénarios d'erreur à **événements progressifs** | Moteur `scenarios` : libération par blocs (`releaseChunk`), information asymétrique par agent |
 | Audit + chain-of-thought | Journal **chaîné par hash** (infalsifiable) + traces CoT persistées par étape |
@@ -62,8 +62,8 @@ produit une évaluation indépendante citant les dispositions applicables.
 
 **SarkiAI Policy Sandbox** is a single policy-grounded agent engine aligned with
 **ITU-T Y.3172**. It ingests a country's legal/policy corpus into a
-jurisdiction-scoped vector knowledge base (structure-aware chunking, Voyage
-embeddings, Qdrant hybrid retrieval) and runs **mandated institutional agents**
+jurisdiction-scoped vector knowledge base (structure-aware chunking, local
+bge-m3 embeddings, Qdrant hybrid retrieval) and runs **mandated institutional agents**
 (legal adviser, sector ministry, data-protection authority, telecom regulator,
 cyber agency, coordinator). It exposes **two switchable lenses** — progressive
 error-scenario simulation and **ITU AI Readiness** assessment — over one shared

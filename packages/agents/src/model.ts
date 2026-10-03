@@ -1,23 +1,32 @@
-/** LLM provider factory. DeepSeek is the default; swap freely via env. */
+/**
+ * LLM provider factory — LOCAL ONLY (sovereign).
+ *
+ * Models are served by Ollama through its OpenAI-compatible endpoint
+ * (`/v1`). No cloud provider is used, so no data leaves the infrastructure
+ * (ITU readiness D10 `data_sovereignty`, D11 `edge_privacy`).
+ */
 
-import { createDeepSeek } from '@ai-sdk/deepseek'
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import type { LanguageModel } from 'ai'
 
 export interface ModelConfig {
-  provider?: 'deepseek' | 'groq' | 'openai' | 'anthropic' | 'google'
-  apiKey?: string
-  model?: string
+  /** Ollama base URL, e.g. http://ollama:11434 (the `/v1` suffix is added). */
   baseURL?: string
+  /** Model tag, e.g. qwen2.5:14b. */
+  model?: string
+  apiKey?: string
+}
+
+function ollamaBase(config: ModelConfig): string {
+  const base = (config.baseURL ?? process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434').replace(/\/$/, '')
+  return base.endsWith('/v1') ? base : `${base}/v1`
 }
 
 export function createModel(config: ModelConfig = {}): LanguageModel {
-  const provider = config.provider ?? (process.env.DEFAULT_LLM_PROVIDER as ModelConfig['provider']) ?? 'deepseek'
-
-  if (provider === 'deepseek') {
-    const deepseek = createDeepSeek({ apiKey: config.apiKey ?? process.env.DEEPSEEK_API_KEY, baseURL: config.baseURL })
-    return deepseek(config.model ?? process.env.DEEPSEEK_MODEL ?? 'deepseek-chat')
-  }
-
-  // Other providers are wired in the app layer to keep this package light.
-  throw new Error(`Provider "${provider}" is not wired in @sps/agents yet.`)
+  const provider = createOpenAICompatible({
+    name: 'ollama',
+    baseURL: ollamaBase(config),
+    apiKey: config.apiKey ?? 'ollama',
+  })
+  return provider.chatModel(config.model ?? process.env.OLLAMA_MODEL ?? 'qwen2.5:14b')
 }

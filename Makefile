@@ -5,8 +5,8 @@ COMPOSE      := docker compose
 COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
 
 .DEFAULT_GOAL := help
-.PHONY: help up up-kb up-app up-qdrant up-mongo ingestion ocr transcription api web \
-        dev dev-kb dev-app logs ps down clean rebuild seed sandbox-config
+.PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo ingestion ocr transcription api web \
+        dev dev-kb dev-app logs ps down clean rebuild seed models sandbox-config
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -14,14 +14,25 @@ help: ## Show available targets
 up: ## Launch the full stack (detached)
 	$(COMPOSE) up --build -d
 
-up-kb: ## Launch only the knowledge-base plane (qdrant + ingestion + ocr)
-	$(COMPOSE) up --build -d qdrant ingestion ocr
+up-kb: ## Launch only the knowledge-base plane (ollama + qdrant + ingestion + ocr)
+	$(COMPOSE) up --build -d ollama qdrant ingestion ocr
 
 up-app: ## Launch only the application plane (api + web)
 	$(COMPOSE) up --build -d api web
 
 up-qdrant: ## Launch only Qdrant (vector KB)
 	$(COMPOSE) up -d qdrant
+
+up-ollama: ## Launch only Ollama (local LLM + embeddings)
+	$(COMPOSE) up -d ollama
+
+models: ## Pull the local models (qwen2.5:14b + bge-m3)
+	$(COMPOSE) up -d ollama
+	@echo "Waiting for Ollama..."
+	@until $(COMPOSE) exec -T ollama ollama list >/dev/null 2>&1; do sleep 2; done
+	$(COMPOSE) exec -T ollama ollama pull $${OLLAMA_MODEL:-qwen2.5:14b}
+	$(COMPOSE) exec -T ollama ollama pull $${EMBEDDING_MODEL:-bge-m3}
+	@echo "Local models ready."
 
 up-mongo: ## Launch only MongoDB (audit + CoT, no vectors)
 	$(COMPOSE) up -d mongo
@@ -45,7 +56,7 @@ dev: ## Launch full stack with hot reload
 	$(COMPOSE_DEV) up
 
 dev-kb: ## Launch KB plane with hot reload
-	$(COMPOSE_DEV) up qdrant ingestion ocr
+	$(COMPOSE_DEV) up ollama qdrant ingestion ocr
 
 dev-app: ## Launch app plane with hot reload
 	$(COMPOSE_DEV) up api web

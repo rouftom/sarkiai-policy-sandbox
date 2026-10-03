@@ -21,11 +21,11 @@ class Settings(BaseSettings):
     # fastembed model used to build the BM25 sparse vector (hybrid search).
     qdrant_sparse_model: str = "Qdrant/bm25"
 
-    # VoyageAI embeddings
-    voyage_api_key: str = ""
-    voyage_embedding_model: str = "voyage-4"
+    # Local embeddings (Ollama, default bge-m3 — 1024-dim, matches Qdrant config)
+    ollama_url: str = "http://localhost:11434"
+    embedding_model: str = "bge-m3"
     embedding_dimension: int = 1024
-    embedding_batch_size: int = 128
+    embedding_batch_size: int = 64
 
     # Chunking
     default_chunk_size: int = 900

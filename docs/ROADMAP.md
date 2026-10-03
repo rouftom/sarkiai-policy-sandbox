@@ -17,7 +17,7 @@
 ### Sprint 0 — foundations (done)
 - `[x]` Monorepo, Docker all-in-one + individual, lens profiles.
 - `[x]` Jurisdiction-aware ingestion (adapted, `country`/`jurisdiction`).
-- `[x]` Hybrid retrieval + RRF + rerank package.
+- `[x]` Hybrid retrieval + RRF + local TEI rerank (optional).
 - `[x]` Agent registry, orchestrator, mandatory-citation prompt.
 - `[x]` Progressive scenario engine.
 - `[x]` Readiness gap engine (13 dimensions / 6 factors, Report 2.0).
@@ -25,6 +25,7 @@
 - `[x]` Causal what-if propagation across dimensions (`packages/readiness/src/causal.ts`).
 - `[x]` African/regional reference corpus (`data/global/africa/`, `scripts/fetch-corpus.sh`).
 - `[x]` Hash-chained audit + persisted CoT traces.
+- `[x]` **Local-first / sovereign**: Ollama (qwen2.5:14b) + local bge-m3 embeddings; **all cloud providers removed**; local faster-whisper. See `docs/LOCAL-FIRST-PLAN.md`, `docs/SOVEREIGNTY-AND-MODELS.md`.
 
 ### Sprint 1 — the Cameroon health corpus
 - `[ ]` Collect real CM corpus (health law, data-protection law, national AI/digital strategy, cyber strategy) → `data/country/cm/`.
@@ -34,7 +35,7 @@
 
 ### Sprint 2 — scenario authoring & coordination
 - `[ ]` Author 3 progressive scenarios (health breach, cross-border telehealth, AI triage failure) with asymmetric `visibleTo`.
-- `[ ]` Implement the coordinator reconciliation step (joint situation report).
+- `[x]` Coordinator reconciliation step (joint situation report) — `packages/agents/src/coordinator.ts`.
 - `[ ]` Add the `onBeforeRelease` facilitator hook in the web console.
 
 ### Sprint 3 — auditability & evidence (in progress)
@@ -47,9 +48,10 @@
 - `[ ]` Record the ≤7-minute demo video.
 - `[ ]` Finalize README, license, and the public KB in the ITU AI for Good Lab.
 
-### Sprint 5 — multi-country (post-shortlist)
+### Sprint 5 — multi-country & fine-tuning (post-shortlist)
 - `[ ]` Add UAE (`data/country/ae/`) for the cross-national narrative.
 - `[ ]` Validate the same engine on a second jurisdiction (no code change).
+- `[ ]` **Fine-tuning local (unsloth)**: export (KB context → cited answer) pairs from Mongo (`cot_traces`, `joint_reports`, readiness) → train a LoRA/QLoRA on `qwen2.5` with [unsloth](https://github.com/unslothai/unsloth) → merge + convert to GGUF → `ollama create sps-qwen` → `OLLAMA_MODEL=sps-qwen`. The dataset never leaves the infrastructure (or train inside the ITU sandbox with its credits).
 
 ## Open gaps carried from the parent platform
 

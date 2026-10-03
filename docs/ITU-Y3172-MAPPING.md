@@ -68,7 +68,7 @@ by the hackathon submission template.
 | Concern | File | Notes |
 |---------|------|-------|
 | Structure-aware chunking (FR/EN legal headings) | `services/ingestion/src/rag_ingestion/services/chunker.py` | `StructureAwareChunker` → `headingPath`, `articleNumber` |
-| Embeddings (VoyageAI voyage-4, 1024-d) | `services/ingestion/src/rag_ingestion/services/embeddings.py` | `EmbeddingService` |
+| Embeddings (local bge-m3, 1024-d, Ollama) | `services/ingestion/src/rag_ingestion/services/embeddings.py` | `EmbeddingService` |
 | Vector persistence in Qdrant (dense + sparse) + payload indexes + dedup | `services/ingestion/src/rag_ingestion/services/qdrant_store.py` | collection payload filters include `country` |
 | OCR fallback for scanned gazettes | `services/ocr/app/ocr.py` | Tesseract `fra+eng` |
 | Runtime config (ports, models, thresholds) | `services/ingestion/src/rag_ingestion/config.py` | pydantic-settings |
@@ -78,7 +78,7 @@ by the hackathon submission template.
 | Concern | File | Notes |
 |---------|------|-------|
 | Hybrid retrieval: query embedding → Qdrant dense + sparse BM25 → RRF → rerank | `packages/retrieval/src/index.ts` | `PolicyRetriever`, `rrf()` |
-| LLM provider abstraction (DeepSeek default) | `packages/agents/src/model.ts` | `createModel()` |
+| LLM provider (local Ollama, qwen2.5:14b) | `packages/agents/src/model.ts` | `createModel()` |
 | Model fine-tuning (sandbox credits, out-of-band) | `deploy/sandbox/README.md` §4 | point at tuned endpoint via env |
 
 ## 5. ML application

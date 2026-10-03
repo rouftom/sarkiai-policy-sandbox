@@ -13,7 +13,7 @@ Named vectors:
 
 | Vector | Kind | Source | Purpose |
 |--------|------|--------|---------|
-| `dense` | dense, 1024-d, cosine | Voyage `voyage-4` | semantic retrieval |
+| `dense` | dense, 1024-d, cosine | local `bge-m3` (Ollama) | semantic retrieval |
 | `text` | sparse, IDF modifier | BM25 (`Qdrant/bm25`) | lexical retrieval → hybrid RRF |
 
 Payload (per point):

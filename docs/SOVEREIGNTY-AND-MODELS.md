@@ -130,3 +130,20 @@ extrémités (embeddings + LLM) ; le passage à Ollama/bge-m3 est un changement
 **localisé** (factory de providers + un service Docker), pas une refonte — et
 c'est probablement **le choix le plus aligné** avec l'ITU si la sandbox est
 isolée.
+
+## 8. Décision appliquée (implémentée)
+
+Choix retenu : **local-first, cloud entièrement retiré.**
+
+| Élément | Décision |
+|---------|----------|
+| LLM | **`qwen2.5:14b`** via Ollama (parité repo ITU) ; `qwen2.5:7b` en option env |
+| Embeddings | **`bge-m3`** (Ollama) — 1024-dim, multilingue FR |
+| Rerank | **TEI local** (`BAAI/bge-reranker-v2-m3`), profil compose `rerank` ; sinon RRF |
+| Transcription | **faster-whisper** local (profil `full`/`media`) |
+| Providers cloud | **supprimés** (DeepSeek, Groq, OpenAI, Anthropic, Google, Voyage) |
+| Fine-tuning | **unsloth** (LoRA/QLoRA local) — cf. `docs/ROADMAP.md` |
+
+Bénéfice direct sur les métriques évaluées : **D10 `d10_m10` Data Sovereignty**
+et **D11 `d11_m06` Edge Privacy** passent au maximum (aucun mouvement de données
+hors infrastructure).

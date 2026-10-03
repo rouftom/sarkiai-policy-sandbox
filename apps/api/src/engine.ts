@@ -13,16 +13,18 @@ import { config } from './config.js'
 
 export function createEngine() {
   const model = createModel({
-    provider: config.llm.provider,
-    apiKey: config.llm.apiKey,
-    model: config.llm.model,
+    baseURL: config.ollama.baseUrl,
+    model: config.ollama.model,
   })
 
   const retriever = new PolicyRetriever({
     qdrantUrl: config.qdrant.url,
     qdrantApiKey: config.qdrant.apiKey || undefined,
     collectionName: config.qdrant.collection,
-    voyageApiKey: config.voyage.apiKey,
+    embeddingsBaseUrl: config.embeddings.baseUrl,
+    embeddingModel: config.embeddings.model,
+    rerankUrl: config.rerank.url || undefined,
+    rerankModel: config.rerank.model,
   })
 
   const audit = new AuditService({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })

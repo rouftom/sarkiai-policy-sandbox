@@ -49,7 +49,7 @@ Chaque entrée a un `status` :
 # 1. placer les fichiers (PDF/TXT) dans data/country/cm/
 cp /chemin/vers/loi.pdf data/country/cm/
 
-# 2. ingérer (Qdrant + Voyage) — le chunking extrait TITRE/CHAPITRE/ARTICLE
+# 2. ingérer (Qdrant + bge-m3 local) — le chunking extrait TITRE/CHAPITRE/ARTICLE
 ./scripts/seed.sh --country cm --doc-type law --dir data/country/cm
 
 # 3. corpus mondial

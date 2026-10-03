@@ -9,8 +9,9 @@
 3. **Grounding is a hard post-condition.** A legal answer with zero citations is
    invalid.
 4. **Every decision is auditable.** Reasoning is persisted, not merely streamed.
-5. **Open and sovereign.** Apache-2.0; no proprietary vector dependency; runs
-   entirely inside the ITU sandbox.
+5. **Open and sovereign.** Apache-2.0; **all models run locally** (Ollama:
+   qwen2.5 LLM + bge-m3 embeddings; optional local TEI reranker); no cloud call;
+   runs entirely inside the ITU sandbox (ITU readiness D10/D11).
 
 ## Storage split
 
@@ -56,7 +57,7 @@ store never dictates vector-search capabilities.
 ## Data flow (simulation lens)
 
 1. **Ingest** — country corpus → `services/ingestion` → structure-aware chunks →
-   Voyage embeddings → Qdrant points (dense + sparse BM25).
+   local bge-m3 embeddings (Ollama) → Qdrant points (dense + sparse BM25).
 2. **Scenario start** — `ScenarioEngine.release()` yields event batches by tick.
 3. **Per agent** — `PolicyOrchestrator.runAgent()` retrieves country provisions
    from Qdrant, builds the mandate-grounded prompt, generates, enforces citations.

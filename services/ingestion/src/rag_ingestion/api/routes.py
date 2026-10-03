@@ -116,7 +116,7 @@ def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         service="sps-ingestion",
-        embeddingModel=settings.voyage_embedding_model,
+        embeddingModel=settings.embedding_model,
         mongoCollection=settings.mongodb_collection,
         ocrEnabled=bool(settings.ocr_url),
     )

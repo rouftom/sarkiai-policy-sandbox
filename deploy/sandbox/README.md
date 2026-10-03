@@ -9,7 +9,7 @@ fine-tuning. Our stack is stateless: the vector KB lives in Qdrant
 
 ```bash
 cp deploy/sandbox/.env.sandbox.example .env.sandbox
-# fill MONGODB_URI, VOYAGE_API_KEY, DEEPSEEK_API_KEY, SERVICE_API_KEY
+# fill MONGODB_URI, SERVICE_API_KEY (+ OLLAMA_URL/EMBEDDING_MODEL if managed)
 ```
 
 ## 2. Run

@@ -105,8 +105,8 @@ Le modèle exige une structure précise :
    hackathon demande en plus (conseiller juridique, acteur institutionnel,
    coordination). Les deux taxonomies sont **complémentaires**.
 8. **Stack.** Référence = Ollama + ChromaDB + SQLite (local, ~16 GB RAM) ; nous =
-   Qdrant + Voyage + providers (portable, sandbox). Le hackathon autorise les
-   crédits cloud ; à confirmer sur l'endpoint réel de la sandbox.
+   Qdrant + **Ollama local (qwen2.5 + bge-m3)** — plus portable et **souverain**
+   (aucun egress), donc déployable dans une sandbox isolée.
 
 ## 5. Actions recommandées (priorisées)
 
