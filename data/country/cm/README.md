@@ -22,6 +22,7 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 | `loi_2013_013_communications_electroniques.pdf` | law | — | Loi communications électroniques |
 | `strategie_ia_collectivites_territoriales.pdf` | report | — | Papier : adoption IA collectivités territoriales |
 | `decret_2023_interconnexion.pdf` | regulation | — | Décret interconnexion/accès réseaux (2023) |
+| `art_recueil_textes_2018.pdf` | law | — | Recueil des textes télécoms (ART, 486 p.) |
 | `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
 | `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |

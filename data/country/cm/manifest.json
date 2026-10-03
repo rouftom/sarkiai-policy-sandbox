@@ -195,6 +195,19 @@
       "sourceUrl": "https://www.art.cm/"
     },
     {
+      "id": "cm-telecom-texts-compilation-2018",
+      "title": "Recueil des textes du secteur des communications électroniques (ART, 2018)",
+      "authority": "ART",
+      "docType": "law",
+      "jurisdiction": "national",
+      "pillar": ["digital_infrastructure", "ai_policies", "human_interface"],
+      "status": "present",
+      "priority": "high",
+      "file": "art_recueil_textes_2018.pdf",
+      "note": "486 pages — compilation de lois/décrets/arrêtés télécoms.",
+      "sourceUrl": "https://www.art.cm/"
+    },
+    {
       "id": "cm-health-sr-pf-standards",
       "title": "Normes et standards en santé de la reproduction et planification familiale au Cameroun",
       "authority": "Ministère de la Santé Publique",
