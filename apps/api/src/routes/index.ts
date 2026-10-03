@@ -6,7 +6,7 @@ import { IngestionClient } from '@sps/kb'
 import { whatIf } from '@sps/readiness'
 import { buildRunDossier, renderDossierMarkdown } from '@sps/report'
 import { institutionsForDomain } from '@sps/shared'
-import type { Domain, JointSituationReport, WorkflowLens } from '@sps/shared'
+import type { Domain, InstitutionSpec, JointSituationReport, ScenarioEvent, WorkflowLens } from '@sps/shared'
 import { createEngine, createScenario } from '../engine.js'
 import { healthDataBreach } from '../scenarios.js'
 import { config } from '../config.js'
@@ -15,6 +15,21 @@ const engine = createEngine()
 const ingestion = new IngestionClient({ baseUrl: config.ingestion.baseUrl, apiKey: config.ingestion.apiKey })
 
 const lensSchema = z.enum(['simulation', 'readiness', 'hybrid'])
+
+/** In-memory facilitator session for tick-by-tick scenario release. */
+interface ScenarioSession {
+  runId: string
+  country: string
+  domain: Domain
+  institutions: InstitutionSpec[]
+  events: ScenarioEvent[]
+  ticks: number[]
+  released: number
+  history: ScenarioEvent[]
+  reports: JointSituationReport[]
+}
+
+const scenarioSessions = new Map<string, ScenarioSession>()
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
   app.get('/health', async () => ({ status: 'ok', service: 'sps-api' }))
@@ -66,11 +81,66 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     })
   })
 
-  // ── Scenario: progressive event release (SSE) ─────────────────────────────
-  app.get('/v1/scenarios/:id/release', async (request, reply) => {
-    const params = z.object({ id: z.string() }).parse(request.params)
-    const query = z.object({ country: z.string().default('cm') }).parse(request.query)
+  // ── Scenarios: progressive release + multi-agent reconciliation ───────────
 
+  function buildSession(country: string, domain: Domain): ScenarioSession {
+    const run = createScenario(healthDataBreach(country), 'simulation').toRun()
+    return {
+      runId: run.id,
+      country,
+      domain,
+      institutions: institutionsForDomain(domain),
+      events: run.events,
+      ticks: [...new Set(run.events.map((e) => e.releaseChunk))].sort((a, b) => a - b),
+      released: 0,
+      history: [],
+      reports: [],
+    }
+  }
+
+  /** Release the next tick (facilitator gate) and reconcile it. */
+  async function releaseNext(session: ScenarioSession) {
+    if (session.released >= session.ticks.length) return { done: true as const, tick: null, report: null }
+    const tick = session.ticks[session.released]!
+    const events = session.events.filter((e) => e.releaseChunk === tick)
+    session.history.push(...events)
+
+    const assessments = await engine.coordinator.runTick({
+      runId: session.runId,
+      tick,
+      country: session.country,
+      domain: session.domain,
+      lens: 'simulation',
+      institutions: session.institutions,
+      events,
+      history: [...session.history],
+    })
+    const report = await engine.coordinator.reconcile({
+      runId: session.runId,
+      tick,
+      country: session.country,
+      domain: session.domain,
+      assessments,
+    })
+    session.reports.push(report)
+    session.released += 1
+    await engine.reports.saveReports(session.runId, session.reports)
+    return { done: session.released >= session.ticks.length, tick, report }
+  }
+
+  async function dossierFor(runId: string, reports: JointSituationReport[]) {
+    return buildRunDossier({
+      runId,
+      audit: await engine.audit.getAuditForRun(runId),
+      traces: await engine.audit.getTrace(runId),
+      reports,
+      integrity: await engine.audit.verifyChain(),
+    })
+  }
+
+  // SSE stream of all ticks (fixed delay) — for passive viewers.
+  app.get('/v1/scenarios/:id/release', async (request, reply) => {
+    const query = z.object({ country: z.string().default('cm') }).parse(request.query)
     const scenario = createScenario(healthDataBreach(query.country), 'simulation')
     reply.raw.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' })
     for await (const batch of scenario.release({ chunkDelayMs: 800 })) {
@@ -80,7 +150,68 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     reply.raw.end()
   })
 
-  // ── Scenario: run all ticks + multi-agent reconciliation ──────────────────
+  // Start a facilitator session (returns the agenda, not the content).
+  app.post('/v1/scenarios/start', async (request, reply) => {
+    const body = z
+      .object({
+        id: z.string().default('health-data-breach'),
+        country: z.string().length(2).default('cm'),
+        domain: z.enum(['health', 'education', 'telecom', 'public_services', 'agriculture']).default('health'),
+      })
+      .safeParse(request.body ?? {})
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
+
+    const session = buildSession(body.data.country, body.data.domain as Domain)
+    scenarioSessions.set(session.runId, session)
+    return {
+      runId: session.runId,
+      country: session.country,
+      domain: session.domain,
+      totalTicks: session.ticks.length,
+      agents: session.institutions.map((i) => i.id),
+      agenda: session.events.map((e) => ({
+        sequence: e.sequence,
+        releaseChunk: e.releaseChunk,
+        title: e.title,
+        visibleTo: e.visibleTo,
+      })),
+    }
+  })
+
+  // Release the next tick (the `onBeforeRelease` facilitator gate).
+  app.post('/v1/scenarios/:runId/next', async (request, reply) => {
+    const { runId } = z.object({ runId: z.string() }).parse(request.params)
+    const session = scenarioSessions.get(runId)
+    if (!session) return reply.status(404).send({ error: `Unknown scenario session "${runId}"` })
+
+    const result = await releaseNext(session)
+    return {
+      runId,
+      releasedTicks: session.released,
+      totalTicks: session.ticks.length,
+      done: result.done,
+      tick: result.tick,
+      report: result.report,
+    }
+  })
+
+  // Current state of a session.
+  app.get('/v1/scenarios/:runId', async (request, reply) => {
+    const { runId } = z.object({ runId: z.string() }).parse(request.params)
+    const session = scenarioSessions.get(runId)
+    if (!session) return reply.status(404).send({ error: `Unknown scenario session "${runId}"` })
+    return {
+      runId,
+      country: session.country,
+      domain: session.domain,
+      releasedTicks: session.released,
+      totalTicks: session.ticks.length,
+      done: session.released >= session.ticks.length,
+      reports: session.reports,
+    }
+  })
+
+  // Auto-run: start + release every tick + dossier.
   app.post('/v1/scenarios/run', async (request, reply) => {
     const body = z
       .object({
@@ -91,47 +222,13 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       .safeParse(request.body ?? {})
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
 
-    const { country, domain } = body.data
-    const scenario = createScenario(healthDataBreach(country), 'simulation')
-    const run = scenario.toRun()
-    const institutions = institutionsForDomain(domain as Domain)
-    const ticks = [...new Set(run.events.map((e) => e.releaseChunk))].sort((a, b) => a - b)
-
-    const history: typeof run.events = []
-    const reports: JointSituationReport[] = []
-    for (const tick of ticks) {
-      const events = run.events.filter((e) => e.releaseChunk === tick)
-      history.push(...events)
-      const assessments = await engine.coordinator.runTick({
-        runId: run.id,
-        tick,
-        country,
-        domain: domain as Domain,
-        lens: 'simulation',
-        institutions,
-        events,
-        history: [...history],
-      })
-      const report = await engine.coordinator.reconcile({
-        runId: run.id,
-        tick,
-        country,
-        domain: domain as Domain,
-        assessments,
-      })
-      reports.push(report)
+    const session = buildSession(body.data.country, body.data.domain as Domain)
+    scenarioSessions.set(session.runId, session)
+    while (session.released < session.ticks.length) {
+      await releaseNext(session)
     }
-
-    await engine.reports.saveReports(run.id, reports)
-    const dossier = buildRunDossier({
-      runId: run.id,
-      audit: await engine.audit.getAuditForRun(run.id),
-      traces: await engine.audit.getTrace(run.id),
-      reports,
-      integrity: { valid: true },
-    })
-
-    return { runId: run.id, country, domain, ticks: reports, dossier }
+    const dossier = await dossierFor(session.runId, session.reports)
+    return { runId: session.runId, country: session.country, domain: session.domain, ticks: session.reports, dossier }
   })
 
   // ── Readiness assessment ──────────────────────────────────────────────────

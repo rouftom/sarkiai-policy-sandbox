@@ -36,12 +36,13 @@
 ### Sprint 2 — scenario authoring & coordination
 - `[ ]` Author 3 progressive scenarios (health breach, cross-border telehealth, AI triage failure) with asymmetric `visibleTo`.
 - `[x]` Coordinator reconciliation step (joint situation report) — `packages/agents/src/coordinator.ts`.
-- `[ ]` Add the `onBeforeRelease` facilitator hook in the web console.
+- `[x]` `onBeforeRelease` facilitator hook: `POST /v1/scenarios/start` + `/:runId/next` + "Mode facilitateur" in the console.
 
-### Sprint 3 — auditability & evidence (in progress)
+### Sprint 3 — auditability & evidence
 - `[x]` Export a run dossier (audit + CoT + reports + citations) — `packages/report`, `GET /v1/audit/dossier/:runId`.
 - `[x]` Multi-agent coordinator + conflict visualization in the web console.
-- `[ ]` Surface `verifyChain()` + trace viewer in the web app.
+- `[x]` Surface `verifyChain()` + chain-of-thought trace viewer in the web app (`AuditPanel`).
+- `[x]` Readiness 0–5 scoring + causal what-if in the web console.
 
 ### Sprint 4 — report & demo
 - `[ ]` Generate the ≤5-page technical report from `docs/` + a real run.

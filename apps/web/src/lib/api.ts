@@ -18,11 +18,45 @@ export interface GapDto {
   severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
+export interface DimensionScoreDto {
+  dimension: string
+  dimensionId: number
+  dimensionName: string
+  score: number
+  maturity: string
+  evidence: string[]
+  gaps: string[]
+  recommendations: string[]
+  confidence: number
+  causalEffect?: number
+}
+
 export interface ReadinessReportDto {
   country: string
   domain: string
   summary: string
-  dimensions: Array<{ dimension: string; gaps: GapDto[] }>
+  dimensions: Array<{ dimension: string; dimensionId: number; gaps: GapDto[] }>
+  scores: DimensionScoreDto[]
+  scenario: { overall: number; composite: number }
+}
+
+export interface WhatIfResultDto {
+  country: string
+  domain: string
+  changes: Record<string, number>
+  original: DimensionScoreDto[]
+  projected: DimensionScoreDto[]
+  effects: Record<string, number>
+  narrative: string
+}
+
+export interface CoTTraceDto {
+  id: string
+  agentId: string
+  step: number
+  thought: string
+  model: string
+  ts: string
 }
 
 export interface AssessmentDto {
@@ -60,6 +94,31 @@ export interface RunResultDto {
   dossier: { citationCount: number; conflictCount: number; traces: unknown[] }
 }
 
+export interface ScenarioAgendaItem {
+  sequence: number
+  releaseChunk: number
+  title: string
+  visibleTo: string[]
+}
+
+export interface ScenarioStartDto {
+  runId: string
+  country: string
+  domain: string
+  totalTicks: number
+  agents: string[]
+  agenda: ScenarioAgendaItem[]
+}
+
+export interface TickResultDto {
+  runId: string
+  releasedTicks: number
+  totalTicks: number
+  done: boolean
+  tick: number | null
+  report: JointReportDto | null
+}
+
 export const api = {
   ask: (body: {
     institutionId: string
@@ -75,7 +134,18 @@ export const api = {
   runScenario: (body: { id?: string; country: string; domain: string }) =>
     request<RunResultDto>('/v1/scenarios/run', { method: 'POST', body: JSON.stringify(body) }),
 
+  startScenario: (body: { id?: string; country: string; domain: string }) =>
+    request<ScenarioStartDto>('/v1/scenarios/start', { method: 'POST', body: JSON.stringify(body) }),
+
+  nextTick: (runId: string) =>
+    request<TickResultDto>(`/v1/scenarios/${runId}/next`, { method: 'POST' }),
+
+  whatIf: (body: { country: string; domain: string; changes: Record<string, number>; scores?: DimensionScoreDto[] }) =>
+    request<WhatIfResultDto>('/v1/readiness/whatif', { method: 'POST', body: JSON.stringify(body) }),
+
   auditChain: () => request<{ valid: boolean; brokenAt?: string }>('/v1/audit/chain'),
+
+  auditTrace: (runId: string) => request<{ runId: string; trace: CoTTraceDto[] }>(`/v1/audit/trace/${runId}`),
 
   dossierUrl: (runId: string, format: 'json' | 'markdown' = 'markdown') =>
     `${API_URL}/v1/audit/dossier/${runId}?format=${format}`,
