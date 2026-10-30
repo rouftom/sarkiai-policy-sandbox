@@ -1,223 +1,399 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronRight, Download, GitMerge, Play, TriangleAlert } from 'lucide-react'
-import { Button, Card, CardContent, CardHeader, CardTitle, cn } from '@sps/ui'
-import { api, type JointReportDto, type ScenarioAgendaItem } from '@/lib/api'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+import { Button } from '@sps/ui'
+import type { Domain } from '@sps/shared'
+import {
+  api,
+  type JointReportDto,
+  type ScenarioAgendaItem,
+  type ScenarioEventDto,
+  type ScenarioRunDto,
+  type ScenarioRunSummaryDto,
+} from '@/lib/api'
+import { useI18n } from '@/lib/i18n'
+import { useToast } from '@/components/shared/toast'
+import { ProcessingBar } from '@/components/processing-bar'
+import { ScenarioHistory } from '@/components/scenario-history'
+import { ScenarioCarousel, type ScenarioBlock } from '@/components/scenario-processes'
 
-const SEVERITY: Record<string, string> = {
-  low: 'text-muted-foreground',
-  medium: 'text-amber-500',
-  high: 'text-orange-500',
-  critical: 'text-destructive',
+const MAX_SECTORS_KEY = 'sps.scenarios.maxSectors'
+
+/** Starting data of one run, as the start and resume routes give it. */
+interface RunStart {
+  runId: string
+  domain: Domain
+  agenda: ScenarioAgendaItem[]
+  totalTicks: number
+  released: number
 }
 
-function TickReport({ tick }: { tick: JointReportDto }) {
-  return (
-    <div className="rounded-xl border border-border p-3">
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] font-black tracking-widest text-muted-foreground">TICK {tick.tick}</span>
-        <span className="text-xs">{tick.summary}</span>
-      </div>
-
-      {tick.agreements.length > 0 && (
-        <div className="mt-2">
-          <p className="text-[10px] font-black tracking-widest text-primary">ACCORDS</p>
-          <ul className="text-xs">
-            {tick.agreements.map((a, i) => (
-              <li key={i}>· {a}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {tick.conflicts.length > 0 && (
-        <div className="mt-2">
-          <p className="text-[10px] font-black tracking-widest text-destructive">CONFLITS DE MANDATS</p>
-          <ul className="space-y-1">
-            {tick.conflicts.map((conflict) => (
-              <li key={conflict.id} className="rounded-lg bg-secondary/60 p-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <TriangleAlert className={cn('h-3.5 w-3.5', SEVERITY[conflict.severity])} />
-                  <span className="font-semibold">
-                    {conflict.between[0]} ↔ {conflict.between[1]}
-                  </span>
-                  <span className={cn('ml-auto uppercase', SEVERITY[conflict.severity])}>{conflict.severity}</span>
-                </div>
-                <p className="mt-1">{conflict.summary}</p>
-                {conflict.positions.map((position, i) => (
-                  <p key={i} className="mt-0.5 text-muted-foreground">
-                    <span className="font-semibold">{position.agentId}</span> : {position.position}
-                  </p>
-                ))}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {tick.openQuestions.length > 0 && (
-        <div className="mt-2">
-          <p className="text-[10px] font-black tracking-widest text-muted-foreground">QUESTIONS OUVERTES</p>
-          <ul className="text-xs text-muted-foreground">
-            {tick.openQuestions.map((q, i) => (
-              <li key={i}>· {q}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <p className="mt-2 text-[10px] font-black tracking-widest text-muted-foreground">
-        {tick.assessments.length} ÉVALUATION(S)
-      </p>
-    </div>
-  )
-}
-
+/**
+ * Plays the scenario of each chosen sector, one after another (auto), or releases
+ * the first sector's batches one at a time (facilitator). Each sector is a process
+ * in the carousel. The page shows the saved runs while nothing is played; a saved
+ * one opens at its own address (`runId`), and starting a run hides the table. A
+ * process that finished is read-only, a failed one resumes from its last released tick.
+ */
 export function ScenarioConsole({
   country,
-  domain,
+  domains = [],
+  runId,
   onRunId,
 }: {
-  country: string
-  domain: string
+  country?: string
+  domains?: Domain[]
+  /** Reopen one saved run at its own address; without it the console plays and lists runs. */
+  runId?: string
   onRunId?: (runId: string) => void
 }) {
+  const { t, locale } = useI18n()
+  const toast = useToast()
+  const router = useRouter()
+  const lang: 'en' | 'fr' = locale === 'fr' ? 'fr' : 'en'
   const [busy, setBusy] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [blocks, setBlocks] = React.useState<ScenarioBlock[]>([])
+  const [history, setHistory] = React.useState<ScenarioRunSummaryDto[] | null>(null)
+  const [maxSectors, setMaxSectors] = React.useState(5)
 
-  const [runId, setRunId] = React.useState<string | null>(null)
-  const [agenda, setAgenda] = React.useState<ScenarioAgendaItem[]>([])
-  const [reports, setReports] = React.useState<JointReportDto[]>([])
-  const [released, setReleased] = React.useState(0)
-  const [total, setTotal] = React.useState(0)
-  const [done, setDone] = React.useState(false)
+  React.useEffect(() => {
+    const saved = Number(window.localStorage.getItem(MAX_SECTORS_KEY))
+    if (saved >= 1 && saved <= 5) setMaxSectors(saved)
+  }, [])
 
-  const reset = () => {
-    setRunId(null)
-    setAgenda([])
-    setReports([])
-    setReleased(0)
-    setTotal(0)
-    setDone(false)
-    setError(null)
+  const changeMaxSectors = (value: number) => {
+    setMaxSectors(value)
+    window.localStorage.setItem(MAX_SECTORS_KEY, String(value))
   }
 
+  const patchBlock = (index: number, patch: (block: ScenarioBlock) => ScenarioBlock) =>
+    setBlocks((previous) => previous.map((block, position) => (position === index ? patch(block) : block)))
+
+  const loadHistory = React.useCallback(async () => {
+    try {
+      setHistory((await api.scenarioRuns()).runs)
+    } catch {
+      setHistory([])
+    }
+  }, [])
+
+  React.useEffect(() => {
+    void loadHistory()
+  }, [loadHistory])
+
+  /** Releases the ticks of one process until the scenario ends (or stops on an error). */
+  const driveBlock = async (index: number, runId: string) => {
+    let finished = false
+    while (!finished) {
+      const tick = await api.nextTick(runId)
+      patchBlock(index, (block) => ({
+        ...block,
+        events: tick.events.length ? [...block.events, ...tick.events] : block.events,
+        reports: tick.report ? [...block.reports, tick.report as JointReportDto] : block.reports,
+        released: tick.releasedTicks,
+        done: tick.done,
+      }))
+      finished = tick.done
+    }
+    void loadHistory()
+  }
+
+  const startRun = async (domain: Domain): Promise<RunStart> => {
+    if (!country) throw new Error(t('scenario.noCountry'))
+    const start = await api.startScenario({ country, domain, lang })
+    return { runId: start.runId, domain, agenda: start.agenda, totalTicks: start.totalTicks, released: 0 }
+  }
+
+  // Auto: the chosen sectors, one scenario after another. One short request per tick:
+  // a multi-agent tick takes about a minute, and a single long request is cut by the proxy.
   const runAll = async () => {
     setBusy(true)
     setError(null)
-    reset()
+    setBlocks([])
+    setShowHistory(false)
     try {
-      const result = await api.runScenario({ id: 'health-data-breach', country, domain })
-      setRunId(result.runId)
-      onRunId?.(result.runId)
-      setReports(result.ticks)
-      setTotal(result.ticks.length)
-      setReleased(result.ticks.length)
-      setDone(true)
+      for (const [index, domain] of domains.slice(0, maxSectors).entries()) {
+        const start = await startRun(domain)
+        setBlocks((previous) => [...previous, blockOf(start, [], [])])
+        onRunId?.(start.runId)
+        await driveBlock(index, start.runId)
+      }
+      toast.success(t('toast.scenariosFinished', { count: domains.slice(0, maxSectors).length }))
     } catch (e) {
       setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+      setShowHistory(true)
+      void loadHistory()
     } finally {
       setBusy(false)
     }
   }
 
-  // Facilitator: start a session and release ticks one at a time (onBeforeRelease).
+  // Facilitator: the first chosen sector starts; its batches are released one by one.
   const startFacilitated = async () => {
+    const first = domains[0]
+    if (!first) return
     setBusy(true)
     setError(null)
-    reset()
+    setBlocks([])
+    setShowHistory(false)
     try {
-      const start = await api.startScenario({ id: 'health-data-breach', country, domain })
-      setRunId(start.runId)
+      const start = await startRun(first)
       onRunId?.(start.runId)
-      setAgenda(start.agenda)
-      setTotal(start.totalTicks)
+      setBlocks([blockOf(start, [], [])])
+      toast.success(t('toast.scenarioStarted', { sector: t(`domain.${first}` as 'domain.health') }))
+      void loadHistory()
     } catch (e) {
       setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+      setShowHistory(true)
     } finally {
       setBusy(false)
     }
   }
 
-  const releaseNext = async () => {
-    if (!runId) return
+  const releaseNext = async (index: number) => {
+    const block = blocks[index]
+    if (!block) return
     setBusy(true)
     setError(null)
     try {
-      const tick = await api.nextTick(runId)
-      if (tick.report) setReports((prev) => [...prev, tick.report as JointReportDto])
-      setReleased(tick.releasedTicks)
-      setDone(tick.done)
+      const tick = await api.nextTick(block.runId)
+      patchBlock(index, (current) => ({
+        ...current,
+        events: tick.events.length ? [...current.events, ...tick.events] : current.events,
+        reports: tick.report ? [...current.reports, tick.report as JointReportDto] : current.reports,
+        released: tick.releasedTicks,
+        done: tick.done,
+      }))
+      if (tick.done) {
+        toast.success(t('toast.scenarioFinished', { sector: t(`domain.${block.domain}` as 'domain.health') }))
+      }
     } catch (e) {
       setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+      void loadHistory()
     } finally {
       setBusy(false)
     }
   }
 
-  const nextAgenda = agenda.find((a) => a.releaseChunk === released)
+  /** Resumes from the last released tick, then plays the run to the end. */
+  const resumeAt = async (block: ScenarioBlock, index: number) => {
+    const started = await api.resumeScenarioRun(block.runId)
+    patchBlock(index, (current) => ({ ...current, done: false, failure: undefined, released: started.released }))
+    await driveBlock(index, block.runId)
+  }
+
+  /** Resume from the table of saved runs: the run takes the stage, then plays out. */
+  const resumeSaved = async (summary: ScenarioRunSummaryDto) => {
+    setBusy(true)
+    setError(null)
+    try {
+      const run = await api.scenarioRun(summary.id)
+      const block = blockFromRun(run)
+      setBlocks([block])
+      setShowHistory(false)
+      onRunId?.(run.id)
+      await resumeAt(block, 0)
+      toast.success(t('toast.scenarioResumed', { sector: t(`domain.${block.domain}` as 'domain.health') }))
+    } catch (e) {
+      setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+    } finally {
+      setBusy(false)
+      void loadHistory()
+    }
+  }
+
+  /** Resume the process on stage, keeping the carousel where it is. */
+  const resumeBlock = async (block: ScenarioBlock) => {
+    const index = blocks.findIndex((item) => item.runId === block.runId)
+    if (index < 0) return
+    setBusy(true)
+    setError(null)
+    try {
+      await resumeAt(block, index)
+      toast.success(t('toast.scenarioResumed', { sector: t(`domain.${block.domain}` as 'domain.health') }))
+    } catch (e) {
+      setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+    } finally {
+      setBusy(false)
+      void loadHistory()
+    }
+  }
+
+  /** Deletes a run; on the run's own page the table takes over. */
+  const deleteBlock = async (block: ScenarioBlock) => {
+    setBusy(true)
+    setError(null)
+    try {
+      await api.scenarioDelete(block.runId)
+      toast.success(t('toast.scenarioDeleted'))
+      if (runId) {
+        router.replace('/scenarios')
+        return
+      }
+      const remaining = blocks.filter((item) => item.runId !== block.runId)
+      setBlocks(remaining)
+      if (remaining.length === 0) setShowHistory(true)
+      void loadHistory()
+    } catch (e) {
+      setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+      throw e
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  /** Deletes a run from the table, without opening it. */
+  const deleteSaved = async (id: string) => {
+    setBusy(true)
+    setError(null)
+    try {
+      await api.scenarioDelete(id)
+      toast.success(t('toast.scenarioDeleted'))
+      setHistory((current) => (current ? current.filter((run) => run.id !== id) : current))
+      void loadHistory()
+    } catch (e) {
+      setError((e as Error).message)
+      toast.error(t('toast.failed'), (e as Error).message)
+      throw e
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const allDone = blocks.length > 0 && blocks.every((block) => block.done)
+
+  /** A run is played here: the table of past runs gives way to it. */
+  const [showHistory, setShowHistory] = React.useState(!runId)
+  const backToRuns = () => {
+    setBlocks([])
+    setError(null)
+    setShowHistory(true)
+    void loadHistory()
+  }
+
+  // The run's own address: the console opens that one run, then nothing to list.
+  React.useEffect(() => {
+    if (!runId) return
+    let live = true
+    setBusy(true)
+    setError(null)
+    api
+      .scenarioRun(runId)
+      .then((run) => {
+        if (!live) return
+        setBlocks([blockFromRun(run)])
+        setShowHistory(false)
+        onRunId?.(run.id)
+      })
+      .catch((e) => {
+        if (live) setError((e as Error).message)
+      })
+      .finally(() => {
+        if (live) setBusy(false)
+      })
+    return () => {
+      live = false
+    }
+  }, [runId, onRunId])
 
   return (
-    <Card>
-      <CardHeader>
-        <GitMerge className="h-4 w-4 text-primary" />
-        <CardTitle>MULTI-AGENT COORDINATION — HEALTH DATA BREACH</CardTitle>
-        <div className="ml-auto flex items-center gap-2">
-          {runId && done && (
-            <>
-              <a href={api.dossierUrl(runId, 'markdown')} target="_blank" rel="noreferrer">
-                <Button variant="outline" size="md">
-                  <Download className="h-3.5 w-3.5" /> Dossier (MD)
-                </Button>
-              </a>
-              <a href={api.dossierUrl(runId, 'json')} target="_blank" rel="noreferrer">
-                <Button variant="ghost" size="md">
-                  JSON
-                </Button>
-              </a>
-            </>
+    <section className="space-y-4">
+      {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {/* The carousel toolbar carries the progress once a process is on screen. */}
+      {busy && blocks.length === 0 && <ProcessingBar label={t('scenario.running')} />}
+
+      {blocks.length === 0 ? (
+        runId || !showHistory ? null : (
+          <ScenarioHistory
+            runs={history}
+            busy={busy}
+            canStart={domains.length > 0}
+            maxSectors={maxSectors}
+            onMaxSectorsChange={changeMaxSectors}
+            onOpen={(run) => router.push(`/scenarios/${encodeURIComponent(run.id)}`)}
+            onResume={(run) => void resumeSaved(run)}
+            onDelete={deleteSaved}
+            onFacilitate={() => void startFacilitated()}
+            onAuto={() => void runAll()}
+          />
+        )
+      ) : (
+        <>
+          {!runId && (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-[11px]" onClick={backToRuns} disabled={busy}>
+                <ArrowLeft className="h-3.5 w-3.5" /> {t('scenario.back')}
+              </Button>
+              {allDone && blocks.length > 1 && (
+                <p className="text-[11px] text-muted-foreground">{t('scenario.allDone', { count: blocks.length })}</p>
+              )}
+            </div>
           )}
-          <Button variant="outline" onClick={startFacilitated} disabled={busy} size="md">
-            Mode facilitateur
-          </Button>
-          <Button onClick={runAll} disabled={busy} size="md">
-            <Play className="h-3.5 w-3.5" /> {busy ? 'Simulation…' : 'Lancer (auto)'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-
-        {!runId && !busy && (
-          <p className="text-sm text-muted-foreground">
-            Libère les événements par blocs (information asymétrique), fait produire à chaque institution une
-            évaluation indépendante, puis réconcilie le tout en détectant les conflits de mandats. Le mode
-            facilitateur libère les blocs un à un (hook <code>onBeforeRelease</code>).
-          </p>
-        )}
-
-        {runId && !done && (
-          <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl bg-secondary/60 p-2">
-            <span className="text-xs text-muted-foreground">
-              Tick {released}/{total}
-              {nextAgenda ? ` — prochain : « ${nextAgenda.title} »` : ''}
-            </span>
-            <span className="text-[10px] text-muted-foreground">
-              {nextAgenda ? `vu par : ${nextAgenda.visibleTo.join(', ')}` : ''}
-            </span>
-            <Button onClick={releaseNext} disabled={busy} size="md" className="ml-auto">
-              <ChevronRight className="h-3.5 w-3.5" /> Libérer l'événement suivant
-            </Button>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          {reports.map((tick) => (
-            <TickReport key={tick.tick} tick={tick} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          <ScenarioCarousel
+            blocks={blocks}
+            busy={busy}
+            onReleaseNext={(index) => void releaseNext(index)}
+            onDelete={deleteBlock}
+            onResume={resumeBlock}
+          />
+        </>
+      )}
+    </section>
   )
+}
+
+/** A block from a start (new run) or an opened run. */
+function blockOf(start: RunStart, events: ScenarioEventDto[], reports: JointReportDto[]): ScenarioBlock {
+  return {
+    domain: start.domain,
+    runId: start.runId,
+    agenda: start.agenda,
+    events,
+    reports,
+    released: start.released,
+    total: start.totalTicks,
+    done: false,
+  }
+}
+
+/** A saved run as a process: its agenda, the facts already released and its reports. */
+function blockFromRun(run: ScenarioRunDto): ScenarioBlock {
+  const agenda = run.events.map((event) => ({
+    sequence: event.sequence,
+    releaseChunk: event.releaseChunk,
+    title: event.title,
+    visibleTo: event.visibleTo,
+  }))
+  const events: ScenarioEventDto[] = run.events
+    .filter((event) => event.releaseChunk < run.released)
+    .map((event) => ({
+      id: `${run.id}-${event.sequence}`,
+      sequence: event.sequence,
+      releaseChunk: event.releaseChunk,
+      title: event.title,
+      payload: event.payload,
+      visibleTo: event.visibleTo,
+      createdAt: run.updatedAt,
+    }))
+  return {
+    domain: run.domain as Domain,
+    runId: run.id,
+    agenda,
+    events,
+    reports: run.reports,
+    released: run.released,
+    total: run.total,
+    done: run.status === 'complete',
+    ...(run.failure ? { failure: run.failure } : {}),
+  }
 }

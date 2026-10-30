@@ -1,0 +1,73 @@
+'use client'
+
+/**
+ * Shows what is actually answering: the local Ollama server, the model, and the
+ * residency. This is the honest answer to "is my data leaving?" — nothing does:
+ * inference, embeddings and retrieval all run on the machine.
+ */
+
+import * as React from 'react'
+import { AlertTriangle, Cpu, Lock } from 'lucide-react'
+import { cn } from '@sps/ui'
+import { api, type ProviderDto } from '@/lib/api'
+import { useI18n } from '@/lib/i18n'
+
+export function ProviderBadge({ className }: { className?: string }) {
+  const { t } = useI18n()
+  const [provider, setProvider] = React.useState<ProviderDto | null>(null)
+  const [failed, setFailed] = React.useState(false)
+
+  React.useEffect(() => {
+    let active = true
+    api
+      .provider()
+      .then((value) => active && setProvider(value))
+      .catch(() => active && setFailed(true))
+    return () => {
+      active = false
+    }
+  }, [])
+
+  if (failed || !provider) {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-xl border border-border px-2 py-1 text-[11px] text-muted-foreground',
+          className,
+        )}
+        title={failed ? 'API unreachable' : 'Loading provider…'}
+      >
+        <AlertTriangle className="h-3.5 w-3.5" />
+        {failed ? 'API offline' : '…'}
+      </span>
+    )
+  }
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-xl border px-2 py-1 text-[11px]',
+        provider.ready
+          ? 'border-primary/40 bg-primary/5 text-foreground'
+          : 'border-amber-500/50 bg-amber-500/10 text-foreground',
+        className,
+      )}
+      title={[
+        `${t('provider.title')}: ${provider.label}`,
+        `${provider.servedBy} · ${provider.baseURL}`,
+        t('provider.residency.on-premise'),
+        provider.openWeights ? t('provider.openWeights') : '',
+        provider.ready ? '' : `${t('provider.notReady')}, ${provider.reason ?? ''} ${t('provider.switchHint')}`,
+      ]
+        .filter(Boolean)
+        .join('\n')}
+    >
+      <Cpu className="h-3.5 w-3.5 text-primary" />
+      <span className="font-semibold">{t('provider.mode.local')}</span>
+      <span className="text-muted-foreground">·</span>
+      <code className="text-[10px] text-muted-foreground">{provider.models.reasoning}</code>
+      <Lock className="h-3 w-3 text-emerald-500" />
+      {!provider.ready && <AlertTriangle className="h-3 w-3 text-amber-500" />}
+    </span>
+  )
+}
