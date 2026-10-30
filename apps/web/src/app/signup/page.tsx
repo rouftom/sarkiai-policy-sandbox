@@ -20,13 +20,14 @@ const MIN_PASSWORD = 12
 type Gate = 'checking' | 'open' | 'closed'
 
 /**
- * Public self-service sign-up, opened by the API in cloud mode only.
+ * Public self-service sign-up, closed on a local install unless `AUTH_SIGNUP`
+ * opens it.
  *
  * The reviewer creates an account with their own password. The address is then
- * confirmed from the e-mail link, and only after that the mandatory TOTP
- * enrolment starts. While a sign-up is in progress this page hands over to
- * `/login`, which shows the progression instead of a second sign-up form. The
- * pitch and the notice about Meta model training sit in the left column.
+ * confirmed from the e-mail link (console outbox), and only after that the
+ * mandatory TOTP enrolment starts. While a sign-up is in progress this page
+ * hands over to `/login`, which shows the progression instead of a second
+ * sign-up form.
  */
 export default function SignupPage() {
   const router = useRouter()

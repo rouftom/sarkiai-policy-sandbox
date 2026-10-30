@@ -318,7 +318,7 @@ export function registerTools(server: McpServer, distDir: string): void {
     }
   );
 
-  // 3. Catalog (tools-only clients, e.g. Anthropic MCP connector, cannot read resources)
+  // 3. Catalog (tools-only clients cannot read resources)
   server.registerTool(
     "sarkiai_charts_list_chart_types",
     {

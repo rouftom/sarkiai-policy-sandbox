@@ -1010,7 +1010,7 @@ export class AuthService {
   }
 
   /**
-   * The Meta model the console last saved, across operators. The engine restores
+   * The chat model the console last saved, across operators. The engine restores
    * it on boot so a redeploy keeps the chosen model.
    */
   async activeModel(): Promise<string | null> {

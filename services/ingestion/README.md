@@ -17,7 +17,7 @@ All `POST` routes require the `X-API-Key` header matching `SERVICE_API_KEY` when
 
 `policy_chunks` with two named vectors:
 
-- `dense`: Voyage `voyage-4`, 1024-d, cosine.
+- `dense`: Ollama `bge-m3`, 1024-d, cosine.
 - `text`: BM25 sparse (IDF modifier) via fastembed, for hybrid search.
 
 Payload: `country`, `jurisdiction`, `docType`, `pillar[]`, `namespace`, `version`,

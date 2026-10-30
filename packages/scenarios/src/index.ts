@@ -1,7 +1,7 @@
 /**
  * Progressive error-scenario engine.
  *
- * Hackathon requirement #5: events must be released in sequenced, chunked order
+ * Events must be released in sequenced, chunked order
  * · never all at once · and different agents may receive different events
  * (information asymmetry). `release()` is an async generator: each yield is one
  * event delivery, optionally gated by a caller-provided delay/approval hook.

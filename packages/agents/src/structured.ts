@@ -1,7 +1,7 @@
 /**
  * Structured output without relying on the provider's JSON-schema mode.
  *
- * `generateObject` asks the provider to enforce a schema; the Meta chat models
+ * `generateObject` asks the provider to enforce a schema; local chat models
  * answer in free text, so a valid report often fails validation ("No object
  * generated: response did not match schema") and the whole tick is lost. Here
  * the model writes plain text, a JSON object is extracted and validated with
@@ -151,9 +151,9 @@ export async function generateStructured<S extends ZodType>(request: StructuredR
       system: `${request.system}\n\nReply with ONLY one JSON object, no prose and no code fence. Shape:\n${request.shape}`,
       prompt: `${request.prompt}${feedback}`,
       maxOutputTokens: request.maxOutputTokens ?? 8192,
-      // The provider reads its own option name ("meta" on Meta's API); the generic one is kept for compatible hosts.
+      // Ollama's OpenAI-compatible endpoint ignores unknown options; the key stays
+      // for hosts that implement reasoning effort.
       providerOptions: {
-        meta: { reasoningEffort: request.reasoningEffort ?? 'low' },
         'openai-compatible': { reasoningEffort: request.reasoningEffort ?? 'low' },
       },
     })

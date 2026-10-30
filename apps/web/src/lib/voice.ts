@@ -97,7 +97,7 @@ async function blobToBase64(blob: Blob): Promise<string> {
   return btoa(binary)
 }
 
-/** Decode any browser recording (webm, ogg, mp4) and re-encode it for Meta. */
+/** Decode any browser recording (webm, ogg, mp4) and re-encode it for the local ASR service. */
 async function toWav16k(blob: Blob): Promise<Blob> {
   const context = new AudioContext()
   try {

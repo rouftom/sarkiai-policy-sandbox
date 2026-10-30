@@ -240,7 +240,6 @@ export class PolicyOrchestrator {
       const effortOptions = input.effort
         ? {
             providerOptions: {
-              meta: { reasoningEffort: input.effort },
               'openai-compatible': { reasoningEffort: input.effort },
             },
           }

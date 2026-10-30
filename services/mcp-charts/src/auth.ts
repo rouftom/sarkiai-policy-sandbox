@@ -6,9 +6,8 @@ import crypto from "node:crypto";
  * A key is accepted from any of the following locations (first match wins):
  *  1. One of the supported HTTP headers (case-insensitive, see API_KEY_HEADER_NAMES).
  *     `Authorization` accepts raw keys as well as `Bearer <key>`, `Token <key>`,
- *     `ApiKey <key>`, `Api-Key <key>` and `Basic base64(user:key)` schemes, which
- *     makes the server compatible with the Anthropic MCP connector
- *     (`authorization_token` -> `Authorization: Bearer <key>`).
+ *     `ApiKey <key>`, `Api-Key <key>` and `Basic base64(user:key)` schemes, so a
+ *     standard MCP client can send its key as `Authorization: Bearer <key>`.
  *  2. A query-string parameter (see API_KEY_QUERY_PARAMS), for clients that can only
  *     configure a URL (e.g. remote connectors without custom headers).
  *  3. Legacy: an `mcp-session-id` ending with the key.

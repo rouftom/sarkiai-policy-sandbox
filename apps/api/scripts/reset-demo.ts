@@ -44,7 +44,7 @@ const dbName = process.env.MONGODB_DB_NAME ?? 'policy_sandbox'
 
 console.log(`Demo reset · database "${dbName}"`)
 console.log(`  collections: ${DEMO_RESET_COLLECTIONS.join(', ')}`)
-console.log('  kept: kb_chunks (corpus + vectors), Atlas indexes, configuration')
+console.log('  kept: Qdrant policy_chunks (corpus + vectors), configuration')
 console.log('')
 
 try {

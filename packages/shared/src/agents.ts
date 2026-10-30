@@ -1,7 +1,7 @@
 /**
  * Institutional agent registry.
  *
- * The mandate is what makes the hackathon multi-agent: each actor receives
+ * The mandate is what makes the engine multi-agent: each actor receives
  * different information, operates under a different legal mandate, and produces
  * an independent assessment.
  */
