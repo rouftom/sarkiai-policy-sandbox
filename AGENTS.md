@@ -1,3 +1,17 @@
+# Agent notes
+
+This repository is a **local-only** product. There is no cloud provider, no
+remote API key and no fallback to a hosted model. Before changing code:
+
+- Models: Ollama only (`qwen3.5:9b` chat model + `bge-m3` embeddings).
+  `packages/shared` fixes `ProviderMode = 'local'`.
+- Retrieval: Qdrant only (dense bge-m3 + BM25 + RRF + optional local TEI).
+- Operational data: MongoDB; objects: MinIO; e-mail: console log + outbox.
+- Integrations: the two local MCP servers (`sarkiai_charts`, `sea_mcp_docx`).
+- Validation on a machine without the stack: `bun run typecheck`, `bun test`,
+  `python3 -m compileall services`, `docker compose config`.
+- Do not run `docker compose up` or pull models as part of a code change.
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

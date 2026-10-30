@@ -1,7 +1,8 @@
 # SarkiAI Policy Sandbox
 
-> Policy-grounded, multi-agent AI engine for the **ITU AI for Good Lab Hackathon (UAE)**.
+> Self-hosted, policy-grounded multi-agent engine for national AI governance.
 > One engine, two lenses: **error-scenario simulation** and **ITU AI Readiness assessment**.
+> Runs entirely on-premise: local models, local vectors, local storage, no hosted provider.
 
 [![ITU AI for Good](https://img.shields.io/badge/ITU-AI%20for%20Good-0093DD?style=for-the-badge)](https://aiforgood.itu.int/)
 [![Y.3172](https://img.shields.io/badge/ITU--T-Y.3172-0057A8?style=for-the-badge)](https://www.itu.int/rec/T-REC-Y.3172/en)
@@ -14,16 +15,16 @@
 
 ## Why
 
-The ITU AI for Good Lab hackathon asks teams to build a **country-specific knowledge base** and
-**AI agents** (policy/legal adviser, institutional participant, multi-agent coordination) that can run
-**progressive error-scenario simulations**, with **audit logging and chain-of-thought tracing**, aligned
-to **ITU-T Y.3172** and the **ITU AI Readiness Framework**.
+The engine builds a **country-specific knowledge base** and **AI agents** (policy/legal adviser,
+institutional participant, multi-agent coordination) that can run **progressive error-scenario
+simulations**, with **audit logging and chain-of-thought tracing**, aligned to **ITU-T Y.3172** and the
+**ITU AI Readiness Framework**.
 
-This repo is the standalone monorepo for that system. It is **not** built on our proprietary
-`agentic-ui-harness` (IP-protected, unpatented) — the hackathon scope is backend orchestration, so we
-reimplement the agent runtime with the public Vercel AI SDK.
+This repo is the standalone monorepo for that system. The agent runtime uses the open-source AI SDK
+against a local OpenAI-compatible endpoint.
 
-- **Fully local & sovereign:** Ollama `qwen3.5:9b` (multimodal, text + image), `bge-m3` embeddings, local OCR/Whisper — no cloud call. The assistant accepts **image attachments** (stored in MinIO, content-addressed) as untrusted context.
+- **Fully local:** Ollama `qwen3.5:9b` (multimodal, text + image), `bge-m3` embeddings, local OCR/Whisper — no outbound call. The assistant accepts **image attachments** (stored in MinIO, content-addressed) as untrusted context.
+- **Local integrations:** Qdrant for vectors, MongoDB for operational records, MinIO for objects, console-only e-mail (log + outbox), local MCP servers for charts and Word documents.
 - **Primary country:** Cameroon (MINPOSTEL-aligned), then multi-country (UAE → …).
 - **Primary domain:** healthcare, with cross-domain spillover (data protection, telecom, cybersecurity).
 - **Open by design:** permissive license so the knowledge base can be published in the ITU AI for Good Lab.
@@ -32,7 +33,7 @@ reimplement the agent runtime with the public Vercel AI SDK.
 
 | Lens | Purpose | Reference |
 |------|---------|-----------|
-| `simulation` | Run a progressive, chunked error scenario across mandated agents; produce an audit trail + gap findings. | Hackathon §5 |
+| `simulation` | Run a progressive, chunked error scenario across mandated agents; produce an audit trail + gap findings. | Scenario engine |
 | `readiness` | Assess a country corpus against the ITU AI Readiness dimensions; produce a gap report. | ITU AI Readiness Framework |
 | `hybrid` | Simulation that emits the readiness / gap report as a by-product. | Both |
 
@@ -72,21 +73,23 @@ sarkiai-policy-sandbox/
 │  ├─ ui/             # shared components (SarkiAI Compact charter)
 │  ├─ theme/          # admin theme packs (fada, green, ocean, sunset, mono)
 │  └─ storage/        # MinIO/S3 client (content-addressed attachments)
-├─ services/          # Python microservices
+├─ services/          # local microservices
 │  ├─ ingestion/      # structure-aware legal chunking + embeddings + Qdrant store
 │  ├─ ocr/            # scanned gazette OCR (Tesseract)
-│  └─ transcription/  # optional media → timestamped transcript
+│  ├─ transcription/  # optional media → timestamped transcript
+│  ├─ mcp-charts/     # local MCP server: interactive charts
+│  └─ mcp-docx/       # local MCP server: Word (.docx) generation
 ├─ data/              # corpora: country/cm, country/ae, global/itu (git-ignored payloads)
 ├─ deploy/
-│  ├─ sandbox/        # ITU AI for Good Lab deployment
+│  ├─ sandbox/        # self-hosted reference deployment (lab VM / institution server)
 │  └─ mongo/init/     # local operational store seed (audit + CoT)
 └─ docs/              # strategic note, mapping, architecture, data model, roadmap
 ```
 
 ## Quick start
 
-> **Sovereign / local-only**: all models run locally via Ollama. No API keys,
-> no cloud calls. First run pulls ~9 GB (qwen3.5:9b) + ~2 GB (bge-m3).
+> **Local-only**: all models run locally via Ollama. No hosted-provider key,
+> no outbound call. First run pulls ~9 GB (qwen3.5:9b) + ~2 GB (bge-m3).
 
 ### Everything at once
 
@@ -102,12 +105,17 @@ Then:
 - API + OpenAPI → http://localhost:8000/docs
 - Ingestion service → http://localhost:8001/docs
 - OCR service → http://localhost:8002/docs
+- MCP charts → http://localhost:8010/mcp
+- MCP Word documents → http://localhost:8011/mcp
 - Qdrant dashboard → http://localhost:6333/dashboard
 - Ollama (local models) → http://localhost:11434
 - MinIO console (attachments) → http://localhost:9001
 - MongoDB (audit + CoT) → `mongodb://localhost:27017`
 
-Optional local reranker (TEI, no cloud):
+Console e-mail writes the temporary password and approval links to the API log
+and the in-console outbox; there is no SMTP and no delivery provider.
+
+Optional local reranker (TEI):
 
 ```bash
 docker compose --profile rerank up -d      # then set RERANK_URL=http://rerank:80 in .env
@@ -117,7 +125,7 @@ docker compose --profile rerank up -d      # then set RERANK_URL=http://rerank:8
 
 ```bash
 docker compose up ollama qdrant ingestion ocr   # knowledge-base plane only
-docker compose up api web                        # application plane only
+docker compose up api web mcp-charts mcp-docx    # application plane only
 docker compose up ollama qdrant ingestion        # just the KB ingest path
 ```
 
@@ -127,9 +135,11 @@ Or via the Makefile:
 make up            # full stack
 make models        # pull local LLM + embeddings
 make up-kb         # ollama + qdrant + ingestion + ocr
-make up-app        # api + web
+make up-app        # api + web + MCP servers
 make logs          # follow logs
 make down          # stop
+make check-provider # local models, embedding size, Qdrant
+make seed-corpus   # ingest a country corpus from its manifest
 make clean         # stop + remove volumes
 ```
 

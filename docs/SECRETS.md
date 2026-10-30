@@ -27,7 +27,7 @@ git.
 - The **private key `secrets/age.key` is never committed** (git-ignored).
 - Rotate by editing `.env.enc` with `sops` and re-encrypting; no service to run.
 - For a team/UI workflow, an alternative is self-hosted Infisical — but SOPS+age
-  is the default here (no server, aligned with the local/sovereign posture).
+  is the default here (no server, aligned with the local-only posture).
 
 ## Per-environment layering
 

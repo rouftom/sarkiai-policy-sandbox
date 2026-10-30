@@ -10,7 +10,7 @@
    invalid.
 4. **Every decision is auditable.** Reasoning is persisted, not merely streamed.
 5. **Open and sovereign.** Apache-2.0; **all models run locally** (Ollama:
-   qwen2.5 LLM + bge-m3 embeddings; optional local TEI reranker); no cloud call;
+   qwen3.5:9b LLM + bge-m3 embeddings; optional local TEI reranker); no outbound call;
    runs entirely inside the ITU sandbox (ITU readiness D10/D11).
 
 ## Storage split

@@ -1,5 +1,9 @@
 # Plan « Local-first » (souveraineté D10/D11) — VALIDÉ & IMPLÉMENTÉ
 
+> **Note historique.** Ce document décrit la migration qui a mené à la
+> distribution actuelle. Les fournisseurs hébergés cités comme « dépendance à
+> retirer » ont tous été supprimés : il ne reste que la pile locale.
+
 > Décisions verrouillées : LLM **qwen3.5:9b** (multimodal texte+image, 6,6 Go) · embeddings
 > **bge-m3** (1024-dim, multilingue FR) · reranker **TEI local** ·
 > transcription **faster-whisper locale** · **suppression totale** des providers

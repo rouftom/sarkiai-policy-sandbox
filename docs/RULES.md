@@ -1,8 +1,8 @@
 # Repository rules
 
-Standalone repo for the ITU AI for Good hackathon. It must NOT depend on
-proprietary/unpublished modules of `sarkiai-enterprise` (notably the AgenticUI
-harness). Adapt-and-reuse is fine; keep this repo publishable.
+Standalone, self-hosted product. It must NOT depend on proprietary/unpublished
+modules of `sarkiai-enterprise` (notably the AgenticUI harness). Adapt-and-reuse
+is fine; keep this repo publishable.
 
 ## Environment
 

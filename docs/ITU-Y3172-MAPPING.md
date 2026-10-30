@@ -115,7 +115,7 @@ as the validation environment. We use these exact symbols.
 |---------|------|-------|
 | Sandbox deployment topology | `deploy/sandbox/docker-compose.sandbox.yml` | Qdrant KB + external Mongo (ops), registry images |
 | Sandbox variables | `deploy/sandbox/.env.sandbox.example` | `MONGODB_URI`, keys, registry |
-| Fine-tuning path | `deploy/sandbox/README.md` | uses Lab cloud credits |
+| Deployment | `deploy/sandbox/README.md` | self-hosted reference stack |
 
 ## 9. AI Readiness Framework 2.0 (6 factors / 13 dimensions)
 
@@ -134,14 +134,14 @@ The readiness engine iterates all 13 dimensions
 | `opensource` | D1, D2, D8 |
 | `sandbox` | D9 Human Impact, D10, D11 AI for Inclusion |
 
-## 10. Hackathon §5 — progressive scenario events
+## 10. Progressive scenario events
 
 `packages/scenarios/src/index.ts` implements the requirement literally:
 `ScenarioEvent.releaseChunk` groups events into ticks, `ScenarioEngine.release()`
 yields one batch at a time, and `visibleTo` encodes **information asymmetry** so
 each institutional agent receives a different, incomplete picture.
 
-## 11. Hackathon §6 — audit & chain-of-thought
+## 11. Audit & chain-of-thought
 
 `packages/audit/src/index.ts` stores two artifacts:
 1. `audit_logs` — hash-chained records (`prevHash` → `hash`) for `verifyChain()`.

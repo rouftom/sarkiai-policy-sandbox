@@ -1,5 +1,9 @@
 # Souveraineté des données & modèles — analyse
 
+> **Note historique.** Analyse rédigée avant la refonte. La distribution actuelle
+> est local-only : tout fournisseur hébergé mentionné ci-dessous comme
+> alternative a été retiré du code et de la configuration.
+
 > Réponse à la remarque : « leur repo utilise Ollama pour du fine-tuning,
 > probablement un aspect de la souveraineté des données. Quid de notre cas ? »
 > **Document d'analyse uniquement — aucune implémentation.**
@@ -16,9 +20,8 @@ un outil de fine-tuning. Dans le repo de référence :
 | KB | ChromaDB (local) | stockage vectoriel |
 | Sessions | SQLite | état/audit |
 
-Tout tourne **hors ligne, sur la machine**. Le fine-tuning dont parle le hackathon
-(« cloud credits in the Sandbox to fine-tune AI models ») est une **capacité
-distincte** offerte par l'ITU. La vraie motivation d'Ollama ici est donc la
+Tout tourne **hors ligne, sur la machine**. Le fine-tuning est une **capacité
+distincte**, hors du chemin d'inférence. La motivation d'Ollama ici est donc la
 **souveraineté / souveraineté-données** : aucun appel sortant, aucune donnée
 (santé, stratégies nationales, etc.) ne quitte l'infrastructure.
 

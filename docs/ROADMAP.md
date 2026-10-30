@@ -1,12 +1,12 @@
 # Roadmap
 
-## Hackathon timeline
+## Delivery timeline
 
 | Date | Milestone |
 |------|-----------|
 | 3 Oct 2026 | First ITU mentoring session |
 | **21 Oct 2026** | **Registration deadline** |
-| **10 Nov 2026** | **Submission:** technical report (≤5 pp.), GitHub repo, KB, demo video |
+| **10 Nov 2026** | **Release:** technical report (≤5 pp.), repository, KB, demo video |
 | 11–18 Nov 2026 | First-round evaluation |
 | 18 Nov 2026 | Shortlisted teams announced |
 | 8 Dec 2026 | Final evaluation, on-site at GITEX Global, Dubai |
@@ -25,7 +25,7 @@
 - `[x]` Causal what-if propagation across dimensions (`packages/readiness/src/causal.ts`).
 - `[x]` African/regional reference corpus (`data/global/africa/`, `scripts/fetch-corpus.sh`).
 - `[x]` Hash-chained audit + persisted CoT traces.
-- `[x]` **Local-first / sovereign**: Ollama (qwen3.5:9b) + local bge-m3 embeddings; **all cloud providers removed**; local faster-whisper. See `docs/LOCAL-FIRST-PLAN.md`, `docs/SOVEREIGNTY-AND-MODELS.md`.
+- `[x]` **Local-only**: Ollama (qwen3.5:9b) + local bge-m3 embeddings; **no hosted provider**; local faster-whisper. See `docs/LOCAL-FIRST-PLAN.md`, `docs/SOVEREIGNTY-AND-MODELS.md`.
 - `[x]` **Admin design system** replicated in `@sps/theme` (packs fada/green/ocean/sunset/mono, fada default) — assistant uses SarkiAI Compact.
 - `[x]` **MinIO** local object bucket (`sps-attachments`) for assistant image attachments.
 - `[x]` **SOPS + age** secrets workflow (`docs/SECRETS.md`, `scripts/gen-age-key.sh`).
