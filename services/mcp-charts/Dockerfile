@@ -1,12 +1,12 @@
 # Local MCP server: interactive charts (Recharts UI + chart tools). Build context: services/mcp-charts.
-FROM oven/bun:1 AS build
+FROM oven/bun:1.4.2-alpine AS build
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install
 COPY . .
 RUN bun run build
 
-FROM oven/bun:1 AS runtime
+FROM oven/bun:1.4.2-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

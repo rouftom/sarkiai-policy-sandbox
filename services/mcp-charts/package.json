@@ -16,7 +16,6 @@
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.7.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "botid": "^1.5.11",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "framer-motion": "^12.0.0",
@@ -29,7 +28,6 @@
     "react-dom": "^19.0.0",
     "react-i18next": "^16.5.4",
     "recharts": "^2.15.1",
-    "vercel": "^53.1.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {

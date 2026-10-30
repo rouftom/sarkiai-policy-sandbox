@@ -61,3 +61,6 @@ coverage/
 
 # deployment metadata
 .vercel
+
+# Self-hosted reference deployment secrets
+deploy/sandbox/.env.sandbox

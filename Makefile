@@ -5,8 +5,9 @@ COMPOSE      := docker compose
 COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
 
 .DEFAULT_GOAL := help
-.PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo up-minio ingestion ocr transcription api web \
-        dev dev-kb dev-app logs ps down clean rebuild seed models sandbox-config secrets-edit secrets-encrypt
+.PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo up-minio ingestion ocr transcription mcp api web \
+        dev dev-kb dev-app logs ps down clean rebuild seed seed-corpus check-provider check-gazette models sandbox-config \
+        secrets-edit secrets-encrypt
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -18,7 +19,7 @@ up-kb: ## Launch only the knowledge-base plane (ollama + qdrant + ingestion + oc
 	$(COMPOSE) up --build -d ollama qdrant ingestion ocr
 
 up-app: ## Launch only the application plane (api + web)
-	$(COMPOSE) up --build -d api web
+	$(COMPOSE) up --build -d api web mcp-charts mcp-docx
 
 up-qdrant: ## Launch only Qdrant (vector KB)
 	$(COMPOSE) up -d qdrant
@@ -48,6 +49,9 @@ ocr: ## Launch ocr
 
 transcription: ## Launch transcription
 	$(COMPOSE) up --build -d transcription
+
+mcp: ## Launch the two local MCP servers (charts + Word)
+	$(COMPOSE) up --build -d mcp-charts mcp-docx
 
 api: ## Launch api (with its dependencies)
 	$(COMPOSE) up --build -d api
@@ -79,8 +83,17 @@ clean: ## Stop and remove volumes (destroys local data)
 rebuild: ## Rebuild all images from scratch
 	$(COMPOSE) build --no-cache
 
-seed: ## Ingest the sample Cameroon corpus into the KB
+seed: ## Ingest the sample corpus into the KB (legacy sample directory)
 	./scripts/seed.sh
+
+seed-corpus: ## Ingest a country corpus from its manifest (COUNTRY=cm by default)
+	bun scripts/seed-corpus.ts --country $${COUNTRY:-cm}
+
+check-provider: ## Verify Ollama models, embedding dimension and Qdrant
+	bun scripts/check-provider.ts
+
+check-gazette: ## Verify the OCR service and the ingestion hand-off
+	bun scripts/check-gazette.ts
 
 sandbox-config: ## Validate the ITU sandbox compose file
 	docker compose -f deploy/sandbox/docker-compose.sandbox.yml config

@@ -1,9 +1,9 @@
 /**
  * Operator auth, preferences and the audit feed.
  *
- * The console (Vercel) and the API (Render) are different origins, so the
- * session travels as an `Authorization: Bearer <token>` header rather than a
- * cookie: no third-party-cookie policy can break the demo. Tokens are stateless
+ * The console and the API may answer on different origins (LAN name, reverse
+ * proxy, second port), so the session travels as an `Authorization: Bearer
+ * <token>` header rather than a cookie. Tokens are stateless
  * and signed for seven days; the client drops the token on sign-out.
  */
 

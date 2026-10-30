@@ -2,14 +2,14 @@
  * Server-side client for the first-party MCP servers (Streamable HTTP, JSON-RPC).
  *
  * The agent calls these tools on the operator's behalf. The shared key
- * (`SEA_MCP_API_KEY`) is added here, on the server, and never leaves it: the
+ * (`MCP_API_KEY`) is added here, on the server, and never leaves it: the
  * browser only receives tool results and UI resource URIs.
  */
 
 export interface McpServerEntry {
   name: string
   url: string
-  /** First-party servers protected by the shared `SEA_MCP_API_KEY` (sent as `x-api-key`). */
+  /** First-party servers protected by the shared `MCP_API_KEY` (sent as `x-api-key`). */
   requiresApiKey: boolean
 }
 

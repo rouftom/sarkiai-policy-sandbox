@@ -41,3 +41,17 @@ services:
       - ./apps/web/public:/app/public
       - ./packages:/app/packages
     command: ["bun", "run", "dev"]
+
+  mcp-charts:
+    build:
+      context: ./services/mcp-charts
+    volumes:
+      - ./services/mcp-charts/src:/app/src
+    command: ["bun", "--watch", "src/main.ts"]
+
+  mcp-docx:
+    build:
+      context: ./services/mcp-docx
+    volumes:
+      - ./services/mcp-docx/src:/app/src
+    command: ["bun", "--watch", "src/main.ts"]

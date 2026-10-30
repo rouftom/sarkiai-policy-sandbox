@@ -178,7 +178,7 @@ async function executeAction(action: ActionRecord): Promise<string> {
   return 'Recorded.'
 }
 
-const mcpGateway = new McpGateway(process.env.SEA_MCP_API_KEY)
+const mcpGateway = new McpGateway(process.env.MCP_API_KEY)
 
 const chatSessions = new ChatSessionStore({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })
 const readinessRuns = new ReadinessRunStore({ mongodbUri: config.mongodb.uri, dbName: config.mongodb.dbName })

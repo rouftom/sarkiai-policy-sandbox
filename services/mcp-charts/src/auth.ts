@@ -1,8 +1,7 @@
 import crypto from "node:crypto";
 
 /**
- * API key authentication shared by the Vercel handler (`api/mcp.ts`) and the
- * standalone Express server (`src/main.ts`).
+ * API key authentication for the standalone Express server (`src/main.ts`).
  *
  * A key is accepted from any of the following locations (first match wins):
  *  1. One of the supported HTTP headers (case-insensitive, see API_KEY_HEADER_NAMES).
@@ -12,11 +11,10 @@ import crypto from "node:crypto";
  *     (`authorization_token` -> `Authorization: Bearer <key>`).
  *  2. A query-string parameter (see API_KEY_QUERY_PARAMS), for clients that can only
  *     configure a URL (e.g. remote connectors without custom headers).
- *  3. Legacy: an `mcp-session-id` ending with the key (`<org>-<key>`), as used by the
- *     SarkiAI MultiMcpClient.
+ *  3. Legacy: an `mcp-session-id` ending with the key.
  *
- * Authentication is only enforced when at least one key is configured through
- * `MCP_API_KEYS` (comma separated), `MCP_API_KEY` or `SEA_MCP_API_KEY`.
+ * Authentication is fail-closed: at least one key must be configured through
+ * `MCP_API_KEYS` (comma separated) or `MCP_API_KEY`.
  * Set `MCP_AUTH_DISABLED=true` to temporarily bypass enforcement.
  */
 
@@ -56,7 +54,7 @@ export interface AuthResult {
 
 /** Returns the list of accepted API keys configured in the environment. */
 export function getConfiguredApiKeys(): string[] {
-  const raw = [process.env.MCP_API_KEYS, process.env.MCP_API_KEY, process.env.SEA_MCP_API_KEY]
+  const raw = [process.env.MCP_API_KEYS, process.env.MCP_API_KEY]
     .filter(Boolean)
     .join(",");
   return Array.from(new Set(raw.split(",").map((k) => k.trim()).filter(Boolean)));
@@ -112,7 +110,7 @@ export function authenticate(getHeader: HeaderGetter, searchParams?: URLSearchPa
   if (!isAuthEnforced()) return { ok: true, source: "disabled" };
   const keys = getConfiguredApiKeys();
   if (keys.length === 0) {
-    return { ok: false, status: 503, reason: "Server misconfigured: no API key is configured (MCP_API_KEYS or SEA_MCP_API_KEY)." };
+    return { ok: false, status: 503, reason: "Server misconfigured: no API key is configured (MCP_API_KEYS or MCP_API_KEY)." };
   }
 
   for (const name of API_KEY_HEADER_NAMES) {
