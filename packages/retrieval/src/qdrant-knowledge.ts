@@ -9,7 +9,7 @@
  *
  * Everything the console does — status, document list, preview, chunk edit,
  * figures, ingestion, playground — is implemented here against those two local
- * stores. No Atlas, no Voyage, no cloud binary.
+ * stores. No external vector service, no hosted embedding, no cloud binary.
  */
 
 import { createHash, randomUUID } from 'node:crypto'

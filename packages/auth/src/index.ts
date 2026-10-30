@@ -396,7 +396,7 @@ export class AuthService {
   private readonly pendingEnrollments = new Map<string, PendingEnrollment>()
   private client: MongoClient | null = null
   /**
-   * A transient Atlas failure must not downgrade the whole process to memory
+   * A transient MongoDB failure must not downgrade the whole process to memory
    * for its lifetime (the previous sticky flag silently lost a password change).
    * The client is dropped and a new attempt is allowed after a short cooldown.
    */
@@ -417,7 +417,7 @@ export class AuthService {
     return this.client && !this.mongoDown ? 'mongo' : 'memory'
   }
 
-  /** Sign-up is a cloud-demo feature; it stays closed unless explicitly enabled. */
+  /** Self-service sign-up stays closed on a local install unless explicitly enabled. */
   get signupEnabled(): boolean {
     return Boolean(this.config.signup)
   }
@@ -439,7 +439,7 @@ export class AuthService {
       if (!this.client) {
         this.client = new MongoClient(this.config.mongodbUri, { serverSelectionTimeoutMS: 8000 })
         await this.client.connect()
-        // Reachability check: `connect()` can succeed lazily against Atlas.
+        // Reachability check: `connect()` can succeed lazily.
         await this.client.db(this.config.dbName ?? 'policy_sandbox').command({ ping: 1 })
       }
       this.mongoFailedAt = 0

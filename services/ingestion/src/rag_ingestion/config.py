@@ -1,7 +1,7 @@
 """Environment-driven configuration for the ingestion microservice.
 
 Local-only: embeddings come from the on-premise Ollama server and vectors are
-stored in Qdrant. There is no hosted embedding or Atlas path.
+stored in Qdrant. There is no hosted embedding or external vector path.
 """
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

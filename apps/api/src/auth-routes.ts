@@ -104,7 +104,7 @@ export async function registerAuthRoutes(app: FastifyInstance, audit: AuditServi
 
   // ── One-time root setup ───────────────────────────────────────────────────
   // No operator exists until someone completes this screen; the account is
-  // created with a random password and mailed through Resend.
+  // created with a random password and written to the console outbox.
   const setupAttempts = new Map<string, { count: number; resetAt: number }>()
   const SETUP_WINDOW_MS = 15 * 60 * 1000
   const SETUP_MAX_ATTEMPTS = 5

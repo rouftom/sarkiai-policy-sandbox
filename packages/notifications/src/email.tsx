@@ -223,7 +223,7 @@ export interface RenderedEmail {
   text: string
 }
 
-/** HTML + plain text in one call: Resend wants both, and some inboxes only read one. */
+/** HTML + plain text in one call: some inboxes only read one and clients differ. */
 export async function renderNotificationEmail(props: NotificationEmailProps): Promise<RenderedEmail> {
   const element = <NotificationEmail {...props} />
   const [html, text] = await Promise.all([
