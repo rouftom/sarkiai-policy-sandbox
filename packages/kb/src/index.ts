@@ -18,6 +18,13 @@ export interface IngestFileInput extends Taxonomy {
   filename: string
   sourceUrl?: string
   organizationId?: string
+  /** Human title shown in the console (defaults to the filename). */
+  title?: string
+  /** Short abstract shown in the console. */
+  summary?: string
+  /** Publication terms recorded by the corpus manifest. */
+  rights?: string
+  rightsNote?: string
 }
 
 export interface IngestTextInput extends Taxonomy {
@@ -25,6 +32,10 @@ export interface IngestTextInput extends Taxonomy {
   filename: string
   sourceUrl?: string
   organizationId?: string
+  title?: string
+  summary?: string
+  rights?: string
+  rightsNote?: string
 }
 
 export interface IngestResult {
@@ -63,6 +74,10 @@ export class IngestionClient {
         version: input.version,
         sourceUrl: input.sourceUrl,
         organizationId: input.organizationId,
+        title: input.title,
+        summary: input.summary,
+        rights: input.rights,
+        rightsNote: input.rightsNote,
       }),
     })
     if (!response.ok) throw new Error(`Ingestion failed (${response.status}): ${await response.text()}`)
@@ -78,6 +93,10 @@ export class IngestionClient {
     if (input.namespace) form.append('namespace', input.namespace)
     if (input.version) form.append('version', input.version)
     if (input.sourceUrl) form.append('sourceUrl', input.sourceUrl)
+    if (input.title) form.append('title', input.title)
+    if (input.summary) form.append('summary', input.summary)
+    if (input.rights) form.append('rights', input.rights)
+    if (input.rightsNote) form.append('rightsNote', input.rightsNote)
 
     const response = await fetch(`${this.config.baseUrl}/v1/ingest/file`, {
       method: 'POST',

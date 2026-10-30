@@ -11,6 +11,7 @@ import type { KbChunk, RetrievalQuery, Taxonomy } from '@sps/shared'
 import type { Retriever } from './types'
 
 export * from './types'
+export * from './qdrant-knowledge'
 
 export interface RetrievalConfig {
   qdrantUrl: string
