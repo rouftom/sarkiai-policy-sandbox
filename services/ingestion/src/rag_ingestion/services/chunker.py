@@ -3,7 +3,7 @@
 Parses legal/administrative structural markers (TITRE, CHAPITRE, SECTION, ARTICLE,
 TITLE, CHAPTER, ...) to produce chunk candidates carrying breadcrumb heading paths,
 article numbers, and parent/child relationships. Adapted from the SarkiAI Enterprise
-RAG ingestion engine for the ITU AI for Good Policy Sandbox.
+RAG ingestion engine for the SarkiAI Policy Sandbox.
 """
 
 import re

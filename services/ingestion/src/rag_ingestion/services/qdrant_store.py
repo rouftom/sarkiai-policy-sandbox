@@ -1,8 +1,8 @@
 """Qdrant vector store for policy chunks.
 
 Collection layout:
-  • dense  — named dense vector (local bge-m3, 1024-d, cosine)
-  • text   — named sparse vector (BM25, IDF modifier) for hybrid search
+  • dense  · named dense vector (local bge-m3, 1024-d, cosine)
+  • text   · named sparse vector (BM25, IDF modifier) for hybrid search
 
 Each point payload carries the full jurisdiction taxonomy plus the structural
 breadcrumbs (headingPath, articleNumber, ...). Points are keyed by a
@@ -85,6 +85,10 @@ class QdrantPolicyStore:
         namespace: Optional[str] = None,
         organization_id: Optional[str] = None,
         source_url: Optional[str] = None,
+        title: Optional[str] = None,
+        summary: Optional[str] = None,
+        rights: Optional[str] = None,
+        rights_note: Optional[str] = None,
         pillar: Optional[List[str]] = None,
         version: Optional[str] = None,
     ) -> Dict[str, int]:
@@ -113,6 +117,10 @@ class QdrantPolicyStore:
 
             payload: Dict[str, Any] = {
                 "filename": filename,
+                "title": title or filename,
+                "summary": summary,
+                "rights": rights,
+                "rightsNote": rights_note,
                 "type": doc_type,
                 "docType": doc_type,
                 "country": country,

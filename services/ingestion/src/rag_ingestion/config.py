@@ -1,4 +1,8 @@
-"""Environment-driven configuration for the ingestion microservice."""
+"""Environment-driven configuration for the ingestion microservice.
+
+Local-only: embeddings come from the on-premise Ollama server and vectors are
+stored in Qdrant. There is no hosted embedding or Atlas path.
+"""
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -21,7 +25,7 @@ class Settings(BaseSettings):
     # fastembed model used to build the BM25 sparse vector (hybrid search).
     qdrant_sparse_model: str = "Qdrant/bm25"
 
-    # Local embeddings (Ollama, default bge-m3 — 1024-dim, matches Qdrant config)
+    # Local embeddings (Ollama, default bge-m3 · 1024-dim, matches Qdrant config)
     ollama_url: str = "http://localhost:11434"
     embedding_model: str = "bge-m3"
     embedding_dimension: int = 1024

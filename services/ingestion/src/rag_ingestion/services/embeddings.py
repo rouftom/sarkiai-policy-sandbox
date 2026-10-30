@@ -1,7 +1,7 @@
 """Local embedding service (Ollama, default model `bge-m3`).
 
 No cloud call: embeddings are produced on-premise so the corpus never leaves the
-infrastructure (ITU readiness D10 `data_sovereignty`, D11 `edge_privacy`).
+infrastructure (data sovereignty and edge privacy).
 """
 
 from typing import List

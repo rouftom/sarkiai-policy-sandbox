@@ -9,12 +9,14 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     embeddingModel: str
+    # Kept for wire compatibility with older callers; this is the Qdrant collection.
     mongoCollection: str
+    vectorBackend: str = "qdrant"
     ocrEnabled: bool
 
 
 class IngestTaxonomy(BaseModel):
-    """Jurisdiction taxonomy attached to every chunk for country-scoped retrieval."""
+    """Jurisdiction taxonomy and document metadata attached to every chunk."""
 
     country: str = Field(..., description="ISO-3166 alpha-2 ('cm', 'ae') or 'global'")
     jurisdiction: str = Field("national", description="national | regional | international")
@@ -22,9 +24,13 @@ class IngestTaxonomy(BaseModel):
         "policy",
         description="law | strategy | regulation | policy | treaty | standard | guidance",
     )
-    pillar: Optional[List[str]] = Field(None, description="ITU AI Readiness dimensions informed")
+    pillar: Optional[List[str]] = Field(None, description="AI-readiness dimensions informed")
     namespace: Optional[str] = Field(None, description="Optional sub-corpus partition")
     version: Optional[str] = Field(None, description="Source version / revision tag")
+    title: Optional[str] = Field(None, description="Human title of the document")
+    summary: Optional[str] = Field(None, description="One-paragraph abstract shown in the console")
+    rights: Optional[str] = Field(None, description="official-text | quotation-only | to-confirm")
+    rightsNote: Optional[str] = Field(None, description="Why the source carries that rights status")
 
 
 class TextIngestRequest(IngestTaxonomy):
