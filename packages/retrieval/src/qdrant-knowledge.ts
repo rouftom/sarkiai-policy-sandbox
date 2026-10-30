@@ -670,7 +670,8 @@ export class QdrantKnowledge {
     const document = documents.find((row) => row.filename === filename) ?? null
     const chunks = await this.chunksOf(filename)
     const images = document?.images ?? []
-    const selected = chunkIndex === undefined ? 0 : Math.max(0, chunks.findIndex((chunk) => chunk.chunkIndex === chunkIndex))
+    // -1 when the requested passage is not in the document: never a silent jump to the first one.
+    const selected = chunkIndex === undefined ? 0 : chunks.findIndex((chunk) => chunk.chunkIndex === chunkIndex)
     return {
       document,
       chunks: chunks.map((chunk) => ({ ...chunk, images: [] as DocumentImage[] })),
