@@ -1,18 +1,16 @@
 /**
- * Hybrid retrieval over the country-scoped knowledge base — LOCAL ONLY.
+ * Retrieval backend.
  *
- * Pipeline (ITU-T Y.3172 "ML model" layer):
- *   1. embed the query locally (Ollama, `bge-m3`)
- *   2. prefetch dense (bge-m3) + sparse (BM25) with the jurisdiction filter
- *   3. Qdrant native fusion (RRF) of both ranked lists
- *   4. optional LOCAL rerank via a TEI `/rerank` endpoint (BAAI/bge-reranker-v2-m3)
- *
- * No cloud call is made: embeddings and rerank stay on-premise
- * (ITU readiness D10 `data_sovereignty`, D11 `edge_privacy`).
+ * Qdrant serves both vectors: `bge-m3` dense (Ollama) and BM25 sparse, fused
+ * with RRF, plus an optional TEI reranker. Everything stays on-premise; there
+ * is no hosted embedding or rerank path.
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest'
 import type { KbChunk, RetrievalQuery, Taxonomy } from '@sps/shared'
+import type { Retriever } from './types'
+
+export * from './types'
 
 export interface RetrievalConfig {
   qdrantUrl: string
@@ -70,7 +68,7 @@ async function embedQuery(config: RetrievalConfig, text: string): Promise<number
   return embedding
 }
 
-/** Reciprocal Rank Fusion — kept for callers that fuse lists locally. */
+/** Reciprocal Rank Fusion · kept for callers that fuse lists locally. */
 export function rrf<T>(lists: Array<{ items: T[]; weight: number }>, k = 60): Array<T & { score: number }> {
   const scores = new Map<string, { item: T; score: number }>()
   for (const { items, weight } of lists) {
@@ -107,7 +105,7 @@ function toChunk(point: QdrantPoint): KbChunk {
   }
 }
 
-export class PolicyRetriever {
+export class PolicyRetriever implements Retriever {
   private client: QdrantClient
   private readonly cfg: Required<Pick<RetrievalConfig, 'collectionName' | 'denseVectorName' | 'sparseVectorName' | 'sparseModel' | 'embeddingModel' | 'rerankModel'>> &
     RetrievalConfig

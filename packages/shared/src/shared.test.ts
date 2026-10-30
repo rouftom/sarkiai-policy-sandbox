@@ -7,10 +7,11 @@ import {
   WORKFLOW_PROFILES,
   getWorkflowProfile,
   institutionsForDomain,
+  institutionsForDomains,
   isLens,
 } from './index'
 
-describe('ITU AI Readiness taxonomy', () => {
+describe('AI-readiness taxonomy', () => {
   test('6 factors / 13 dimensions', () => {
     expect(READINESS_FACTORS).toHaveLength(6)
     expect(READINESS_DIMENSIONS).toHaveLength(13)
@@ -69,5 +70,18 @@ describe('institutions', () => {
       expect(institution.mandate.length).toBeGreaterThan(10)
       expect(['legal_advisor', 'institutional', 'coordinator', 'innovator']).toContain(institution.role)
     }
+  })
+})
+
+describe('institutions of several sectors', () => {
+  test('union of the sectors, each institution once', () => {
+    const union = institutionsForDomains(['health', 'telecom']).map((i) => i.id)
+    expect(new Set(union).size).toBe(union.length)
+    for (const id of institutionsForDomain('health').map((i) => i.id)) expect(union).toContain(id)
+    for (const id of institutionsForDomain('telecom').map((i) => i.id)) expect(union).toContain(id)
+  })
+
+  test('one sector gives the same list as before', () => {
+    expect(institutionsForDomains(['education']).map((i) => i.id)).toEqual(institutionsForDomain('education').map((i) => i.id))
   })
 })

@@ -35,11 +35,10 @@ export type AgentRole =
   | 'innovator'
 
 /**
- * ITU AI Readiness Framework, Report 2.0 (January 2026).
+ * National AI-readiness framework: 6 factors and 13 dimensions.
  *
- * The framework defines 6 factors and 13 dimensions. This replaces the earlier
- * 8-perspective placeholder and matches the canonical `dimensions.json` shipped
- * by the ITU reference code.
+ * The canonical machine-readable definition is `data/global/standards/dimensions.json`
+ * (factor descriptions + 111 dimension metrics).
  */
 export type ReadinessFactor =
   | 'data'
@@ -108,19 +107,53 @@ export const DIMENSION_FACTORS: Record<ReadinessDimension, ReadinessFactor[]> = 
   READINESS_DIMENSIONS.map((d) => [d.shortName, d.factors]),
 ) as Record<ReadinessDimension, ReadinessFactor[]>
 
-/** A single dimension scored on the ITU 0–5 maturity scale. */
+/** The languages an assessment is written in. */
+export type ReadinessLang = 'fr' | 'en'
+
+/** The written part of one dimension, in one language. */
+export interface DimensionText {
+  summary: string
+  evidence: string[]
+  gaps: string[]
+  recommendations: string[]
+}
+
+/** The country's situation against the global context, in one language. */
+export interface CountrySituation {
+  headline: string
+  situation: string
+  context: string
+}
+
+/** A single dimension scored on the 0–5 maturity scale. */
 export interface DimensionScore {
   dimension: ReadinessDimension
   dimensionId: number
   dimensionName: string
   score: number // 0..5
   maturity: string
+  /** Text in the first language the evaluation produced (English when both exist). */
+  summary?: string
   evidence: string[]
   gaps: string[]
   recommendations: string[]
   confidence: number // 0..1
+  /** The same text per language. Assessments made before bilingual output have none. */
+  localized?: Partial<Record<ReadinessLang, DimensionText>>
   /** Set when the value moved due to causal propagation. */
   causalEffect?: number
+}
+
+/** The text of a dimension in `lang`, falling back to the text the evaluation kept. */
+export function dimensionTextIn(score: DimensionScore, lang: ReadinessLang): DimensionText {
+  const own = score.localized?.[lang]
+  if (own) return own
+  return { summary: score.summary ?? '', evidence: score.evidence, gaps: score.gaps, recommendations: score.recommendations }
+}
+
+/** Whether every dimension already has its text in `lang`. */
+export function hasLanguage(scores: DimensionScore[], lang: ReadinessLang): boolean {
+  return scores.every((score) => Boolean(score.localized?.[lang]))
 }
 
 export interface ReadinessScenario {
@@ -153,8 +186,28 @@ export interface Taxonomy {
   version?: string
 }
 
+/**
+ * A figure attached to a provision: a diagram, a scanned chart, a generated
+ * reference image. Retrieval carries the metadata, never the bytes, so a
+ * citation stays small; `url` is served by the API (`/v1/kb/images/:id`).
+ */
+export interface DocumentImage {
+  id: string
+  url: string
+  caption: string
+  alt?: string
+  tags?: string[]
+  /** Readiness dimension this figure illustrates, when known. */
+  dimension?: ReadinessDimension
+  articleNumber?: string
+  headingPath?: string
+  /** Where the image came from: an upload or a locally drawn reference. */
+  source?: 'upload' | 'sample'
+}
+
 export interface KbChunk extends Taxonomy {
   id: string
+  documentId?: string
   filename: string
   text: string
   chunkIndex: number
@@ -163,6 +216,7 @@ export interface KbChunk extends Taxonomy {
   unitType?: string
   chunkRole?: 'parent' | 'child'
   sourceUrl?: string
+  images?: DocumentImage[]
   score?: number
   isActive: boolean
 }
@@ -175,6 +229,11 @@ export interface Citation {
   headingPath?: string
   sourceUrl?: string
   quote: string
+  /** Stable identifiers so the console can load the passage, not just the excerpt. */
+  chunkId?: string
+  chunkIndex?: number
+  documentId?: string
+  images?: DocumentImage[]
 }
 
 export interface Gap {
@@ -190,6 +249,8 @@ export interface Gap {
 
 export interface AgentAssessment {
   agentId: string
+  /** Wall-clock time this agent took to answer, measured by the coordinator. */
+  durationMs?: number
   role: AgentRole
   mandate: string
   domain: Domain
@@ -198,6 +259,8 @@ export interface AgentAssessment {
   gaps: Gap[]
   confidence: number
   cotTraceId: string
+  /** Citation-validator verdict (N2); absent when validation was skipped. */
+  validation?: CitationValidation
 }
 
 /** A scenario event is released progressively, never all at once. */
@@ -230,6 +293,8 @@ export interface ScenarioRun {
 export interface AuditRecord {
   id: string
   runId?: string
+  /** Operator (e-mail) whose work produced this record. */
+  userId?: string
   ts: string
   actor: string
   action: string
@@ -243,6 +308,8 @@ export interface AuditRecord {
 export interface CoTTrace {
   id: string
   runId: string
+  /** Operator (e-mail) whose run produced this trace step. */
+  userId?: string
   agentId: string
   step: number
   thought: string
@@ -258,4 +325,67 @@ export interface RetrievalQuery {
   docType?: DocType
   namespace?: string
   topK?: number
+}
+
+/**
+ * Where inference happens and whose weights answer.
+ *
+ * This deployment has one mode: local Ollama. The type is kept so the console,
+ * the audit trail and the API share one vocabulary.
+ */
+export type ProviderMode = 'local'
+
+/** Models backing the local provider (each field is a model identifier). */
+export interface ProviderModels {
+  /** Reasoning / generation (text, and images for the vision model). */
+  reasoning: string
+  /** Vision model used to read uploaded figures. */
+  vision: string
+  /** Embeddings. */
+  embedding: string
+}
+
+/** Public, secret-free description of the active provider. */
+export interface ProviderDescriptor {
+  mode: ProviderMode
+  /** Human label, e.g. "Local". */
+  label: string
+  /** Upstream vendor serving the weights. */
+  servedBy: string
+  baseURL: string
+  models: ProviderModels
+  /** `on-premise` means no prompt, document or answer leaves the institution. */
+  residency: 'cloud' | 'on-premise'
+  openWeights: boolean
+  /** Hard ceiling per scenario run, in USD. `0` when nothing is billed. */
+  budgetUsd: number
+  /** False when the local server is not reachable. */
+  ready: boolean
+  /** Why the provider is unusable, when `ready` is false. */
+  reason?: string
+}
+
+/**
+ * Outcome of the citation validator (N2).
+ *
+ * A policy answer is only admissible when every quoted provision actually
+ * appears in the retrieved corpus. Fabricated quotes are rejected and the agent
+ * is asked to answer again · the engine never ships an unsourced claim.
+ */
+export interface CitationValidation {
+  /** True when the answer cites at least one provision and quotes nothing invented. */
+  ok: boolean
+  /** Citations the answer actually refers to (article or heading present). */
+  used: Citation[]
+  /** Quoted passages that do not appear in the retrieved corpus. */
+  rejected: string[]
+  /** Generation attempts, including rejected ones. */
+  attempts: number
+}
+
+/** The flag of an ISO 3166 alpha-2 country code, from regional indicator symbols. */
+export function flagOf(code: string): string {
+  const upper = code.toUpperCase()
+  if (!/^[A-Z]{2}$/.test(upper)) return ''
+  return String.fromCodePoint(...[...upper].map((letter) => 0x1f1e6 + letter.charCodeAt(0) - 65))
 }

@@ -2,7 +2,7 @@
   "name": "sarkiai-policy-sandbox",
   "version": "0.1.0",
   "private": true,
-  "description": "Policy-grounded multi-agent engine for the ITU AI for Good Lab Hackathon (UAE)",
+  "description": "Policy-grounded multi-agent engine for national AI governance (local-first, sovereign)",
   "license": "Apache-2.0",
   "workspaces": [
     "apps/*",
@@ -18,17 +18,29 @@
     "test:all": "bun test",
     "test:int": "bun test --test-name-pattern integration",
     "test:e2e": "bun test tests/e2e",
+    "check:provider": "bun scripts/check-provider.ts",
+    "check:gazette": "bun scripts/check-gazette.ts",
+    "kb:seed": "bun scripts/seed-corpus.ts",
+    "demo:reset": "bun apps/api/scripts/reset-demo.ts",
     "clean": "turbo run clean && rm -rf node_modules .turbo"
   },
   "devDependencies": {
+    "@sps/agents": "workspace:*",
+    "@sps/gazette": "workspace:*",
+    "@sps/retrieval": "workspace:*",
+    "@sps/shared": "workspace:*",
     "@types/bun": "^1.4.2",
     "@types/node": "^20.17.0",
+    "@types/pngjs": "^6.0.5",
+    "ai": "^6.0.0",
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
     "turbo": "^2.3.0",
     "typescript": "^5.6.0"
   },
   "engines": {
     "node": ">=20.0.0",
-    "bun": ">=1.1.0"
+    "bun": ">=1.4.2"
   },
-  "packageManager": "bun@1.1.0"
+  "packageManager": "bun@1.4.2"
 }

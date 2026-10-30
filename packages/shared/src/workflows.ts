@@ -44,9 +44,9 @@ export const WORKFLOW_PROFILES: Record<WorkflowLens, WorkflowProfile> = {
   },
   readiness: {
     lens: 'readiness',
-    label: 'ITU AI Readiness assessment',
+    label: 'AI readiness assessment',
     description:
-      'Assess a country corpus against the 13 ITU AI Readiness dimensions (6 factors) and produce a gap report.',
+      'Assess a country corpus against the 13 AI-readiness dimensions (6 factors) and produce a gap report.',
     stages: {
       ingest: true,
       retrieve: true,

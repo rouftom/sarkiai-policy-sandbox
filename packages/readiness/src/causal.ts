@@ -1,12 +1,12 @@
 /**
- * Causal graph over the 13 ITU AI Readiness dimensions.
+ * Causal graph over the 13 AI-readiness dimensions.
  *
  * When a what-if or a decision changes one dimension's score, the graph
  * propagates weighted effects to downstream dimensions
  * (e.g. D13 Infra → D5 AI Integration → D6 Human Interface).
  *
- * Edge weights are ported from the ITU reference implementation and derived
- * from the framework's factor↔dimension mapping and logical dependencies.
+ * Edge weights follow the framework's factor↔dimension mapping and the
+ * observed logical dependencies between dimensions.
  */
 
 import { READINESS_DIMENSIONS, type DimensionScore, type ReadinessDimension } from '@sps/shared'

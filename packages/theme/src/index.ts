@@ -1,5 +1,5 @@
 /**
- * @sps/theme — the SarkiAI admin charter (apps/organization) replicated for the
+ * @sps/theme · the SarkiAI admin charter (apps/organization) replicated for the
  * Policy Sandbox. Theme packs: fada (default), green, ocean, sunset, mono.
  */
 
@@ -28,6 +28,15 @@ export function isThemePackId(id?: string | null): boolean {
 
 export const THEME_PACK_STORAGE_KEY = 'sps-theme-pack'
 export const MODE_STORAGE_KEY = 'sps-theme-mode'
+
+/** Corner treatment of the console chrome: square by default, or the FSM radii. */
+export type CornerStyle = 'square' | 'rounded'
+export const DEFAULT_CORNER_STYLE: CornerStyle = 'square'
+export const RADIUS_STORAGE_KEY = 'sps.radius'
+
+export function resolveCornerStyle(preferred?: string | null): CornerStyle {
+  return preferred === 'rounded' ? 'rounded' : DEFAULT_CORNER_STYLE
+}
 
 export * from './types'
 export * from './generate-css'

@@ -58,3 +58,6 @@ data/global/*/*
 .DS_Store
 *.log
 coverage/
+
+# deployment metadata
+.vercel
