@@ -1,0 +1,84 @@
+#!/usr/bin/env bun
+/**
+ * Wipe the demo's operational state.
+ *
+ *   bun run demo:reset -- --dry-run     # show what would be deleted
+ *   bun run demo:reset -- --yes         # actually delete
+ *
+ * What goes:
+ *   operators            accounts (sign-in, TOTP secrets, recovery codes)
+ *   password_resets      pending reset links
+ *   audit_logs           hash-chained audit trail
+ *   cot_traces           chain-of-thought traces
+ *   joint_reports        joint situation reports
+ *   approvals            approval decisions
+ *
+ * What stays: the legal corpus and its vectors (`kb_chunks`), the Qdrant
+ * collection, and every configuration value. Re-seed the corpus only when you
+ * mean to (`bun run kb:seed`).
+ *
+ * Hosts without shell access use the boot hook instead: commit
+ * `apps/api/scripts/reset-on-boot.flag`, start the stack, then delete the flag.
+ *
+ * The connection string is never printed, never echoed in an error and never
+ * written to disk.
+ */
+
+import { DEMO_RESET_COLLECTIONS, resetDemoState } from '../src/demo-reset.js'
+
+const args = new Set(process.argv.slice(2))
+const dryRun = args.has('--dry-run')
+const confirmed = args.has('--yes') || args.has('-y')
+
+function fail(message: string): never {
+  console.error(message)
+  process.exit(1)
+}
+
+const uri = process.env.MONGODB_URI
+if (!uri) {
+  fail('MONGODB_URI is not set; refusing to guess a cluster.')
+}
+
+const dbName = process.env.MONGODB_DB_NAME ?? 'policy_sandbox'
+
+console.log(`Demo reset · database "${dbName}"`)
+console.log(`  collections: ${DEMO_RESET_COLLECTIONS.join(', ')}`)
+console.log('  kept: kb_chunks (corpus + vectors), Atlas indexes, configuration')
+console.log('')
+
+try {
+  const preview = await resetDemoState({ uri, dbName, dryRun: true })
+  for (const entry of preview.counts) {
+    const state = entry.present ? `${entry.count} document(s)` : 'collection absent'
+    console.log(`  ${entry.name.padEnd(20)} ${state}`)
+  }
+
+  if (dryRun) {
+    console.log('\nDry run: nothing was deleted. Re-run with --yes to wipe these collections.')
+    process.exit(0)
+  }
+
+  if (!confirmed) {
+    console.log('\nNothing deleted. This command is destructive:')
+    console.log('  bun run demo:reset -- --yes')
+    console.log('Use --dry-run first if you only want to look.')
+    process.exit(2)
+  }
+
+  const result = await resetDemoState({ uri, dbName })
+  console.log('')
+  for (const entry of result.counts) {
+    if (!entry.present) continue
+    console.log(`  cleared ${entry.name.padEnd(20)} ${entry.count} document(s)`)
+  }
+
+  console.log(`\nDone · ${result.deleted} document(s) deleted. The corpus was left untouched.`)
+  console.log('Next: open the console, create the root operator from /setup, then enrol TOTP.')
+} catch (error) {
+  // Deliberately no connection string, no stack trace with credentials.
+  const message = error instanceof Error ? error.message : 'unknown error'
+  console.error(`\nReset failed: ${message}`)
+  console.error('Check that this machine can reach the cluster and that MONGODB_URI is current.')
+  process.exitCode = 1
+}
