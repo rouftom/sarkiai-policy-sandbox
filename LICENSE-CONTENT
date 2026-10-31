@@ -20,4 +20,8 @@ Apache License 2.0 — see LICENSE), nor to third-party source documents (nation
 laws, strategies, reports), which retain their own terms. Provenance for each
 source is recorded in the relevant data/**/manifest.json.
 
+Files reproduced from the ITU AI Readiness reference repository are under the
+MIT License: see data/global/LICENSE-ITUAIReadiness. The rights review of the
+knowledge base is in data/KNOWLEDGE-BASE.md.
+
 Copyright 2026 Djotta — Made with ♥️ by Djotta (https://djotta.com)

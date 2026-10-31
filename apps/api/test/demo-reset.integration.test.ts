@@ -25,7 +25,7 @@ describe.skipIf(!mongoUri)('demo reset (integration: MongoDB)', () => {
     const db = client.db(DB)
     await db.collection('operators').insertOne({ email: 'root@sarkiai.dev' })
     await db.collection('audit_logs').insertMany([{ seq: 1 }, { seq: 2 }])
-    await db.collection('whatsapp_approvals').insertOne({ decision: 'approved' })
+    await db.collection('approvals').insertOne({ decision: 'approved' })
     await db.collection('kb_chunks').insertOne({ text: 'Article 1er' })
 
     const preview = await resetDemoState({ uri: mongoUri!, dbName: DB, dryRun: true })
@@ -38,7 +38,7 @@ describe.skipIf(!mongoUri)('demo reset (integration: MongoDB)', () => {
     expect(result.deleted).toBe(4)
     expect(await db.collection('operators').countDocuments()).toBe(0)
     expect(await db.collection('audit_logs').countDocuments()).toBe(0)
-    expect(await db.collection('whatsapp_approvals').countDocuments()).toBe(0)
+    expect(await db.collection('approvals').countDocuments()).toBe(0)
     // The corpus is never part of the wipe.
     expect(await db.collection('kb_chunks').countDocuments()).toBe(1)
 

@@ -105,7 +105,7 @@ export interface OrchestratorDeps {
   provider?: ProviderDescriptor
   /**
    * Output ceiling per generation. Reasoning models spend output tokens before
-   * answering (muse-spark-1.3: 600–1500), so a tight cap returns an empty answer.
+   * answering, so a tight cap returns an empty answer.
    * The ceiling is not billed · only produced tokens are.
    */
   maxOutputTokens?: number

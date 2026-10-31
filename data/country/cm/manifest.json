@@ -2,7 +2,7 @@
   "country": "cm",
   "jurisdiction": "national",
   "generated": "2026-10-03",
-  "note": "Corpus Cameroun. status='present' = fichier copié localement (payloads non versionnés, cf. .gitignore) ; status='to_confirm' = instrument à collecter/vérifier avant ingestion. needsOcr=true => PDF scanné sans couche texte : l'ingestion déclenche le service OCR (services/ocr). Toute erreur factuelle se propage aux réponses des agents. Le champ rights (official-text | quotation-only | to-confirm) fixe ce qui peut être publié du payload ; rightsNote en donne la raison.",
+  "note": "Corpus Cameroun. status='present' = fichier présent localement ; seuls les payloads rights='official-text' sont versionnés (liste blanche dans .gitignore, revue des droits dans data/KNOWLEDGE-BASE.md) ; status='to_confirm' = instrument à collecter/vérifier avant ingestion. needsOcr=true => PDF scanné sans couche texte : l'ingestion déclenche le service OCR (services/ocr). Toute erreur factuelle se propage aux réponses des agents. Le champ rights (official-text | open-licence | quotation-only | to-confirm) fixe ce qui peut être publié du payload ; rightsNote en donne la raison.",
   "documents": [
     {
       "id": "cm-data-protection-law-2024",
@@ -94,8 +94,8 @@
       "needsOcr": true,
       "note": "Partie du texte extraite avec police non-unicode (garbled) — OCR recommandé.",
       "sourceUrl": "",
-      "rights": "to-confirm",
-      "rightsNote": "Government/development-partner compact: partner terms may apply; verify before publishing the payload."
+      "rights": "official-text",
+      "rightsNote": "Public document of the Ministry of Public Health (Minsanté), freely accessible like the other public documents: published unchanged."
     },
     {
       "id": "cm-health-system",
@@ -198,8 +198,8 @@
       "priority": "medium",
       "file": "art_observatoire_marche_telecom_2016.pdf",
       "sourceUrl": "https://www.art.cm/",
-      "rights": "to-confirm",
-      "rightsNote": "ART report; reuse terms not stated on the publication: verify before publishing the payload."
+      "rights": "official-text",
+      "rightsNote": "Publication of the telecom regulator (ART), a public body: reproduced unchanged, with attribution."
     },
     {
       "id": "cm-cybersecurity-law-2010",
@@ -283,7 +283,8 @@
       "status": "present",
       "priority": "high",
       "file": "art_recueil_textes_2018.pdf",
-      "note": "486 pages — compilation de lois/décrets/arrêtés télécoms.",
+      "needsOcr": true,
+      "note": "486 pages — compilation de lois/décrets/arrêtés télécoms. Couche texte partielle (polices non-Unicode, 7 150 mots extraits) : OCR requis.",
       "sourceUrl": "https://www.art.cm/",
       "rights": "official-text"
     },
@@ -359,12 +360,13 @@
       "needsOcr": true,
       "note": "139 pages, scanné — OCR requis.",
       "sourceUrl": "",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Publish only the text promulgated by Law No. 2016/007 of 12 July 2016 (official gazette or government copy), never a publisher's annotated edition."
     },
     {
       "id": "cm-id-cr-ecosystem-diagnostic",
-      "title": "Cameroon ID and Civil Registration Ecosystem Diagnostic (FR)",
-      "authority": "ID4D / Government of Cameroon",
+      "title": "Etude diagnostique du système d'ID au Cameroun (édition française de l'ID4D Diagnostic of ID Systems in Cameroon, 2023)",
+      "authority": "Banque mondiale (ID4D)",
       "docType": "report",
       "jurisdiction": "national",
       "pillar": [
@@ -376,9 +378,9 @@
       "priority": "medium",
       "file": "cameroon_id_cr_ecosystem_diagnostic.txt",
       "note": "Converti depuis .docx (l'ingestion ne lit que PDF/TXT).",
-      "sourceUrl": "",
-      "rights": "to-confirm",
-      "rightsNote": "World Bank / ID4D report, usually CC BY 3.0 IGO; verify the licence on the report before publishing the payload."
+      "sourceUrl": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099012324023052410",
+      "rights": "open-licence",
+      "rightsNote": "World Bank, ID4D, 2023, CC BY 3.0 IGO (https://creativecommons.org/licenses/by/3.0/igo/). Cite the English original: World Bank. 2023. Identification for Development (ID4D): Diagnostic of ID Systems in Cameroon. Washington, DC: World Bank. This copy is a plain-text conversion of the French edition. sourceUrl points to the English original page; the French edition's own URL has not been verified."
     },
     {
       "id": "cm-constitution-1996",
@@ -393,7 +395,8 @@
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "https://www.prc.cm/",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
     },
     {
       "id": "cm-health-framework-1996",
@@ -408,37 +411,8 @@
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "https://www.minsante.cm/",
-      "rights": "official-text"
-    },
-    {
-      "id": "cm-cybersecurity-2010",
-      "title": "Loi n° 2010/012 du 21 décembre 2010 relative à la cybersécurité et à la cybercriminalité au Cameroun",
-      "authority": "Assemblée Nationale",
-      "docType": "law",
-      "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "ai_policies"
-      ],
-      "status": "to_confirm",
-      "priority": "critical",
-      "sourceUrl": "https://www.antic.cm/",
-      "rights": "official-text"
-    },
-    {
-      "id": "cm-electronic-comms-2010",
-      "title": "Loi n° 2010/013 du 21 décembre 2010 régissant les communications électroniques au Cameroun",
-      "authority": "Assemblée Nationale",
-      "docType": "law",
-      "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "contextualization"
-      ],
-      "status": "to_confirm",
-      "priority": "high",
-      "sourceUrl": "https://www.art.cm/",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
     },
     {
       "id": "cm-data-protection-authority-mandate",
@@ -453,7 +427,8 @@
       "status": "to_confirm",
       "priority": "critical",
       "sourceUrl": "",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
     },
     {
       "id": "cm-antic-mandate",
@@ -468,7 +443,8 @@
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "https://www.antic.cm/",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
     },
     {
       "id": "cm-national-cyber-strategy",
@@ -483,22 +459,8 @@
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "",
-      "rights": "official-text"
-    },
-    {
-      "id": "cm-malabo-convention",
-      "title": "Convention de Malabo sur la cybersécurité et la protection des données à caractère personnel (2014)",
-      "authority": "Union Africaine",
-      "docType": "treaty",
-      "jurisdiction": "regional",
-      "pillar": [
-        "data_marketplace",
-        "human_interface"
-      ],
-      "status": "verified",
-      "priority": "high",
-      "sourceUrl": "https://au.int/en/treaties",
-      "rights": "official-text"
+      "rights": "official-text",
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
     }
   ]
 }

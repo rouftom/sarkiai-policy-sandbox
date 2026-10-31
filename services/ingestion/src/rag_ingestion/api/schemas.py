@@ -29,7 +29,7 @@ class IngestTaxonomy(BaseModel):
     version: Optional[str] = Field(None, description="Source version / revision tag")
     title: Optional[str] = Field(None, description="Human title of the document")
     summary: Optional[str] = Field(None, description="One-paragraph abstract shown in the console")
-    rights: Optional[str] = Field(None, description="official-text | quotation-only | to-confirm")
+    rights: Optional[str] = Field(None, description="official-text | open-licence | quotation-only | to-confirm")
     rightsNote: Optional[str] = Field(None, description="Why the source carries that rights status")
 
 

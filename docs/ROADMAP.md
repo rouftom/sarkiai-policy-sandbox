@@ -32,13 +32,14 @@
 - `[x]` **Multimodal assistant**: local vision model (`qwen3.5:9b`), image attachments stored in MinIO (content-addressed), untrusted-context guardrails, audit hash. `POST /v1/agents/ask` + `attachments[]`.
 
 ### Sprint 1 — the Cameroon health corpus
-- `[ ]` Collect real CM corpus (health law, data-protection law, national AI/digital strategy, cyber strategy) → `data/country/cm/`.
-- `[ ]` Collect global best-practice corpus (ITU/WHO) → `data/global/itu/`.
+- `[x]` Collect real CM corpus → `data/country/cm/`: 21 documents (data-protection, cybersecurity, e-commerce and electronic-communications laws, decrees, CEMAC directive, SND30, digital and digital-health strategies). 5 instruments are still to source (constitution, health framework law, data-protection authority decree, ANTIC mandate, national cyber strategy), and the official AI strategy document is still to obtain.
+- `[x]` Global best-practice corpus: ITU, WHO, UNESCO, OECD, Malabo (`data/global/itu/`, link-only) and 10 African strategies (`data/global/africa/`, fetched from the ITU reference repository).
 - `[ ]` Ingest + validate retrieval quality per dimension.
 - `[ ]` Replace `data/samples/*` placeholders.
 
 ### Sprint 2 — scenario authoring & coordination
-- `[ ]` Author 3 progressive scenarios (health breach, cross-border telehealth, AI triage failure) with asymmetric `visibleTo`.
+- `[x]` Author progressive scenarios with asymmetric `visibleTo` (`apps/api/src/scenarios.ts`): health-data breach in a public hospital (primary), education data exposure, telecom SIM-swap fraud, public-services ID leak, agriculture subsidy fraud.
+- `[ ]` Cross-border telehealth and AI triage failure scenarios.
 - `[x]` Coordinator reconciliation step (joint situation report) — `packages/agents/src/coordinator.ts`.
 - `[x]` `onBeforeRelease` facilitator hook: `POST /v1/scenarios/start` + `/:runId/next` + "Mode facilitateur" in the console.
 
@@ -51,7 +52,8 @@
 ### Sprint 4 — report & demo
 - `[x]` Technical report (≤5 pp.) drafted.
 - `[ ]` Record the ≤7-minute demo video.
-- `[ ]` Finalize README, license, and the public KB in the ITU AI for Good Lab.
+- `[x]` Public KB: 17 redistributable documents tracked in git, rights review in `data/KNOWLEDGE-BASE.md`, `make check-kb`.
+- `[ ]` Publish the KB in the ITU AI for Good Lab.
 - `[ ]` Finalize submission artifacts (checklist, demo video, public repository).
 
 ### Sprint 5 — multi-country & fine-tuning (post-shortlist)

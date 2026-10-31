@@ -6,7 +6,7 @@ COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
 
 .DEFAULT_GOAL := help
 .PHONY: help up up-kb up-app up-qdrant up-ollama up-mongo up-minio ingestion ocr transcription mcp api web \
-        dev dev-kb dev-app logs ps down clean rebuild seed seed-corpus check-provider check-gazette models sandbox-config \
+        dev dev-kb dev-app logs ps down clean rebuild seed seed-corpus check-kb check-provider check-gazette models sandbox-config \
         secrets-edit secrets-encrypt
 
 help: ## Show available targets
@@ -88,6 +88,9 @@ seed: ## Ingest the sample corpus into the KB (legacy sample directory)
 
 seed-corpus: ## Ingest a country corpus from its manifest (COUNTRY=cm by default)
 	bun scripts/seed-corpus.ts --country $${COUNTRY:-cm}
+
+check-kb: ## Check which knowledge-base documents the repo publishes (rights review)
+	bun scripts/check-kb.ts
 
 check-provider: ## Verify Ollama models, embedding dimension and Qdrant
 	bun scripts/check-provider.ts

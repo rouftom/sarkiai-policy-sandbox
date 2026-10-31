@@ -94,7 +94,7 @@ describe('analyzeImpact', () => {
     let called = false
     const analysis = await analyzeImpact({
       model: {} as LanguageModel,
-      modelLabel: 'muse-spark-1.3',
+      modelLabel: 'qwen3.5:9b',
       provision: { title: 'Loi 2010/012', articleNumber: 'ARTICLE 2', text: '...' },
       cases: [openCase()],
       deps: {
@@ -113,7 +113,7 @@ describe('analyzeImpact', () => {
   test('returns ranked findings for the candidates', async () => {
     const analysis = await analyzeImpact({
       model: {} as LanguageModel,
-      modelLabel: 'muse-spark-1.3',
+      modelLabel: 'qwen3.5:9b',
       provision: { title: 'Decret 2026/341', articleNumber: 'ARTICLE 2', text: 'Délai de 48 heures.', effectiveDate: '2026-11-01' },
       cases: [openCase(), openCase({ runId: 'run-2', citations: [] })],
       deps: {
@@ -132,6 +132,6 @@ describe('analyzeImpact', () => {
     expect(analysis.findings[0]?.runId).toBe('run-1')
     expect(analysis.findings[0]?.severity).toBe('critical')
     expect(analysis.provision.effectiveDate).toBe('2026-11-01')
-    expect(analysis.model).toBe('muse-spark-1.3')
+    expect(analysis.model).toBe('qwen3.5:9b')
   })
 })

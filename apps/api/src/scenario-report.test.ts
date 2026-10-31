@@ -54,7 +54,7 @@ const trace: CoTTrace = {
   step: 0,
   thought: 'Retrieved one provision.',
   toolCalls: [],
-  model: 'muse-spark',
+  model: 'qwen3.5:9b',
   ts: '2026-10-29T10:00:00Z',
 }
 

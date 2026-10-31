@@ -8,7 +8,7 @@ const input = (userId: string, exerciseId = 'drill') => ({
   evaluatedAtMinute: 60,
   actionCount: 2,
   lang: 'en' as const,
-  model: 'muse-spark-1.3',
+  model: 'qwen3.5:9b',
   definition: { id: exerciseId },
   actions: [],
   report: { title: 'Breach drill' },

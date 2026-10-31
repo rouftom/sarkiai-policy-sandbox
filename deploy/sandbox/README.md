@@ -5,6 +5,20 @@ operational records, attachments, OCR, transcription and the two MCP servers.
 It is the recommended shape for an institution server or a lab VM behind a
 reverse proxy. Nothing is managed and no request leaves the network.
 
+## Sizing
+
+The deployment runs fully on-premise, with no external API call.
+
+| Profile | Compute | Memory | Storage |
+|---------|---------|--------|---------|
+| Recommended (CPU only) | 8 to 16 vCPU | 32 GB RAM | 40 GB SSD |
+| Faster responses (GPU) | 8 vCPU, NVIDIA GPU with 16 to 24 GB VRAM (e.g. L4 or A10) | 32 to 64 GB RAM | 100 GB NVMe |
+| Minimum | 4 to 8 vCPU | 16 GB RAM | 25 GB SSD |
+
+The models (`qwen3.5:9b` and `bge-m3`) are downloaded once, about 8 GB in
+total. The published knowledge base adds about 170 MB. Details per component
+are in [`docs/HARDWARE-REQUIREMENTS.md`](../../docs/HARDWARE-REQUIREMENTS.md).
+
 ## 1. Configure
 
 ```bash

@@ -3,7 +3,8 @@
   "jurisdiction": "regional",
   "namespace": "africa",
   "generated": "2026-10-03",
-  "note": "Corpus régional et national africain (documents publics) utilisé comme référence d'écart par le moteur readiness. Les PDF sont volumineux et exclus de git (voir scripts/fetch-corpus.sh) ; le manifeste, lui, est versionné. Source : recueil de référence ITU AI Readiness.",
+  "note": "Corpus régional et national africain (documents publics) utilisé comme référence d'écart par le moteur readiness. Les PDF ne sont pas redistribués ici : scripts/fetch-corpus.sh les récupère dans le dépôt de référence ITU, à un commit figé ; le manifeste, lui, est versionné. Source : recueil de référence ITU AI Readiness.",
+  "distribution": "fetched, not redistributed: payloads come from the ITU AI Readiness reference repository (github.com/CrashingGuru/ITUAIReadiness, commit 84010da9e9c443afcceeccb86d1700a662223395) and keep the terms of their original publishers.",
   "documents": [
     {
       "id": "au-continental-ai-strategy-2024",
