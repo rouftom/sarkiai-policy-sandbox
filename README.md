@@ -79,11 +79,12 @@ sarkiai-policy-sandbox/
 │  ├─ transcription/  # optional media → timestamped transcript
 │  ├─ mcp-charts/     # local MCP server: interactive charts
 │  └─ mcp-docx/       # local MCP server: Word (.docx) generation
-├─ data/              # corpora: country/cm, country/ae, global/itu (git-ignored payloads)
+├─ data/              # knowledge base: country/cm, global/itu, global/africa (see data/KNOWLEDGE-BASE.md)
 ├─ deploy/
 │  ├─ sandbox/        # self-hosted reference deployment (lab VM / institution server)
 │  └─ mongo/init/     # local operational store seed (audit + CoT)
-└─ docs/              # strategic note, mapping, architecture, data model, roadmap
+├─ docs/              # strategic note, mapping, architecture, data model, roadmap
+└─ submission/        # AI for Good Sandbox Hackathon: technical report, judge Q&A, demo script
 ```
 
 ## Quick start
@@ -149,6 +150,27 @@ make clean         # stop + remove volumes
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
+## Submission
+
+AI for Good Sandbox Hackathon 2026 (Cameroon, health and public governance):
+
+- [`submission/TECHNICAL-REPORT.md`](submission/TECHNICAL-REPORT.md) (also [PDF](submission/TECHNICAL-REPORT.pdf) and [DOCX](submission/TECHNICAL-REPORT.docx)), 5 pages
+- [`submission/JUDGE-QA.md`](submission/JUDGE-QA.md): questions the jury is likely to ask, and where to show the answer in the console
+- [`submission/DEMO-SCRIPT.md`](submission/DEMO-SCRIPT.md): storyboard of the demo video
+
+## Knowledge base
+
+The Cameroonian corpus (laws, decrees, regulations, national strategies and
+health policies) ships with the repository in [`data/country/cm/`](data/country/cm/),
+limited to the documents we may redistribute: official texts and openly
+licensed public-body publications. Press articles, authored
+papers and documents with unconfirmed licences are listed but kept out. The
+African reference corpus is fetched from the ITU AI Readiness reference
+repository (`./scripts/fetch-corpus.sh`).
+
+Contents, rights review and rebuild steps: [`data/KNOWLEDGE-BASE.md`](data/KNOWLEDGE-BASE.md).
+`make check-kb` verifies what the repository publishes.
+
 ## Contributing
 
 - Branch model and conventions: [`docs/RULES.md`](docs/RULES.md)
@@ -159,6 +181,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 - **Code** — Apache-2.0 (see [`LICENSE`](LICENSE)).
 - **Knowledge base / docs** — CC BY 4.0 (see [`LICENSE-CONTENT`](LICENSE-CONTENT)); source documents retain their own terms.
+- **ITU reference files** (`dimensions.json` and three summaries) — MIT, see [`data/global/LICENSE-ITUAIReadiness`](data/global/LICENSE-ITUAIReadiness).
 
 See [`docs/LICENSING.md`](docs/LICENSING.md) for the rationale and provenance.
 
