@@ -1,277 +1,134 @@
----
-title: "AI for Good Sandbox Hackathon: Technical Report"
-subtitle: "Team [Team name]: SarkiAI Policy Sandbox (Cameroon)"
----
+# AI for Good Sandbox Hackathon - “Team Djotta”
 
-**Team leader:** Muller Roufaou · **Team members:** [_names_]\
-**Contact:** muller.roufaou@djotta.com · **Country:** Cameroon (CM)\
-**Github:** https://github.com/rouftom/sarkiai-policy-sandbox\
-**Domain:** public governance & health data\
-**Alignment:** ITU-T Y.3172 · ITU Readiness 2.0 (6 factors, 13 dimensions)
+## SarkiAI Policy Sandbox: health-data incident response under national law
 
----
+Team leader: Muller Roufaou
+
+Team members: HABIBA Issa Muller, BALOG Thèrese Christine
+
+Contact details: muller.roufaou@djotta.com, +237 696 171 176
+
+Github link: https://github.com/rouftom/sarkiai-policy-sandbox
+
+Country: Cameroon
 
 ## 1. Introduction
 
-AI is increasingly used to analyse anomalies, but detecting one is only half the
-problem. The other half (**how institutions respond**, who is accountable, under
-which mandate, within which deadline) is where public systems fail: slowly, ad
-hoc, and with uncertain legal footing.
+- in public health, telecoms and other public services, incidents on digital platforms (a breach of patient records, a wave of SIM-swap fraud) are reported by hospitals, operators, media and citizens.
 
-We propose **SarkiAI Policy Sandbox**: a policy-grounded multi-agent engine
-that ingests a country's legal corpus into a jurisdiction-scoped knowledge base,
-runs **mandated institutional agents** with partial information, executes
-**progressive error scenarios** in sequenced blocks, and produces **auditable**
-joint reports with a hash-chained log and persisted traces. It scores the **13
-ITU readiness dimensions** on 0–5, projects causal what-if effects, and carries
-scanned gazette pages through OCR into an impact analysis on open incidents.
+- several institutions must respond, each under its own law: the Ministry of Public Health, the personal data protection authority, the national cyber agency (ANTIC), the telecom regulator (ART).
 
-**Sovereignty is architectural, not a setting.** Generation (`qwen3.5:9b`) and
-embeddings (`bge-m3`, 1024-d) run on-premise in Ollama; no request leaves the
-host, and there is no cloud fallback to disable.
+- facts reach each institution at different times; the texts are scattered across laws, decrees and CEMAC directives, partly scanned, in French and English.
 
----
+- routing each fact to the competent institution, with its background context (which platform, which data, which users, since when), within its mandate and deadline, is critical.
+
+- recommendations must be explained afterwards and approved by a named official.
+
+What is the role played by AI?
+
+- local language models (qwen3.5:9b, bge-m3) running on national infrastructure, in French and English.
+
+- context provided by the KB: the national legal corpus, quoted article by article.
+
+- policy guidelines applied: legal mandates, citation check, human approval, audit log.
+
+Requirements
+
+- it is critical that every recommendation rests on a provision present in the national corpus, and that the system says so when the corpus is silent.
+
+- it is critical that no incident data leaves national infrastructure and that the operations of the hospital are not impacted: the system advises, officials decide.
+
+- it is expected that each institution only receives the facts within its mandate, and that a joint report is produced in a minimal number of steps.
+
+- it is of added value that another institution reuses the same framework by swapping its context KB, without new code.
+
+Demo scenarios:
+
+- scenario-1: step-1: the solution is online. The crisis cell of the Ministry of Public Health, the data protection authority and ANTIC handles an anomalous access to the national e-health platform.
+
+- step-2: after a while, the hospital asks why the agents recommended suspending remote access to the platform, when it was working normally for its staff.
+
+- traceability and explainability.
+
+- step-3: the recommendations conflict. The cyber agent asks to isolate the platform, the health agent requires continuity of care, and the data protection agent asks to keep the access logs, which contain the IP addresses and locations of users.
+
+- user privacy guidelines.
+
+- step-4: the same solution is adopted in the telecom sector by the regulator (ART) for a wave of SIM-swap fraud complaints. The KB context is different, but the same interface and P rules apply. Swapping the context KB, reuse and cost reduction are achieved with the framework.
+
+- strategy to reduce the overall cost.
+
+Demo:
+
+1)  Highlight the scenarios (Section 5).
+
+2)  Standards, policies, gaps (Sections 4 and 6).
 
 ## 2. Description of the use case
 
-**The case.** Institutional response to a **health-data breach** in a public
-hospital connected to a national e-health platform. Then, in the same engine
-and corpus, the **exposure of minors' records** on a national learning platform.
+**The problem.** When patient records leak from a public hospital connected to the national e-health platform, the Ministry of Public Health answers for continuity of care, the data protection authority for the law of 23 December 2024, ANTIC for the cybersecurity law 2010/012, and the telecom regulator when networks are involved. No actor holds the full picture, and the outcome depends on who read which text first.
 
-**The problem.** Detection is mature; the response is not. Notification duties are
-split across the health ministry, the data-protection authority and the cyber
-agency. No actor holds the full picture, the law is silent on several hand-offs,
-and the outcome depends on who read which document first.
+**The solution.** SarkiAI Policy Sandbox gives each institution an AI agent bound to its legal mandate, releases the facts progressively and produces a joint report in which every claim quotes its article; a coordinator brings conflicts between mandates to light and a named official approves any action. The engine also scores the 13 ITU readiness dimensions.
 
-**Gaps in existing solutions.** Notification duties are not allocated across
-sectors, so each authority waits for another. Decisions are not machine-readably
-audited, so accountability cannot be reconstructed. The tension between the duty
-to notify and the duty to preserve continuity of service is unresolved by any
-instrument we found. Generic assistants answer with fluent prose and no traceable
-basis, and cannot refuse cleanly when the corpus is silent. Cloud inference on
-this material is a sovereignty risk we consider unacceptable.
+**Gaps in existing solutions, and how the solution closes them.** Coordination by meetings and letters is slow and leaves no shared record: the sandbox runs one scenario for all institutions and merges their assessments into a single joint report. Generic AI assistants answer without a verifiable legal basis and cannot say that the law is silent: here, each quote is matched against the retrieved corpus, an invented quote is rejected and the answer regenerated, and a gap is declared when no provision applies. Cloud AI would send incident data abroad: here, inference is local by construction. Nobody can reconstruct who decided what, on which basis: here, the audit log is re-verifiable, the run is exported as a dossier, and each approval is a signed, single-use link.
 
-**How the system answers.** Agents are grounded in national provisions with
-**article-level citations verified against the retrieved text**: an invented quote
-is rejected and generation retried with a directive naming the passage. Mandate
-conflicts are surfaced, not smoothed over. Every step lands in a tamper-evident
-audit trail and a persisted trace, exportable as a run dossier. Local inference
-removes the sovereignty risk by construction, not by policy.
+## 3. Use case requirement
 
----
+Each node of the ML pipeline (ITU-T Y.3172) is associated with requirements:
 
-## 3. Mapping with ITU-T Y.3172 and Readiness 2.0
+- **SRC:** only official texts and openly licensed public documents enter the published KB, each with its issuer and provenance; incident data are fictional in the sandbox, and in deployment only the facts needed for the response are shared, never patient records.
 
-Each Y.3172 node maps onto a component of the deployment, carries a requirement,
-and is scored against the Readiness 2.0 dimensions it serves.
+- **C:** scanned gazettes go through local OCR (Tesseract), with the page zone kept as provenance, so that no text enters the KB from a bad scan unnoticed.
 
-| Node | Implemented as · requirement | Dimension(s) |
-|:---------|:-----------------------------------------------------------|:----------------------------|
-| `SRC` | logs, EHR extracts, telemetry, gazettes · coverage, retention, access control | 1 Marketplace · 13 Infrastructure |
-| `C` | chunker (FR/EN), OCR, transcription · fidelity to the published text; no pseudo-law from a bad scan | 5 Workflows · 13 Infrastructure |
-| `PP` | normalisation, jurisdiction tagging, de-identification · purpose limitation, per-chunk provenance | 1 Marketplace · 6 Human Interface |
-| `M` | local generation + hybrid retrieval (`bge-m3` + BM25, RRF, optional rerank) · no external inference | 5 Workflows · 3 Cross-Domain Correlation |
-| `P` | citation gate, routing, approvals, scoring · a legal basis per claim; human validation before any side effect | 10 AI & Policies · 7 Strategy Alignment |
-| `D` | API, console, signed approval links, console outbox · alignment across institutions | 7 Strategy Alignment · 8 Collaboration |
-| `SINK` | agents, officials, joint report, dossier · oversight, inclusion | 9 Impacts of Humans · 6 Human Interface · 11 Inclusion |
+- **PP:** legal texts are split by structure (title, chapter, article) and tagged with country, jurisdiction, document type and readiness dimension; incident facts are released in blocks, and each agent only receives the blocks within its mandate.
 
-Anchoring documents: the 2024 data-protection law and the CEMAC directive (`PP`,
-`P`), cybersecurity law 2010/012 (`C`, `P`), the communications law and the ART
-compendium (`SRC`), SND30 and PSNSN (`D`, `SINK`). **Sovereignty cuts across all
-nodes**: generation, embeddings and reranking run on the deployment host, so
-patient data never leaves national infrastructure (dimensions 10 and 11). The
-compose file contains no external inference service, and the provider
-configuration exposes one mode, `local`.
+- **M:** generation and embeddings run locally in Ollama, with hybrid retrieval (dense and BM25, RRF fusion). The reference sandbox needs 8 to 16 vCPU, 32 GB RAM and 40 GB of disk, with no GPU; no request leaves the host.
 
-### 3.1 Knowledge base
+- **P:** every claim cites a provision present in the retrieved corpus; agents act within their mandate (what they can and must not do); any notification or public statement requires a human approval.
 
-**Cameroon: 26 manifest entries, 21 ingestible today**: the 2024 data-protection
-law, cybersecurity law 2010/012, communications and e-commerce laws, penal code,
-the MINPOSTEL compendium 2023, the ART compendium 2018 (486 pp.), SND30, the
-national digital strategy, the digital-health plan (PSNSN 2026-2030), two decrees
-and the CEMAC users-rights directive. Five entries have no text: the constitution, the
-1996 framework law, the DPA and ANTIC mandates, and the cyber strategy, all
-`to_confirm`. They stay listed, not dropped.
+- **D:** the coordinator merges the assessments into a joint report listing agreements, conflicts and open questions; every step is written to the audit log and can be re-verified end to end.
 
-Each chunk carries `country`, `jurisdiction`, `docType`, `pillar`,
-`headingPath` and `articleNumber`. Eight documents carry an OCR caveat (six with
-no text layer, one partial, one non-Unicode font) and go through local Tesseract
-with a zone overlay, so an operator sees the exact crop the text came from.
+- **SINK:** officials read the joint report, the citations and the audit trail in a bilingual console (French and English) and export the run dossier.
 
-**Ten regional instruments are ingested** for comparison: AU Continental AI
-Strategy 2024, Kigali Declaration 2025, Windhoek Statement, Smart Africa
-blueprint, and the strategies of Kenya (with roadmap), Rwanda, Egypt, Zambia and
-Nigeria. **Six international references are catalogued but not loaded**: ITU-T
-Y.3172, the ITU Readiness Framework, WHO, UNESCO, Malabo, OECD: so the system
-cannot quote them; they frame the gaps, nothing more. The ITU taxonomy (6
-factors, 13 dimensions, 111 metrics) is shipped as
-`data/global/itu/dimensions.json` and mirrored in the scoring engine.
+## 4. Mapping with ITU-T Y.3172 Readiness 2.0 Report, and domain-specific policies
 
----
+|      | **Use case (incident response, public health domain)**                                 | **Readiness 2.0 Report**                                                   | **Documents (policies, strategies, regulations)**                                                                 |
+|------|----------------------------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| SRC  | National legal corpus; incident facts from the hospital and the e-health platform      | D1 Data/Model Marketplace; D13 Digital Infrastructure                      | PSNSN 2026-2030 (digital health plan); health compact (CSU) 2023; SND30; Plan stratégique Cameroun Numérique 2020 |
+| C    | Ingestion service, local OCR of scanned gazettes, upload from the console              | D5 Integration of AI in Workflows; D13 Digital Infrastructure              | Decree on electronic certification; Law 2010/012 on cybersecurity and cybercrime                                  |
+| PP   | Article-level chunking, jurisdiction tagging, release of facts by block and by mandate | D1 Data/Model Marketplace; D3 Cross-Domain Correlation; D6 Human Interface | Law of 23 Dec. 2024 on personal data protection; CEMAC directive on users' rights                                 |
+| M    | Local models (qwen3.5:9b, bge-m3), hybrid retrieval                                    | D4 Contextualization and Regional Impact; D13 Digital Infrastructure       | AU Continental AI Strategy 2024; Smart Africa AI Blueprint; Malabo Convention\*                                   |
+| P    | Citation check, mandates, signed human approvals                                       | D10 AI & Policies; D9 Impacts of Humans; D7 Strategy Alignment             | Law of 23 Dec. 2024; Law 2010/012; Penal Code 2016; WHO guidance on AI for health\*                               |
+| D    | Coordinator, joint report, hash-chained audit log                                      | D8 Collaboration with AI; D5 Integration of AI in Workflows                | Law 2010/012 (security audits); ITU-T Y.3172\*                                                                    |
+| SINK | Officials of the ministry, the authority and ANTIC; bilingual console; dossier export  | D6 Human Interface; D11 AI for Inclusion; D12 Granular Priorities          | Law of 23 Dec. 2024; CEMAC directive on users' rights; UNESCO Recommendation on the Ethics of AI\*                |
 
-## 4. What is deterministic, and what is the model
+\* Framing references, cited by their official link: the agents do not quote them.
 
-| Step | Mechanism | Arguable? |
-|:-----------------|:--------------------------------------------------|:-------------------------|
-| Retrieval | Qdrant dense + BM25, RRF, optional rerank | no: arithmetic over vectors |
-| Citation extraction | quotes matched against the retrieved corpus | no: exact substring match |
-| Citation gate | `validateCitations`: absent quote → rejection, retry with a named directive | no: a loop, not a suggestion |
-| Readiness score | weighted composite; causal propagation over a fixed graph | no: arithmetic |
-| Scenario sequencing | tick release, per-agent visibility sets | no: declared in the record |
-| Audit | hash chain, end-to-end re-verification | no: cryptographic |
-| Approval | signed token, single use, expiry, bound to one action | no: signature check |
-| Drafting, deciding when to search, ranking impact | `qwen3.5:9b`, on-demand retrieval | **yes**: hence gated, cited, logged |
-
-**The model writes; the system decides what may be written.** The console shows
-rejected quotes when a retry happened and the audit records the attempt count, so
-the gate can be observed rather than trusted.
-
----
+**Knowledge base.** 21 Cameroonian documents collected; 18 published with the repository (17 official texts and a World Bank ID4D diagnostic under CC BY 3.0 IGO), 3 kept local for rights reasons (a press page, a research paper, an authored article). Five instruments are still to source: the constitution, the health framework law 96/03, the data protection authority text, the ANTIC mandate and the cyber strategy. Ten African strategies come from the ITU reference repository; the ITU taxonomy (6 factors, 13 dimensions, 111 metrics) drives the readiness scoring.
 
 ## 5. Error scenarios
 
-Facts are released in blocks; each institution sees only its block, then the
-coordinator reconciles the independent assessments.
+**Step 1: the solution works.** Facts are released in three blocks: an anomalous access, a possible exfiltration of patient records, then media pressure and a notification deadline. Each agent assesses only the blocks within its mandate, citing its articles; the coordinator merges the assessments into one joint report.
 
-**A: health-data breach.** Tick 0: anomalous access on the e-health platform
-(ministry, cyber agency). Tick 1: possible exfiltration of patient records
-(+ DPA). Tick 2: media pressure and a notification deadline. Output: the **mandate
-conflict** between the DPA's notification duty and the ministry's
-continuity-of-care duty, the open questions, and the gaps: each with its
-article, or an explicit statement that none was found.
+**Step 2: traceability and explainability.** The answer to the hospital is read from the record, not regenerated. The run dossier shows the facts the cyber agent held at that block, the passages retrieved, the article quoted, the model used and the hash of each step: the recommendation rests on a possible exfiltration, not on the availability of the service. **Controversy:** if the quoted passage does not support the recommendation, the dossier makes it visible, and the error is recorded instead of defended.
 
-**B: minors' records, same corpus, different domain.** Tick 0: a school reports
-that the learning platform shows pupils from other schools. Tick 1: ~40,000 pupil
-records (names, birth dates, results) reachable for days, some pupils under 13.
-Tick 2: parents demand notification within 72 hours; the ministry must decide
-whether to suspend the platform. Awkward on purpose: two ministries and a
-regulator share the decision, the subjects are minors, and the service cannot
-simply be switched off. The engine must name the provisions that apply and say
-plainly where the corpus is silent, instead of inventing a 72-hour rule.
+**Step 3: user privacy guidelines.** The coordinator lists the conflict between isolation, continuity of care and evidence preservation, with each position, the provisions in tension and a severity; it does not decide. The data protection agent applies the law of 2024: the logs are personal data, so only what the investigation needs is kept, for a stated purpose. Agents cannot notify or publish: a named official decides through a signed, single-use approval, and the choice is logged. **Controversy:** when the corpus does not say which duty prevails, or how long such evidence may be kept, the joint report states it as an open question and the gap is recorded (gaps 2 and 4).
 
-**C: a gazette that changes open cases.** A scanned page of the Official Gazette
-is analysed zone by zone, OCR'd and ingested as one document. The panel asks what
-the new provision changes for open runs: severity, deadlines, runs untouched. The
-provision is analysed, not trusted; the zones stay visible so a wrong cut is
-caught before the text becomes retrievable.
+**Step 4: strategy to reduce the overall cost.** The telecom regulator runs the SIM-swap fraud scenario on the same engine, console and P rules. The domain selects the institutions and their mandates, and the context comes from the telecom texts of the KB (ART compilation 2018, MINPOSTEL compendium 2023, electronic communications law, CEMAC directive). A new ministry or country only adds its corpus through a manifest and one ingestion run: no code change, no new model, the same CPU-only hardware. **Controversy:** reuse does not mean trusting another institution's answers: agents only quote what the active corpus contains, and the citation check rejects any quote absent from it.
 
-**When the corpus is silent, we say so.** If the model invents a passage, the
-gate rejects it and forces a retry; if retries are exhausted, the answer is shown
-marked `validation.ok = false`, with lower confidence and a gap written to the
-audit: never presented as established fact. Returning a named
-`INSUFFICIENT_EVIDENCE` verdict instead of an uncited answer is our next step:
-the refusal mechanics exist, the verdict still needs exposing in the interface.
+**Where the solution can fail.** If the model invents a passage, the check rejects it and forces a new attempt; if attempts run out, the answer is shown as unverified, with a lower confidence and a gap in the audit log. Until the five missing instruments are sourced, and the ART compilation 2018 is OCR'd (its text layer is poor), the gaps below are provisional. The solution supports officials; it is neither legal advice nor an automatic decision.
 
----
+## 6. Policy gaps and standards gaps derived from the mapping exercise
 
-## 6. Policy gaps and standards gaps
+Each gap is a provision we looked for in the collected corpus and did not find.
 
-Each gap is a text we searched for and did not find, with the action it implies.
-
-| # | Type | Gap | Dim. | Recommendation |
-|:--|:-------------|:-------------------------------|:--------|:----------------------------|
-| 1 | Law | notification duties not allocated across sectors | 10, 7 | designate a lead authority and an escalation path |
-| 2 | Standard | no machine-readable traceability of automated decisions | 5, 6 | require an audit artefact (hash chain + citations) per decision |
-| 3 | Policy | no guardrail on secondary use of inferred health signals | 10, 9 | prohibit advertising use; require consent and purpose limitation |
-| 4 | Standard | health interoperability formats not binding | 1, 3 | make compliant formats and metadata mandatory |
-| 5 | Policy | consent and purpose limitation for minors' data unaddressed | 6, 11 | align with UNESCO and WHO guidance |
-| 6 | Infrastructure | no redundancy requirement for critical e-health services | 13 | availability requirements for AI-assisted public services |
-| 7 | Policy | no rule on liability when an official follows an AI recommendation and harm follows | 10, 9 | allocate liability, require a **named** approver, logged |
-
-Gap 7 is the one we can act on without waiting for the law: the approval flow is
-signed and nominative, so every decision carries a name.
-
----
-
-## 7. Architecture, Sovereignty, Auditability
-
-```
-SRC → C → PP → M → P → D → SINK      (MLFO coordinator; the deployment is the ML sandbox)
-```
-
-One `docker compose up`, no hosted dependency: `ollama` (`qwen3.5:9b`, `bge-m3`),
-`rerank` (TEI, optional), `qdrant`, `mongodb` (audit, approvals, outbox),
-`minio` (content-addressed attachments and page images), `ingestion`, `ocr`
-(Tesseract), `transcription` (faster-whisper), `mcp-charts` and `mcp-docx`, `api`
-(Fastify, 81 routes), `web` (Next.js, 26 screens, 19 in-console, FR/EN). Twelve
-long-running services plus a one-shot MinIO bucket init.
-
-- **Local by construction**: one inference mode, `local`; the console badge says
-  so because the configuration accepts nothing else.
-- **Sovereign auth**: scrypt passwords, TOTP with single-use recovery codes,
-  local reset, sign-up closed by default; no identity provider.
-- **E-mail without a provider**: notifications and approval links go to a console
-  outbox and the operator log; no SMTP, no relay.
-- **Untrusted context, verifiable record**: up to three images per question,
-  content-addressed, treated as data never instructions; hash-chained log,
-  persisted traces, every citation, exportable with chain verification.
-
----
-
-## 8. Evaluation-criteria alignment
-
-| Criterion | How the solution addresses it |
-|:-------------------------|:--------------------------------------------------------------|
-| Knowledge-base quality | 26 entries / 21 ingestible, gazettes through local OCR with zone provenance, `TITRE/CHAPITRE/ARTICLE` tagging, ITU taxonomy, 10 regional strategies |
-| Agent capability | mandated agents with partial information, citation-mandatory prompts, on-demand search, coordinator reconciliation, conflict detection |
-| Gap identification | seven gaps across the 13 dimensions, each with a recommendation to the regulator |
-| Auditability | deterministic citation gate, hash-chained log, traces, dossier export, chain re-verification, named approvals |
-| ITU alignment | node-by-node Y.3172 mapping (MLFO, sandbox); Readiness 2.0 (6 factors, 13 dimensions); 0–5 scoring with causal what-if |
-
-Clickable evidence per dimension: **10 AI & Policies** (citations, rejected
-quotes, gap table) · **11 Inclusion** (bilingual console, local-only inference,
-OCR and voice) · **13 Infrastructure** (the self-hosted stack, offline once models
-are pulled) · **7 Strategy Alignment** (scoring against SND30 and PSNSN) ·
-**6 Human Interface** (citation dialog, OCR overlay, signed approvals) ·
-**5 Workflows** (ticks, approvals, notifications and audit in one flow).
-
-**Reproducibility.** TypeScript/Python monorepo: 18 packages, 81 API routes, 26
-screens. Validation for this submission: `typecheck` 38/38, `test` 228 tests in
-44 files with 0 failure, production console build 20/20, `docker compose config`
-on all three stacks. Unit tests run without infrastructure; integration tests
-are environment-gated.
-
----
-
-## 9. Honest limits
-
-- **Corpus coverage is partial.** Eight documents carry an OCR caveat (numbers
-  flagged per document); five entries have no text at all (all `to_confirm`);
-  six international references are catalogued but never loaded, so the system
-  cannot quote Y.3172, WHO, UNESCO or the OECD principles.
-- **The reasoning is a 9B local model**: bounded, slower than a hosted model, and
-  its prose quality is not the claim; being gated, cited and logged is.
-- **Not legal advice, not a production gate.** A real deployment needs the
-  authority's own sign-off on the corpus.
-- **The readiness scores are our model of judgement**, built on ITU dimensions
-  and metrics, not an official ITU assessment.
-- **No live integration with ministries**: inputs are the corpus, the scenario
-  record, and what an operator uploads.
-
----
-
-## 10. From sandbox to deployment
-
-Three concrete steps, in order: source the five `to_confirm` instruments and run
-OCR on the eight documents that need it, so the corpus claim is complete rather
-than honest-but-partial; expose the `INSUFFICIENT_EVIDENCE` verdict in the
-console and the dossier; and harden the approval path: mandatory reason, no
-self-approval, and an action type with no approval route at all, because some
-things are not ours to authorise. Each is a bounded change to code we already
-run, not a redesign.
-
----
-
-## 11. Team and submission
-
-| Role | Member |
-|:--------------------|:------------------------------------------------------------|
-| Team leader | Muller Roufaou |
-| Members | [_names, max 4_] |
-| Mentor | [_name if applicable_] |
-
-Repository: https://github.com/rouftom/sarkiai-policy-sandbox · Knowledge base:
-`data/country/cm/` and `data/global/` · Demo video: [_link_].
-
-**Licence.** Code Apache-2.0; knowledge base and documentation CC BY 4.0. No API
-keys in the repository, at any commit.
+| **#** | **Type**       | **Gap**                                                                             | **Dim.** | **Recommendation**                                                                     |
+|--------|----------------|-------------------------------------------------------------------------------------|----------|----------------------------------------------------------------------------------------|
+| 1      | Law            | Notification duties not allocated across sectors: each authority waits for another  | D10, D7  | Designate a lead authority and an escalation path                                      |
+| 2      | Law            | No rule on which duty prevails between containment and continuity of care           | D10, D9  | Define a precedence rule or an arbitration body                                        |
+| 3      | Standard       | No machine-readable traceability of AI recommendations used by public bodies        | D5, D6   | Require an audit artefact per decision: citations, model, hash chain                   |
+| 4      | Policy         | Retention and minimisation of incident evidence (logs with locations) not specified | D1, D10  | Set retention limits and access rules for incident evidence                            |
+| 5      | Standard       | Interoperability formats and metadata for health data are not binding               | D1, D3   | Make standard formats and metadata mandatory                                           |
+| 6      | Infrastructure | No availability or redundancy requirement for critical e-health services            | D13      | Set availability requirements for AI-assisted public services                          |
+| 7      | Policy         | No rule on liability when an official follows an AI recommendation                  | D10, D9  | Allocate liability; require a named approver, logged (already enforced in the sandbox) |
+| 8      | Standard       | ITU-T Y.3172 has no explicit control for the legal grounding of generated outputs   | D10, D5  | Add a citation check function at node P in sandbox profiles                            |
