@@ -1,42 +1,42 @@
-# Plan « Local-first » (souveraineté D10/D11) — VALIDÉ & IMPLÉMENTÉ
+# "Local-first" plan (data and model sovereignty, D10/D11): VALIDATED AND IMPLEMENTED
 
-> **Note historique.** Ce document décrit la migration qui a mené à la
-> distribution actuelle. Les fournisseurs hébergés cités comme « dépendance à
-> retirer » ont tous été supprimés : il ne reste que la pile locale.
+> **Historical note.** This document describes the migration that led to the
+> current distribution. The hosted providers listed as "dependencies to remove"
+> have all been deleted: only the local stack remains.
 
-> Décisions verrouillées : LLM **qwen3.5:9b** (multimodal texte+image, 6,6 Go) · embeddings
-> **bge-m3** (1024-dim, multilingue FR) · reranker **TEI local** ·
-> transcription **faster-whisper locale** · **suppression totale** des providers
-> cloud · fine-tuning **unsloth** (documenté).
+> Locked decisions: LLM **qwen3.5:9b** (multimodal text and image, 6.6 GB) · embeddings
+> **bge-m3** (1024-dim, multilingual, French) · reranker **local TEI** ·
+> transcription **local faster-whisper** · **total removal** of cloud
+> providers · fine-tuning **unsloth** (documented).
 >
-> ✅ Implémenté : provider local, embeddings locaux, service `ollama`, reranker
-> TEI optionnel, transcription locale, purge cloud, docs.
+> ✅ Implemented: local provider, local embeddings, `ollama` service, optional
+> TEI reranker, local transcription, cloud purge, documentation.
 
-## 1. Principe
+## 1. Principle
 
-Tout le raisonnement, les embeddings et la transcription s'exécutent **en local**
-(Ollama / modèles open-weight). **Aucune donnée ne quitte l'infrastructure** →
-alignement direct avec les métriques ITU **`d10_m10` Data Sovereignty** (D10) et
-**`d11_m06` Edge Privacy** (D11), et fonctionnement offline dans la sandbox ITU.
+All reasoning, embeddings and transcription run **locally** (Ollama, open-weight
+models). **No data leaves the infrastructure**: this aligns directly with the ITU
+metrics **`d10_m10` Data Sovereignty** (D10) and **`d11_m06` Edge Privacy** (D11),
+and with offline operation in the ITU sandbox.
 
-## 2. Inventaire des dépendances cloud à retirer
+## 2. Inventory of cloud dependencies to remove
 
-| Emplacement | Dépendance actuelle | Remplacement local |
-|-------------|---------------------|--------------------|
-| `packages/agents/src/model.ts` | `@ai-sdk/deepseek` + providers deepseek/groq/openai/anthropic/google | `@ai-sdk/openai-compatible` → Ollama `/v1` |
+| Location | Current dependency | Local replacement |
+|----------|--------------------|-------------------|
+| `packages/agents/src/model.ts` | `@ai-sdk/deepseek` + deepseek / groq / openai / anthropic / google providers | `@ai-sdk/openai-compatible` → Ollama `/v1` |
 | `packages/agents/package.json` | `@ai-sdk/deepseek` | `@ai-sdk/openai-compatible` |
-| `apps/api/package.json` | `@ai-sdk/deepseek` | (retiré) |
-| `packages/retrieval/src/index.ts` | Voyage embed + Voyage rerank (`api.voyageai.com`) | Ollama `/v1/embeddings` (bge-m3) + RRF (rerank local optionnel) |
-| `services/ingestion/.../embeddings.py` | `voyageai` SDK | client Ollama HTTP (bge-m3) |
-| `services/ingestion/requirements.txt` / `pyproject.toml` | `voyageai` | (retiré) ; `httpx` déjà présent |
+| `apps/api/package.json` | `@ai-sdk/deepseek` | (removed) |
+| `packages/retrieval/src/index.ts` | Voyage embed + Voyage rerank (`api.voyageai.com`) | Ollama `/v1/embeddings` (bge-m3) + RRF (optional local rerank) |
+| `services/ingestion/.../embeddings.py` | `voyageai` SDK | Ollama HTTP client (bge-m3) |
+| `services/ingestion/requirements.txt` / `pyproject.toml` | `voyageai` | (removed); `httpx` already present |
 | `services/transcription/app/*` | Groq Whisper API | **faster-whisper** local (CTranslate2) |
 | `apps/api/src/config.ts` | `VOYAGE_API_KEY`, `DEEPSEEK_API_KEY`, `DEFAULT_LLM_PROVIDER` | `OLLAMA_*`, `EMBEDDING_*` |
-| `apps/api/src/engine.ts` | `voyageApiKey` | config Ollama |
-| `docker-compose.yml` (+ sandbox) | env Voyage/DeepSeek/Groq | service `ollama` + env Ollama |
-| `.env.example` (+ sandbox) | clés cloud | variables Ollama locales |
-| Docs | mentions Voyage/DeepSeek | mises à jour |
+| `apps/api/src/engine.ts` | `voyageApiKey` | Ollama configuration |
+| `docker-compose.yml` (+ sandbox) | Voyage / DeepSeek / Groq environment variables | `ollama` service + Ollama environment variables |
+| `.env.example` (+ sandbox) | cloud keys | local Ollama variables |
+| Docs | mentions of Voyage / DeepSeek | updated |
 
-## 3. Architecture locale cible
+## 3. Target local architecture
 
 ```
                     ┌──────────────────────────┐
@@ -47,97 +47,96 @@ alignement direct avec les métriques ITU **`d10_m10` Data Sovereignty** (D10) e
                     │  apps/api (Fastify)      │
                     └───┬───────────┬──────────┘
                         │           │
-        Qdrant (vecteurs)│           │ Mongo (audit/CoT)
+        Qdrant (vectors)│           │ Mongo (audit/CoT)
                         │           │
-              ┌─────────▼───┐   ┌───▼───────────────┐
+              ┌─────────▼───┐   ┌───▼────────────────┐
               │  Ollama     │   │ services/ingestion │
-              │  • qwen3.5  │◀──│  embeddings bge-m3 │
-              │  • bge-m3   │   └───────────────────┘
-              └─────────────┘   ┌───────────────────┐
+              │  • qwen3.5  │◀──│  bge-m3 embeddings │
+              │  • bge-m3   │   └────────────────────┘
+              └─────────────┘   ┌────────────────────┐
                                 │ services/ocr (loc.)│
-                                └───────────────────┘
-                                ┌───────────────────┐
+                                └────────────────────┘
+                                ┌────────────────────┐
                                 │ transcription      │
                                 │ faster-whisper loc.│
-                                └───────────────────┘
-   (optionnel) TEI reranker bge-reranker-v2-m3 — profil `rerank`
+                                └────────────────────┘
+   (optional) TEI reranker bge-reranker-v2-m3: `rerank` profile
 ```
 
-Aucun appel sortant. `ollama` est le **seul** fournisseur de modèles.
+No outbound call. `ollama` is the **only** model provider.
 
-## 4. Choix de modèles
+## 4. Model choices
 
-| Rôle | Modèle | Justification |
-|------|--------|---------------|
-| LLM raisonnement | **`qwen3.5:9b`** (Ollama) | multimodal (texte+image) ; 201 langues ; 256K contexte ; ~6,6 Go disque, ~8–10 Go RAM |
-| LLM léger (option) | `qwen2.5:7b` via `OLLAMA_MODEL` | portabilité sandbox sans GPU |
-| Embeddings | **`bge-m3`** (Ollama) | multilingue (FR excellent), **dense 1024 = notre dimension Qdrant** (aucun changement de schéma) |
-| Sparse (hybride) | BM25 (Qdrant, serveur) | inchangé |
-| Rerank (option) | `BAAI/bge-reranker-v2-m3` via **TEI** local | remplace Voyage rerank-2 ; sinon RRF brut |
-| Transcription (option) | `faster-whisper` (`large-v3` / `small`) | remplace Groq Whisper |
+| Role | Model | Rationale |
+|------|-------|-----------|
+| Reasoning LLM | **`qwen3.5:9b`** (Ollama) | multimodal (text and image); 201 languages; 256K context; ~6.6 GB disk, ~8–10 GB RAM |
+| Light LLM (option) | `qwen2.5:7b` via `OLLAMA_MODEL` | portability to a sandbox without GPU |
+| Embeddings | **`bge-m3`** (Ollama) | multilingual (excellent in French); **1024 dense, the same as our Qdrant dimension** (no schema change) |
+| Sparse (hybrid) | BM25 (Qdrant, server side) | unchanged |
+| Rerank (option) | `BAAI/bge-reranker-v2-m3` via local **TEI** | replaces Voyage rerank-2; otherwise plain RRF |
+| Transcription (option) | `faster-whisper` (`large-v3` / `small`) | replaces Groq Whisper |
 
-**Bonne surprise** : `bge-m3` est en **1024 dimensions**, exactement la config
-Qdrant actuelle → **pas de migration vectorielle**.
+**Good news**: `bge-m3` is **1024-dimensional**, exactly our current Qdrant
+configuration, so **no vector migration** is needed.
 
-## 5. Contexte/env cible
+## 5. Target context and environment
 
 ```env
-# Modèles locaux (souveraineté — défaut)
+# Local models (sovereignty, the default)
 LLM_PROVIDER=local
 OLLAMA_BASE_URL=http://ollama:11434
 OLLAMA_MODEL=qwen3.5:9b
 EMBEDDING_PROVIDER=local
 EMBEDDING_MODEL=bge-m3
 EMBEDDING_DIMENSION=1024
-# Rerank local optionnel (TEI)
-RERANK_URL=            # ex: http://rerank:80 ; vide => RRF seul
-# Transcription locale optionnelle
+# Optional local rerank (TEI)
+RERANK_URL=            # e.g. http://rerank:80; empty => RRF only
+# Optional local transcription
 WHISPER_MODEL=large-v3
 ```
 
 ## 6. Docker
 
-- Nouveau service **`ollama`** (`ollama/ollama`), volume `ollama-data`, GPU NVIDIA optionnel (comme le repo ITU).
-- Nouvelle cible **`make models`** → `ollama pull qwen3.5:9b` + `ollama pull bge-m3`.
-- Service **`rerank`** (TEI) sous profil `rerank` (optionnel).
-- `transcription` passe en faster-whisper (profil `media`/`full`).
-- `depends_on` : `ingestion` et `api` attendent `ollama` healthy.
+- New **`ollama`** service (`ollama/ollama`), `ollama-data` volume, optional NVIDIA GPU (as in the ITU repository).
+- New **`make models`** target → `ollama pull qwen3.5:9b` + `ollama pull bge-m3`.
+- **`rerank`** service (TEI) under the `rerank` profile (optional).
+- `transcription` moves to faster-whisper (`media` / `full` profile).
+- `depends_on`: `ingestion` and `api` wait for `ollama` to be healthy.
 
-## 7. Fine-tuning (documenté, hors implémentation initiale)
+## 7. Fine-tuning (documented, outside the initial implementation)
 
-Chaîne **100 % locale**, dataset jamais exporté :
+A **100% local** chain, with the dataset never exported:
 
-1. **Export du dataset** : paires (contexte KB + question → réponse citée) depuis
-   Mongo (`cot_traces`, `joint_reports`, sorties readiness).
-2. **Entraînement LoRA/QLoRA** : `peft` + `trl` (ou `unsloth`) sur `qwen3.5` open-weight (Apache-2.0).
-3. **Conversion** : merge LoRA → `llama.cpp` → **GGUF**.
-4. **Déploiement** : `ollama create sps-qwen` puis `OLLAMA_MODEL=sps-qwen`.
-5. **Alternative sandbox ITU** : entraîner **dans** la sandbox avec les crédits,
-   sans sortir le dataset.
+1. **Dataset export**: pairs (KB context + question → cited answer) from Mongo
+   (`cot_traces`, `joint_reports`, readiness outputs).
+2. **LoRA/QLoRA training**: `peft` + `trl` (or `unsloth`) on the open-weight `qwen3.5` (Apache-2.0).
+3. **Conversion**: merge the LoRA, then `llama.cpp` → **GGUF**.
+4. **Deployment**: `ollama create sps-qwen`, then `OLLAMA_MODEL=sps-qwen`.
+5. **ITU sandbox alternative**: train **inside** the sandbox with the credits,
+   without moving the dataset out.
 
-Documenté dans `docs/ROADMAP.md` + section README ; pas de code tant que non requis.
+Documented in `docs/ROADMAP.md` and the README; no code until it is required.
 
-## 8. Impact & risques
+## 8. Impact and risks
 
-| Risque | Mitigation |
-|--------|-----------|
-| RAM ~10 Go (9B) | option `OLLAMA_MODEL=qwen2.5:7b` (env) ; doc prérequis |
-| 1er pull ~5-9 Go | `make models` documenté ; volume persistant |
-| `generateObject` moins fiable en local | mode JSON Ollama + retry + fallback ; tester |
-| Qualité < frontier | acceptable pour la démo ; fine-tuning possible |
-| Rerank cloud supprimé | RRF déjà fort ; TEI local optionnel |
+| Risk | Mitigation |
+|------|------------|
+| ~10 GB RAM for the 9B model | `OLLAMA_MODEL=qwen2.5:7b` (environment variable); prerequisites documented |
+| First pull of ~5–9 GB | `make models` documented; persistent volume |
+| `generateObject` less reliable locally | Ollama JSON mode + retry + fallback; to be tested |
+| Quality below frontier models | acceptable for the demo; fine-tuning possible |
+| Cloud rerank removed | RRF is already strong; local TEI optional |
 
-## 9. Dimensions ITU renforcées
+## 9. ITU dimensions reinforced
 
-- **D10 `d10_m10` Data Sovereignty** : politiques de possession/mouvement des
-  données → **coché** (aucun mouvement hors infra).
-- **D11 `d11_m06` Edge Privacy** : edge autonome sans fuite → **coché** (inférence locale).
-- Surface explicite de ces deux métriques dans le moteur readiness (evidence + score).
+- **D10 `d10_m10` Data Sovereignty**: data possession and movement policies → **checked** (no data moves outside the infrastructure).
+- **D11 `d11_m06` Edge Privacy**: autonomous edge with no leakage → **checked** (local inference).
+- Explicit surfacing of these two metrics in the readiness engine (evidence and score).
 
-## 10. Questions de validation
+## 10. Validation questions
 
-1. **LLM par défaut** : `qwen3.5:9b` (qualité, 16 Go RAM) — avec `qwen2.5:7b` en option env. OK ?
-2. **Embeddings** : `bge-m3` (1024, FR) — confirmé ?
-3. **Rerank** : on **supprime** Voyage et on met un **reranker TEI local optionnel** (sinon RRF) — OK, ou RRF seul sans TEI ?
-4. **Transcription** : passer à **faster-whisper local** (profil optionnel) — OK ?
-5. **Portée** : je retire **tout** cloud (y compris `OPENAI/ANTHROPIC/GOOGLE` des `.env.example`) — confirmé ?
+1. **Default LLM**: `qwen3.5:9b` (quality, 16 GB RAM), with `qwen2.5:7b` as an environment option. OK?
+2. **Embeddings**: `bge-m3` (1024, French), confirmed?
+3. **Rerank**: remove Voyage and provide an **optional local TEI reranker** (otherwise RRF), OK, or RRF only without TEI?
+4. **Transcription**: move to **local faster-whisper** (optional profile), OK?
+5. **Scope**: remove **all** cloud providers (including `OPENAI` / `ANTHROPIC` / `GOOGLE` from the `.env.example` files), confirmed?
