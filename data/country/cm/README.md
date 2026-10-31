@@ -5,32 +5,36 @@ Base de connaissances nationale (domaine **santé** prioritaire). Noms de fichie
 
 ## Présent (copié localement)
 
-| Fichier | Type | OCR ? | Contenu |
-|---------|------|-------|---------|
-| `loi_2024_protection_donnees_personnelles.pdf` | law | — | Loi protection des données (23 déc. 2024) — **cœur** |
-| `actualite_strategie_ia_cameroun.pdf` | report | — | Article presse sur la stratégie IA nationale |
-| `plan_strategique_cameroun_numerique_2020.pdf` | strategy | — | Plan stratégique Cameroun Numérique |
-| `psnsn_sante_numerique_2026_2030.pdf` | policy | **oui** | Plan Stratégique National de Santé Numérique (114 p.) |
-| `compact_national_sante_2023.pdf` | policy | **oui** | Compact national santé / CSU (police partiellement non-unicode) |
-| `systeme_de_sante_camerounais.pdf` | report | — | Description du système de santé |
-| `resume_snd30.pdf` | strategy | — | Résumé SND30 |
-| `snd30_complet_2020_2030.pdf` | strategy | — | SND30 complet (collecté en ligne) |
-| `cemac_protection_droits_utilisateurs.pdf` | regulation | — | Directive CEMAC droits des utilisateurs (télécoms) |
-| `loi_2010_021_commerce_electronique.pdf` | law | **oui** | Loi n° 2010/021 commerce électronique (14 p. scanné) |
-| `art_observatoire_marche_telecom_2016.pdf` | report | — | Observatoire ART marché télécoms 2016 |
-| `loi_2010_012_cybersecurite_cybercriminalite.pdf` | law | — | Loi cybersécurité/cybercriminalité 2010/012 |
-| `loi_2013_013_communications_electroniques.pdf` | law | — | Loi communications électroniques |
-| `strategie_ia_collectivites_territoriales.pdf` | report | — | Papier : adoption IA collectivités territoriales |
-| `decret_2023_interconnexion.pdf` | regulation | — | Décret interconnexion/accès réseaux (2023) |
-| `art_recueil_textes_2018.pdf` | law | — | Recueil des textes télécoms (ART, 486 p.) |
-| `compendium_textes_poste_telecom_tic_2023.pdf` | law | **oui** | Compendium MINPOSTEL 2023 (456 p.) |
-| `decret_certification_electronique.pdf` | regulation | **oui** | Décret certification électronique |
-| `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) |
-| `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) |
-| `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |
+| Fichier | Type | OCR ? | Contenu | Publié |
+|---------|------|-------|---------|:------:|
+| `loi_2024_protection_donnees_personnelles.pdf` | law | — | Loi protection des données (23 déc. 2024) — **cœur** | oui |
+| `actualite_strategie_ia_cameroun.pdf` | report | — | Article presse sur la stratégie IA nationale | non |
+| `plan_strategique_cameroun_numerique_2020.pdf` | strategy | — | Plan stratégique Cameroun Numérique | oui |
+| `psnsn_sante_numerique_2026_2030.pdf` | policy | **oui** | Plan Stratégique National de Santé Numérique (114 p.) | oui |
+| `compact_national_sante_2023.pdf` | policy | **oui** | Compact national santé / CSU (police partiellement non-unicode) | non |
+| `systeme_de_sante_camerounais.pdf` | report | — | Description du système de santé | non |
+| `resume_snd30.pdf` | strategy | — | Résumé SND30 | oui |
+| `snd30_complet_2020_2030.pdf` | strategy | — | SND30 complet (collecté en ligne) | oui |
+| `cemac_protection_droits_utilisateurs.pdf` | regulation | — | Directive CEMAC droits des utilisateurs (télécoms) | oui |
+| `loi_2010_021_commerce_electronique.pdf` | law | **oui** | Loi n° 2010/021 commerce électronique (14 p. scanné) | oui |
+| `art_observatoire_marche_telecom_2016.pdf` | report | — | Observatoire ART marché télécoms 2016 |  oui |
+| `loi_2010_012_cybersecurite_cybercriminalite.pdf` | law | — | Loi cybersécurité/cybercriminalité 2010/012 | oui |
+| `loi_2013_013_communications_electroniques.pdf` | law | — | Loi communications électroniques | oui |
+| `strategie_ia_collectivites_territoriales.pdf` | report | — | Papier : adoption IA collectivités territoriales | non |
+| `decret_2023_interconnexion.pdf` | regulation | — | Décret interconnexion/accès réseaux (2023) | oui |
+| `art_recueil_textes_2018.pdf` | law | — | Recueil des textes télécoms (ART, 486 p.) | oui |
+| `compendium_textes_poste_telecom_tic_2023.pdf` | law | **oui** | Compendium MINPOSTEL 2023 (456 p.) | oui |
+| `decret_certification_electronique.pdf` | regulation | **oui** | Décret certification électronique | oui |
+| `normes_standards_sr_pf_sante.pdf` | guidance | **oui** | Normes SR/PF (164 p.) | oui |
+| `penal_code_2016.pdf` | law | **oui** | Code pénal (139 p.) | oui |
+| `cameroon_id_cr_ecosystem_diagnostic.txt` | report | — | Diagnostic ID/état civil (converti docx→txt) |  oui |
 
-Les payloads (PDF/TXT) sont **hors git** (`.gitignore`) ; seuls `manifest.json`
-et ce README sont versionnés.
+Seuls les **textes officiels** et les publications d'organismes publics sous
+licence ouverte (`rights: official-text` ou `open-licence`) sont versionnés : la
+liste blanche est en fin de `.gitignore`. Les articles de presse, travaux
+d'auteur et documents dont les conditions ne sont pas confirmées restent locaux. La
+revue des droits est détaillée dans [`../../KNOWLEDGE-BASE.md`](../../KNOWLEDGE-BASE.md),
+et `make check-kb` vérifie la règle avant chaque commit.
 
 ## OCR
 

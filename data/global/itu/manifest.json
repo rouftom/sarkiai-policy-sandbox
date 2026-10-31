@@ -3,6 +3,7 @@
   "jurisdiction": "international",
   "generated": "2026-10-03",
   "note": "Corpus de bonnes pratiques mondiales utilisé comme référence d'écart par le moteur readiness. Les entrées to_confirm doivent être vérifiées avant ingestion.",
+  "distribution": "link-only: no payload of these documents is redistributed in this repository; each one is referenced by its official sourceUrl and keeps its own terms.",
   "documents": [
     {
       "id": "itu-y3172",

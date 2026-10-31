@@ -40,7 +40,9 @@ secrets/
 *.age.key
 age.key
 
-# local data payloads (corpora can be large; keep structure via .gitkeep + manifests)
+# Knowledge-base payloads: ignored by default; the documents cleared for
+# redistribution are re-included at the end of this file (see
+# data/KNOWLEDGE-BASE.md). Structure stays visible via .gitkeep + manifests.
 data/country/*/*
 !data/country/*/.gitkeep
 !data/country/**/manifest.json
@@ -52,6 +54,8 @@ data/global/*/*
 !data/global/**/*.txt
 *.pdf
 *.docx
+!submission/TECHNICAL-REPORT.pdf
+!submission/TECHNICAL-REPORT.docx
 
 # docker / os
 .docker/
@@ -64,3 +68,27 @@ coverage/
 
 # Self-hosted reference deployment secrets
 deploy/sandbox/.env.sandbox
+
+# Knowledge base: Cameroon documents published with the repository.
+# Only official texts and openly licensed public-body publications (rights:
+# official-text or open-licence in data/country/cm/manifest.json) are listed.
+# Press articles, authored papers and documents whose terms are unconfirmed
+# stay local; `make check-kb` enforces the rule.
+!data/country/cm/loi_2024_protection_donnees_personnelles.pdf
+!data/country/cm/plan_strategique_cameroun_numerique_2020.pdf
+!data/country/cm/psnsn_sante_numerique_2026_2030.pdf
+!data/country/cm/resume_snd30.pdf
+!data/country/cm/snd30_complet_2020_2030.pdf
+!data/country/cm/cemac_protection_droits_utilisateurs.pdf
+!data/country/cm/loi_2010_021_commerce_electronique.pdf
+!data/country/cm/loi_2010_012_cybersecurite_cybercriminalite.pdf
+!data/country/cm/loi_2013_013_communications_electroniques.pdf
+!data/country/cm/decret_2023_interconnexion.pdf
+!data/country/cm/art_recueil_textes_2018.pdf
+!data/country/cm/compendium_textes_poste_telecom_tic_2023.pdf
+!data/country/cm/decret_certification_electronique.pdf
+!data/country/cm/normes_standards_sr_pf_sante.pdf
+!data/country/cm/penal_code_2016.pdf
+!data/country/cm/compact_national_sante_2023.pdf
+!data/country/cm/art_observatoire_marche_telecom_2016.pdf
+!data/country/cm/cameroon_id_cr_ecosystem_diagnostic.txt
