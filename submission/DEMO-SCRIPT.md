@@ -1,51 +1,52 @@
-# Vidéo de démo: script et storyboard (≤ 7 min)
+# Demo video: script and storyboard (≤ 7 min)
 
-**Format :** capture d'écran + voix off FR, sous-titres EN obligatoires.
-**Cible :** 6 min 40.
-**Préparation :** `docker compose up --build -d`, `make models`,
-`make seed-corpus COUNTRY=cm` déjà exécutés ; une page de gazette scannée prête
-dans `apps/web/public/samples/` ; un run de scénario déjà terminé pour la partie audit.
+**Format:** screen capture with English voice-over and English subtitles.
+**Target length:** 6 min 40 s.
+**Preparation:** `docker compose up --build -d`, `make models` and
+`make seed-corpus COUNTRY=cm` already run; a scanned gazette page ready in
+`apps/web/public/samples/`; one completed scenario run ready for the audit part.
 
-> Ne jamais filmer un `.env`, un token d'approbation ou un secret. Le badge
-> `local` et les journaux suffisent à prouver la souveraineté.
+> Never film a `.env` file, an approval token or any secret. The `local` badge
+> and the logs are enough to prove sovereignty.
 
-| Temps | Écran | Voix off (FR) |
-|------:|-------|---------------|
-| 0:00–0:30 | Carton titre : nom de l'équipe, « SarkiAI Policy Sandbox (Cameroun) », badge ITU | « Détecter une fuite de données de santé n'est que la moitié du problème. L'autre moitié, comment les institutions répondent, qui est responsable, sous quel mandat, dans quel délai, c'est là que les systèmes publics échouent. » |
-| 0:30–1:10 | Schéma Y.3172 `SRC→C→PP→M→P→D→SINK` + les 13 dimensions ITU | « Nous proposons un moteur policy-grounded multi-agents, aligné sur ITU-T Y.3172 et le AI Readiness Framework 2.0 : 6 facteurs, 13 dimensions. Tout tourne en local, aucun fournisseur cloud, aucune donnée ne sort de l'hôte. » |
-| 1:10–1:50 | Terminal : `docker compose ps` (12 services), puis la console → badge `local` | « Douze services : Ollama avec qwen3.5:9b et bge-m3, Qdrant, MongoDB, MinIO, Tesseract, faster-whisper, deux serveurs MCP. Un seul `docker compose up`. La configuration n'expose qu'un mode : local. » |
-| 1:50–2:35 | `make seed-corpus COUNTRY=cm` ; puis `Knowledge base` : liste des documents avec statut et type | « Le corpus Cameroun compte 26 entrées, dont 21 ingérables aujourd'hui. Cinq sont marquées `to_confirm` : nous préférons afficher ce que nous n'avons pas plutôt que de gonfler le corpus. » |
-| 2:35–3:05 | Un chunk ouvert : `TITRE > CHAPITRE > ARTICLE`, `articleNumber`, source | « Le découpage est structure-aware : chaque passage garde son fil d'Ariane juridique. C'est ce qui rend une citation vérifiable au lieu d'être plausible. » |
-| 3:05–4:20 | `Crisis scenarios` → *Health-data breach* → **Start this batch**, puis **Release next batch** ×2 ; rapports par bloc, puis rapport joint | « Les faits sont révélés par blocs. Chaque institution ne voit que ce à quoi son mandat lui donne droit : le ministère, l'autorité de protection des données et l'agence cyber raisonnent sur des informations partielles. Le coordinateur réconcilie, et nomme le conflit de mandats au lieu de le lisser. » |
-| 4:20–4:55 | Ouvrir une citation dans une réponse : dialogue, passage complet surligné, passages voisins | « Chaque affirmation porte l'article sur lequel elle repose. La fenêtre charge le passage entier depuis l'API, pas l'extrait que la réponse avait copié. » |
-| 4:55–5:35 | Poser une question, puis `Audit trail` : événement `citation.rejected`, nombre de tentatives | « Si le modèle invente une citation, la porte la rejette, nomme le passage fautif et relance la génération. La tentative est écrite dans l'audit : on voit le garde-fou travailler, on ne le croit pas sur parole. » |
-| 5:35–6:15 | `Scanned gazette` → panneau gazette : scan, overlay des zones OCR, ingestion d'une page, puis **impact** sur les runs ouverts | « Une page du Journal officiel arrive scannée. L'OCR travaille zone par zone, et l'overlay montre exactement ce qui a été lu : une mauvaise découpe se voit avant que le texte devienne interrogeable. Le panneau demande ensuite ce que la nouvelle disposition change pour les incidents déjà ouverts. » |
-| 6:15–6:40 | Lien d'approbation signé, ouvert depuis `Notifications` (outbox console) | « Toute action à effet de bord passe par une approbation nominative, signée, à usage unique. Et l'e-mail reste local : les liens partent dans une outbox console, sans SMTP ni relais tiers. » |
-| 6:40–6:55 | `AI readiness` : composite 13 dimensions + what-if causal | « Le même moteur note les 13 dimensions de 0 à 5 et projette l'effet d'une décision de politique publique sur un graphe causal fixe : les mêmes entrées donnent le même résultat. » |
-| 6:55–7:00 | Carton final : repo, licence, « Local · Auditable · Aligné ITU » | « Souverain, auditable, aligné ITU. Le code et le corpus sont publics. » |
+| Time | Screen | Voice-over (EN) |
+|-----:|--------|-----------------|
+| 0:00–0:30 | Title card: team name, "SarkiAI Policy Sandbox (Cameroon)", ITU badge | "Detecting a health-data leak is only half of the problem. The other half, how institutions respond, who is accountable, under which mandate and within which deadline, is where public systems fail." |
+| 0:30–1:10 | Y.3172 diagram `SRC→C→PP→M→P→D→SINK` + the 13 ITU dimensions | "We propose a policy-grounded multi-agent engine, aligned with ITU-T Y.3172 and the AI Readiness Framework 2.0: 6 factors, 13 dimensions. Everything runs locally: no cloud provider, no data leaves the host." |
+| 1:10–1:50 | Terminal: `docker compose ps` (12 services), then the console, `local` badge | "Twelve services: Ollama with qwen3.5:9b and bge-m3, Qdrant, MongoDB, MinIO, Tesseract, faster-whisper, two MCP servers. One `docker compose up`. The configuration exposes a single mode: local." |
+| 1:50–2:35 | `make seed-corpus COUNTRY=cm`; then `Knowledge base`: list of documents with status and type | "The Cameroon corpus has 26 entries, 21 of them ingestible today. Five are marked `to_confirm`: we show what we do not have rather than inflating the corpus." |
+| 2:35–3:05 | An open chunk: `TITRE > CHAPITRE > ARTICLE`, `articleNumber`, source | "Chunking is structure-aware: every passage keeps its legal breadcrumb. That is what makes a citation verifiable rather than merely plausible." |
+| 3:05–4:20 | `Crisis scenarios` → *Health-data breach* → **Start this batch**, then **Release next batch** ×2; per-block reports, then the joint report | "Facts are revealed in blocks. Each institution sees only what its mandate allows: the ministry, the data protection authority and the cyber agency reason on partial information. The coordinator reconciles them and names the mandate conflict instead of smoothing it over." |
+| 4:20–4:55 | Open a citation from an answer: dialog, full passage highlighted, neighbouring passages | "Every claim carries the article it rests on. The dialog loads the whole passage from the API, not the excerpt the answer had copied." |
+| 4:55–5:35 | Ask a question, then `Audit trail`: `citation.rejected` event, number of attempts | "If the model invents a citation, the gate rejects it, names the faulty passage and asks for a new generation. The attempt is written to the audit trail: you can see the safeguard working instead of taking it on trust." |
+| 5:35–6:15 | `Scanned gazette` → gazette panel: scan, OCR zone overlay, ingestion of a page, then the **impact** on open runs | "A page of the Official Gazette arrives as a scan. OCR works zone by zone, and the overlay shows exactly what was read: a bad cut is visible before the text becomes searchable. The panel then shows what the new provision changes for incidents already open." |
+| 6:15–6:40 | Signed approval link, opened from `Notifications` (console outbox) | "Every action with a side effect goes through a named, signed, single-use approval. E-mail also stays local: links go to a console outbox, with no SMTP and no third-party relay." |
+| 6:40–6:55 | `AI readiness`: 13-dimension composite + causal what-if | "The same engine scores the 13 dimensions from 0 to 5 and projects the effect of a policy decision on a fixed causal graph: the same inputs always give the same result." |
+| 6:55–7:00 | Closing card: repository, licence, "Local · Auditable · ITU-aligned" | "Sovereign, auditable, ITU-aligned. The code and the corpus are public." |
 
-## Captures à préparer
+## Screenshots to prepare
 
-1. Carton titre (nom d'équipe + nom de solution).
-2. Schéma Y.3172 + 13 dimensions.
-3. `docker compose ps` + badge `local`.
-4. Liste des documents avec statuts (`present` / `to_confirm`).
-5. Un chunk avec `headingPath` et `articleNumber`.
-6. Scénario : 3 blocs, puis rapport joint (conflits de mandats visibles).
-7. Dialogue de citation avec surlignage.
-8. Audit : `citation.rejected` + compteur de tentatives.
-9. Gazette : overlay OCR + panneau d'impact.
-10. Approbation signée + outbox console.
-11. Readiness + what-if.
-12. Carton final.
+1. Title card (team name and solution name).
+2. Y.3172 diagram and the 13 dimensions.
+3. `docker compose ps` and the `local` badge.
+4. List of documents with statuses (`present` / `to_confirm`).
+5. A chunk showing `headingPath` and `articleNumber`.
+6. Scenario: 3 blocks, then the joint report (mandate conflicts visible).
+7. Citation dialog with highlighting.
+8. Audit: `citation.rejected` and the attempt counter.
+9. Gazette: OCR overlay and impact panel.
+10. Signed approval and console outbox.
+11. Readiness and what-if.
+12. Closing card.
 
-## Notes de tournage
+## Recording notes
 
-- **Durée cible 6:40**, jamais plus de 7:00. Couper l'attente du modèle au montage,
-  mais laisser voir le temps réel sur une étape (crédibilité).
-- Sous-titres EN à partir de la voix off FR, pas de traduction automatique non relue.
-- Éviter deux pièges : ne pas montrer un chargement infini sans explication ;
-  ne pas commenter « l'IA a décidé », c'est le système qui décide, le modèle rédige.
-- Plan B sans narration : mêmes captures, cartons-titres, musique libre de droits.
-- Si un service manque le jour du tournage, filmer la démo sur le scénario seul
-  (3:05–6:15) : c'est le cœur et cela tient en 3 minutes.
+- **Target length 6:40**, never more than 7:00. Cut waiting time for the model
+  in editing, but keep one real-time wait on screen for credibility.
+- English subtitles are produced from the English voice-over; review them before
+  publication, do not rely on automatic translation.
+- Avoid two traps: never show an endless loading state without explanation;
+  never say "the AI decided". The system decides, the model drafts.
+- Fallback without narration: same captures, title cards and royalty-free music.
+- If a service is down on the day of recording, film the demo on the scenario
+  alone (3:05–6:15): it is the core and fits in three minutes.

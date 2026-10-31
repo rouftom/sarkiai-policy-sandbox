@@ -90,7 +90,8 @@ sarkiai-policy-sandbox/
 ## Quick start
 
 > **Local-only**: all models run locally via Ollama. No hosted-provider key,
-> no outbound call. First run pulls ~9 GB (qwen3.5:9b) + ~2 GB (bge-m3).
+> no outbound call. The models are downloaded once (about 8 GB: qwen3.5:9b and
+> bge-m3). Sizing: see [`deploy/sandbox/README.md`](deploy/sandbox/README.md#sizing).
 
 ### Everything at once
 

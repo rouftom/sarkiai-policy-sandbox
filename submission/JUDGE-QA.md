@@ -1,82 +1,81 @@
-# Fiche réponses juges: SarkiAI Policy Sandbox
+# Judge Q&A: SarkiAI Policy Sandbox
 
-Neuf questions probables. Pour chacune : **pourquoi le juge la pose**, **la
-réponse à dire (EN)**, **ce qu'on clique**, **ce qu'on montre**.
+Nine likely questions. For each one: **why the judge asks it**, **the answer to
+give**, **what to click**, **what to show**.
 
-Règle de conduite : on ne promet jamais plus que ce que le code fait. Si on ne
-sait pas, on dit « this is not implemented yet », c'est ce qui rend le reste
-crédible.
+Rule of conduct: never claim more than the code does. If we do not know, we say
+"this is not implemented yet". That is what makes the rest credible.
 
 ---
 
-## 1. « Montrez le cœur du système en direct, pas les slides. »
+## 1. "Show me the core of the system live, not the slides."
 
-**Pourquoi :** ils veulent voir un système vivant, pas une vidéo.
+**Why:** they want to see a living system, not a video.
 
-**Réponse (EN) :**
+**Answer:**
 > I'll run the health-data breach scenario. The scenario is released in batches,
 > and each institution only sees the batch it is entitled to see. The ministry,
 > the data-protection authority and the cyber agency produce independent
 > assessments; the coordinator reconciles them and names the mandate conflicts
 > instead of smoothing them over. Every claim carries the article it rests on.
 
-**À cliquer :** `Crisis scenarios` → *Health-data breach in a public hospital* →
-**Start this batch**, puis **Release next batch** (3 fois).
+**To click:** `Crisis scenarios` → *Health-data breach in a public hospital* →
+**Start this batch**, then **Release next batch** (3 times).
 
-**À montrer :** les trois rapports par bloc, puis le rapport joint :
-*agreements*, *mandate conflicts*, *open questions*. Ouvrir une citation :
-la fenêtre charge le passage complet, pas l'extrait.
+**To show:** the three per-block reports, then the joint report: *agreements*,
+*mandate conflicts*, *open questions*. Open a citation: the dialog loads the full
+passage, not the excerpt.
 
 ---
 
-## 2. « Le raisonnement, c'est juste un LLM qui invente ? »
+## 2. "Is the reasoning just an LLM making things up?"
 
-**Pourquoi :** c'est la question qui tue tous les projets « RAG + agents ».
+**Why:** this is the question that kills every "RAG + agents" project.
 
-**Réponse (EN) :**
+**Answer:**
 > No. The model writes, but the system decides what may be written. Retrieval is
 > arithmetic over vectors; the citation gate is exact substring matching; the
 > readiness score and the audit chain are deterministic. The model's only job is
 > drafting and deciding when to search, and everything it produces is gated,
 > cited and logged. Remove the model and the scoring, the audit and the approvals
-> still work, you lose the prose, not the decision record.
+> still work: you lose the prose, not the decision record.
 
-**À cliquer :** aucune manipulation nécessaire ; montrer le tableau §4 du rapport.
+**To click:** nothing special; show the determinism table in §4 of the report.
 
-**À montrer :** `packages/citations/src/index.ts` (`validateCitations`),
-`packages/agents/src/orchestrator.ts` (la boucle de retry), et le badge de
-validation sous une réponse.
+**To show:** `packages/citations/src/index.ts` (`validateCitations`),
+`packages/agents/src/orchestrator.ts` (the retry loop), and the validation badge
+under an answer.
 
 ---
 
-## 3. « Comment prouvez-vous qu'une citation n'est pas fabriquée ? »
+## 3. "How do you prove a citation is not fabricated?"
 
-**Pourquoi :** une citation inventée dans un rapport juridique est une faute
-grave ; ils testent la robustesse.
+**Why:** an invented citation in a legal report is a serious fault; they are
+testing robustness.
 
-**Réponse (EN) :**
+**Answer:**
 > Every quote in an answer is matched against the retrieved chunk text. A quote
 > that is not there is rejected, the model is asked again with a directive that
 > names the rejected passage, and the attempt is written into the audit trail.
 > The console shows when a retry happened, so you can see the gate working
 > instead of trusting it. If the retries are exhausted, the answer is returned
-> flagged `validation.ok = false`, with lower confidence and a recorded gap, it
+> flagged `validation.ok = false`, with lower confidence and a recorded gap. It
 > is never presented as established fact.
 
-**À cliquer :** poser une question qui force une citation, ouvrir la citation
-(bouton dans la réponse), puis `Audit trail` → l'événement `citation.rejected` /
-`agent.assessment` avec le nombre de tentatives.
+**To click:** ask a question that forces a citation, open the citation (button in
+the answer), then `Audit trail` → the `citation.rejected` / `agent.assessment`
+event with the number of attempts.
 
-**À montrer :** le dialogue de citation qui surligne le passage dans le document
-entier, et l'entrée d'audit correspondante.
+**To show:** the citation dialog highlighting the passage in the full document,
+and the matching audit entry.
 
 ---
 
-## 4. « Et quand la loi ne dit rien ? »
+## 4. "And when the law says nothing?"
 
-**Pourquoi :** c'est le cas réel ; un système qui invente est disqualifiant.
+**Why:** this is the real case; a system that invents is disqualifying.
 
-**Réponse (EN) :**
+**Answer:**
 > The corpus runs out, and we say so. If no retrieved passage supports a claim,
 > the gate refuses the quote, and after the retry budget the answer comes back
 > unvalidated, with a gap record and a lower confidence. We also refuse to
@@ -84,40 +83,40 @@ entier, et l'entrée d'audit correspondante.
 > so the system cannot quote them; six international references are also
 > catalogued but not loaded. Those absences are the gap analysis.
 
-**À cliquer :** `Knowledge base` → filtre `status: to_confirm` ; puis une question
-hors corpus (par ex. sur un texte non ingéré).
+**To click:** `Knowledge base` → filter on `status: to_confirm`; then ask a
+question outside the corpus (for example on a text that was not ingested).
 
-**À montrer :** la liste des documents à confirmer et la réponse marquée non
-validée. **Ne pas dire** que le verdict `INSUFFICIENT_EVIDENCE` est déjà livré :
-il est spécifié, pas encore exposé dans l'UI.
+**To show:** the list of documents to confirm, and the answer marked as not
+validated. **Do not say** that the `INSUFFICIENT_EVIDENCE` verdict is already
+delivered: it is specified, not yet exposed in the UI.
 
 ---
 
-## 5. « Est-ce vraiment souverain ? Prouvez qu'aucun appel ne sort. »
+## 5. "Is it really sovereign? Prove that no call leaves the host."
 
-**Pourquoi :** c'est notre différenciateur ; ils vérifient qu'il est réel.
+**Why:** this is our differentiator; they check that it is real.
 
-**Réponse (EN) :**
+**Answer:**
 > Everything runs in the compose file: `qwen3.5:9b` and `bge-m3` on Ollama,
 > Qdrant, MongoDB, MinIO, Tesseract, faster-whisper, and two local MCP servers.
-> The provider configuration exposes exactly one mode, `local`, there is no
+> The provider configuration exposes exactly one mode, `local`: there is no
 > cloud key to revoke and no fallback that silently reaches the internet. Even
 > e-mail stays local: approval links and notifications go to a console outbox,
 > with no SMTP and no third-party relay.
 
-**À cliquer :** `docker-compose.yml` (aucun service externe), le badge
-`local` dans la console, `Notifications` (outbox).
+**To click:** `docker-compose.yml` (no external service), the `local` badge in
+the console, `Notifications` (outbox).
 
-**À montrer :** `provider-badge`, la page `Notifications`, et `.env.example`
-où `OLLAMA_BASE_URL` pointe sur le service interne. Flouter les secrets.
+**To show:** `provider-badge`, the `Notifications` page, and `.env.example`, where
+`OLLAMA_BASE_URL` points to the internal service. Blur any secrets.
 
 ---
 
-## 6. « En quoi c'est différent de ChatGPT avec mes PDF ? »
+## 6. "How is this different from ChatGPT with my PDFs?"
 
-**Pourquoi :** c'est le concurrent implicite de tout projet RAG.
+**Why:** it is the implicit competitor of every RAG project.
 
-**Réponse (EN) :**
+**Answer:**
 > A chat with PDFs answers one question at a time. Here the unit is an
 > institution with a mandate and partial information: agents do not see the same
 > facts, so the system can find the conflict between the DPA's notification duty
@@ -127,19 +126,19 @@ où `OLLAMA_BASE_URL` pointe sur le service interne. Flouter les secrets.
 > over the 13 ITU dimensions with causal what-if. A chatbot does not have a
 > mandate, a signature, or an audit chain.
 
-**À cliquer :** `AI readiness` → composite + what-if ; lien d'approbation signé
-(ouvert depuis `Notifications`) ; `Audit trail` → vérification de chaîne ; export du dossier.
+**To click:** `AI readiness` → composite and what-if; the signed approval link
+(opened from `Notifications`); `Audit trail` → chain verification; dossier export.
 
-**À montrer :** le graphe causal, puis l'écran d'approbation publique, puis le
-badge « chaîne intègre ».
+**To show:** the causal graph, then the public approval screen, then the
+"chain intact" badge.
 
 ---
 
-## 7. « Votre score de readiness, c'est officiel ? »
+## 7. "Is your readiness score official?"
 
-**Pourquoi :** ils connaissent le framework ITU et testeront la rigueur.
+**Why:** they know the ITU framework and will test the rigour.
 
-**Réponse (EN) :**
+**Answer:**
 > It is our model of judgement, built on the ITU framework, 6 factors, 13
 > dimensions, 111 metrics, not an official ITU assessment. The scores are a
 > weighted composite computed in code, and the causal projection runs over a
@@ -147,76 +146,77 @@ badge « chaîne intègre ».
 > taxonomy; what we add is a reproducible way to score a country against it and
 > to project the effect of a policy decision.
 
-**À cliquer :** `AI readiness` → une dimension → les preuves ; puis le panneau
-what-if.
+**To click:** `AI readiness` → one dimension → the evidence; then the what-if
+panel.
 
-**À montrer :** la définition des dimensions dans
-`data/global/itu/dimensions.json` et le calcul dans `packages/readiness/`.
-**Ne pas dire** « officiel ITU ».
+**To show:** the dimension definitions in `data/global/itu/dimensions.json` and
+the computation in `packages/readiness/`. **Do not say** "official ITU".
 
 ---
 
-## 8. « Vos gaps, vous les inventez ? »
+## 8. "Are your gaps invented?"
 
-**Pourquoi :** « gap analysis » est souvent une liste d'opinions.
+**Why:** "gap analysis" is often a list of opinions.
 
-**Réponse (EN) :**
+**Answer:**
 > Each gap is a text we searched for and did not find, with the action it implies
-> for the regulator. Seven are documented, each tied to dimensions and to a
-> recommendation, designate a lead authority, require a machine-readable audit
-> artefact, prohibit secondary use of inferred health signals. Separately, we
-> report the state of the corpus instead of hiding it: ten regional strategies
-> are ingested, six international references are catalogued with their URLs, and
-> five Cameroon entries have no text in the system, all still to source.
+> for the regulator. Eight are documented, each tied to dimensions and to a
+> recommendation: designate a lead authority, require a machine-readable audit
+> artefact, prohibit secondary use of inferred health signals, and others.
+> Separately, we report the state of the corpus instead of hiding it: ten regional
+> strategies are ingested, six international references are catalogued with their
+> URLs, and five Cameroon entries have no text in the system, all still to source.
 
-**À cliquer :** `Knowledge base` → `status` ; la table des gaps dans le rapport §6.
+**To click:** `Knowledge base` → `status`; the gap table in §6 of the report.
 
-**À montrer :** le lien mécanique entre un document absent et un gap nommé.
+**To show:** the direct link between a missing document and a named gap.
 
 ---
 
-## 9. « C'est un avis juridique ? Vous déploieriez ça en production demain ? »
+## 9. "Is this legal advice? Would you deploy it in production tomorrow?"
 
-**Pourquoi :** ils cherchent à voir si l'équipe surestime son produit.
+**Why:** they are checking whether the team overstates its product.
 
-**Réponse (EN) :**
+**Answer:**
 > No, and no. It is a sandbox for institutional response, not legal advice and
 > not a production gate. A real deployment needs the authority's own sign-off on
 > the corpus, a validation of the OCR on the scanned instruments, and an
 > operator training path. What is production-shaped already: the audit chain,
 > the signed approvals, the citation gate, and the local-only deployment. What is
-> not: seven of the Cameroon documents still need sourcing, and the reasoning
-> model is a 9B local model, bounded, slower, and not the claim.
+> not: five Cameroon entries still need sourcing, the OCR of several scanned
+> texts is pending, and the reasoning model is a 9B local model, bounded, slower,
+> and not the claim.
 
-**À cliquer :** `Audit trail` (ce qui est déjà solide) et `Knowledge base` (ce qui manque).
+**To click:** `Audit trail` (what is already solid) and `Knowledge base` (what is
+missing).
 
-**À montrer :** la section « Honest limits » du rapport. C'est un point fort,
-pas un aveu.
+**To show:** the limits section of the report, if it is kept in the final
+version. It is a strength, not a confession.
 
 ---
 
-## Fiche chiffres: à ne pas improvviser
+## Figures sheet: do not improvise
 
-| Élément | Valeur exacte |
+| Item | Exact value |
 |---|---|
-| Services compose | 12 longue durée + 1 job d'init MinIO |
-| Routes API | 81 |
-| Écrans web | 26 (dont 19 dans la console) |
-| Packages du monorepo | 18 |
-| Tests | 228 tests, 44 fichiers, 0 échec |
-| Validation build | `typecheck` 38/38, build web 20/20 |
-| Corpus Cameroun | 26 entrées au manifeste, **21 ingérables**, 5 `to_confirm` |
-| Réserves OCR | 8 documents (6 sans couche texte, 1 partielle, 1 police non-Unicode) |
-| Corpus régional ingéré | 10 instruments (UA, Kigali, Windhoek, Smart Africa, Kenya ×2, Rwanda, Égypte, Zambie, Nigéria) |
-| Références internationales | 6 cataloguées, **non chargées** (Y.3172, ITU Readiness, WHO, UNESCO, Malabo, OCDE) |
-| Dimensions ITU | 6 facteurs, 13 dimensions, 111 métriques |
-| Modèles | `qwen3.5:9b`, `bge-m3` (1024 d), locaux |
+| Compose services | 12 long-running + 1 MinIO init job |
+| API routes | 81 |
+| Web screens | 26 (19 inside the console) |
+| Monorepo packages | 18 |
+| Tests | 228 tests, 44 files, 0 failures |
+| Build validation | `typecheck` 38/38, web build 20/20 |
+| Cameroon corpus | 26 manifest entries, **21 ingestible**, 5 `to_confirm` |
+| OCR caveats | 8 documents (6 with no text layer, 1 partial, 1 non-Unicode font) |
+| Regional corpus ingested | 10 instruments (AU, Kigali, Windhoek, Smart Africa, Kenya ×2, Rwanda, Egypt, Zambia, Nigeria) |
+| International references | 6 catalogued, **not loaded** (Y.3172, ITU Readiness, WHO, UNESCO, Malabo, OECD) |
+| ITU dimensions | 6 factors, 13 dimensions, 111 metrics |
+| Models | `qwen3.5:9b`, `bge-m3` (1024-d), local |
 
-## Trois phrases à ne jamais dire
+## Three sentences never to say
 
-1. « Tout est déterministe. » → *Le raisonnement est un LLM ; ce qui est
-   déterministe, c'est la récupération, la validation des citations, le score,
-   l'audit et les approbations.*
-2. « 29 documents ingérés. » → *26 entrées au manifeste, 21 ingérables, 5 sans texte.*
-3. « C'est un outil juridique. » → *C'est un bac à sable de réponse
-   institutionnelle ; l'autorité signe son corpus avant tout usage réel.*
+1. "Everything is deterministic." → *The reasoning is an LLM; what is
+   deterministic is retrieval, citation validation, the score, the audit and the
+   approvals.*
+2. "29 documents ingested." → *26 manifest entries, 21 ingestible, 5 without text.*
+3. "This is a legal tool." → *It is a sandbox for institutional response; the
+   authority signs its own corpus before any real use.*

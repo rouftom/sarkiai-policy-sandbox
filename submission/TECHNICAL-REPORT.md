@@ -82,7 +82,7 @@ Each node of the ML pipeline (ITU-T Y.3172) is associated with requirements:
 
 - **PP:** legal texts are split by structure (title, chapter, article) and tagged with country, jurisdiction, document type and readiness dimension; incident facts are released in blocks, and each agent only receives the blocks within its mandate.
 
-- **M:** generation and embeddings run locally in Ollama, with hybrid retrieval (dense and BM25, RRF fusion). The reference sandbox needs 8 to 16 vCPU, 32 GB RAM and 40 GB of disk, with no GPU; no request leaves the host.
+- **M:** generation and embeddings run locally in Ollama, with hybrid retrieval (dense and BM25, RRF fusion). The sandbox runs fully on-premise, with no external API call. Recommended sizing (CPU only): 8 to 16 vCPU, 32 GB RAM, 40 GB SSD; for faster responses, an NVIDIA GPU with 16 to 24 GB VRAM (e.g. L4 or A10), 8 vCPU, 32 to 64 GB RAM and 100 GB NVMe; minimum: 4 to 8 vCPU, 16 GB RAM, 25 GB SSD. The models are downloaded once (about 8 GB) and the published knowledge base adds about 170 MB. No request leaves the host.
 
 - **P:** every claim cites a provision present in the retrieved corpus; agents act within their mandate (what they can and must not do); any notification or public statement requires a human approval.
 
