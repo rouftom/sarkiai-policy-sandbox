@@ -137,7 +137,7 @@ describe('after-action report', () => {
   test('parses the narrative with an injected generator', async () => {
     const report = await writeAfterAction({
       model: {} as LanguageModel,
-      modelLabel: 'muse-spark-1.3',
+      modelLabel: 'qwen3.5:9b',
       definition,
       log,
       evaluatedAtMinute: 30,
@@ -158,7 +158,7 @@ describe('after-action report', () => {
     expect(report.narrative.recommendations).toHaveLength(1)
     expect(report.situations.map((item) => item.outcome)).toEqual(['addressed', 'missed'])
     expect(report.teamInputs[0]?.actor).toBe('cyber_agency')
-    expect(report.model).toBe('muse-spark-1.3')
+    expect(report.model).toBe('qwen3.5:9b')
     expect(report.generatedAt).toBeTruthy()
   })
 

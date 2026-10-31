@@ -102,7 +102,7 @@ describe('citation validator · real model output', () => {
   const provision = citationFromChunk(chunk)
 
   test('a citation label printed inside the quotes is not a fabrication', () => {
-    // Observed from muse-spark-1.3: the provenance line is wrapped with the quote.
+    // Real model output: the provenance line is wrapped with the quote.
     const answer =
       '> loi_2024_protection_donnees.pdf · ARTICLE 12 : “Tout traitement de données à caractère personnel doit être licite et transparent pour la personne concernée.”'
     const result = validateCitations(answer, [provision])
