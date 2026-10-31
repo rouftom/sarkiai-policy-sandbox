@@ -1,79 +1,78 @@
-# Corpus Cameroun (CM) — collecte et ingestion
+# Cameroon corpus (CM): collection and ingestion
 
-Objectif : constituer la base de connaissances nationale **scopée `country=cm`**,
-puis la référence mondiale (`country=global`) pour le moteur d'écarts.
+Goal: build the national knowledge base scoped to `country=cm`, then the global
+reference (`country=global`) used by the gap engine.
 
-## 1. Checklist machine-lisible
+## 1. Machine-readable checklist
 
-- Corpus national : [`data/country/cm/manifest.json`](../data/country/cm/manifest.json)
-- Bonnes pratiques mondiales : [`data/global/itu/manifest.json`](../data/global/itu/manifest.json)
+- National corpus: [`data/country/cm/manifest.json`](../data/country/cm/manifest.json)
+- Global good practices: [`data/global/itu/manifest.json`](../data/global/itu/manifest.json)
 
-Chaque entrée a un `status` :
+Each entry has a `status`:
 
-| `status` | Signification |
-|----------|---------------|
-| `verified` | instrument public dont le numéro/intitulé est fiable |
-| `to_confirm` | **à vérifier avant ingestion** (numéro, version en vigueur, URL officielle) |
+| `status` | Meaning |
+|----------|---------|
+| `verified` | public instrument whose number and title are reliable |
+| `to_confirm` | **to be checked before ingestion** (number, version in force, official URL) |
 
-> ⚠️ Règle d'or : une erreur factuelle dans la KB se propage aux réponses des
-> agents. Ne jamais ingérer un texte marqué `to_confirm` sans confirmation.
+> ⚠️ Golden rule: a factual error in the KB propagates into the agents' answers.
+> Never ingest a text marked `to_confirm` without confirmation.
 
-## 2. Sources officielles à privilégier
+## 2. Official sources to prefer
 
-| Émetteur | Rôle |
-|----------|------|
-| Primature / Présidence | constitution, décrets, textes fondateurs |
-| Assemblée Nationale | lois |
-| MINPOSTEL | stratégie numérique, télécoms, IA |
-| Ministère de la Santé Publique | loi-cadre santé, e-santé |
-| ANTIC | cybersécurité, mandats techniques |
-| ART | communications électroniques |
-| Autorité de protection des données | protection des données |
-| SND30 / MINEPAT | stratégie de développement |
-| OAPI / UA | propriété intellectuelle, traités régionaux |
+| Issuer | Role |
+|--------|------|
+| Prime Minister's Office / Presidency | constitution, decrees, founding texts |
+| National Assembly | laws |
+| MINPOSTEL | digital strategy, telecoms, AI |
+| Ministry of Public Health | health framework law, e-health |
+| ANTIC | cybersecurity, technical mandates |
+| ART | electronic communications |
+| Data protection authority | data protection |
+| SND30 / MINEPAT | development strategy |
+| OAPI / AU | intellectual property, regional treaties |
 
-## 3. Catégories → dimensions ITU
+## 3. Categories → ITU dimensions
 
-| Catégorie (`docType`) | Dimensions principalement informées |
-|-----------------------|-------------------------------------|
+| Category (`docType`) | Mainly informed dimensions |
+|----------------------|----------------------------|
 | `law` | ai_policies, human_interface |
 | `strategy` | contextualization, digital_infrastructure |
 | `regulation` | ai_policies, human_interface |
 | `policy` | cross_domain, ai_integration |
 | `treaty` | data_marketplace, human_interface |
-| `guidance` / `standard` (global) | toutes — référence d'écart |
+| `guidance` / `standard` (global) | all: reference for gaps |
 
-## 4. Procédure d'ingestion
+## 4. Ingestion procedure
 
 ```bash
-# 1. placer les fichiers (PDF/TXT) dans data/country/cm/
-cp /chemin/vers/loi.pdf data/country/cm/
+# 1. place the files (PDF/TXT) in data/country/cm/
+cp /path/to/law.pdf data/country/cm/
 
-# 2. ingérer (Qdrant + bge-m3 local) — le chunking extrait TITRE/CHAPITRE/ARTICLE
+# 2. ingest (Qdrant + local bge-m3): chunking extracts TITRE/CHAPITRE/ARTICLE
 ./scripts/seed.sh --country cm --doc-type law --dir data/country/cm
 
-# 3. corpus mondial
+# 3. global corpus
 ./scripts/seed.sh --country global --jurisdiction international --doc-type guidance --dir data/global/itu
 ```
 
-Le service d'ingestion bascule automatiquement sur l'OCR (`services/ocr`) pour
-les PDF scannés (gazettes).
+The ingestion service switches automatically to OCR (`services/ocr`) for scanned
+PDFs (gazettes).
 
-## 5. Contrôle qualité (avant soumission)
+## 5. Quality control (before submission)
 
-1. **Couverture** : chaque dimension ITU a ≥ 1 disposition nationale et ≥ 1
-   référence mondiale.
-2. **Récupération** : `POST /v1/agents/ask` sur 5–10 questions de référence →
-   les citations pointent le bon article.
-3. **Écarts** : `POST /v1/readiness/report` → vérifier que les écarts citent une
-   source nationale **et** une bonne pratique mondiale.
-4. **Asymétrie** : le scénario santé libère bien les événements par blocs et
-   chaque agent ne voit que ce qui le concerne.
+1. **Coverage**: each ITU dimension has at least one national provision and at
+   least one global reference.
+2. **Retrieval**: `POST /v1/agents/ask` on 5–10 reference questions; the
+   citations point to the right article.
+3. **Gaps**: `POST /v1/readiness/report`; check that each gap cites a national
+   source **and** a global good practice.
+4. **Asymmetry**: the health scenario releases events in blocks, and each agent
+   sees only what concerns it.
 
-## 6. Éthique & légalité
+## 6. Ethics and legality
 
-- Vérifier les droits de réutilisation des textes avant publication dans l'ITU
-  AI for Good Lab (les lois/décrets sont généralement publics).
-- Ne pas ingérer de données personnelles (le corpus est réglementaire, pas
-  nominatif).
-- Citer systématiquement l'émetteur et l'URL d'origine.
+- Check the reuse rights of texts before publication in the ITU AI for Good Lab
+  (laws and decrees are generally public).
+- Do not ingest personal data (the corpus is regulatory, not nominative).
+- Always cite the issuer and the original URL.

@@ -1,152 +1,149 @@
-# Souveraineté des données & modèles — analyse
+# Data and model sovereignty: analysis
 
-> **Note historique.** Analyse rédigée avant la refonte. La distribution actuelle
-> est local-only : tout fournisseur hébergé mentionné ci-dessous comme
-> alternative a été retiré du code et de la configuration.
+> **Historical note.** Analysis written before the refactoring. The current
+> distribution is local-only: every hosted provider mentioned below as an
+> alternative has been removed from the code and the configuration.
 
-> Réponse à la remarque : « leur repo utilise Ollama pour du fine-tuning,
-> probablement un aspect de la souveraineté des données. Quid de notre cas ? »
-> **Document d'analyse uniquement — aucune implémentation.**
+> Answer to the remark: "their repository uses Ollama for fine-tuning, probably
+> a data-sovereignty aspect. What about our case?"
+> **Analysis document only: no implementation.**
 
-## 1. Mise au point : Ollama ≠ fine-tuning
+## 1. Clarification: Ollama is not fine-tuning
 
-Ollama est un **serveur d'inférence local** (serving de modèles open-weight), pas
-un outil de fine-tuning. Dans le repo de référence :
+Ollama is a **local inference server** (serving open-weight models), not a
+fine-tuning tool. In the reference repository:
 
-| Usage | Techno | Rôle |
-|-------|--------|------|
-| Raisonnement | `qwen2.5:14b` via **Ollama** | scoring/analyse des 13 dimensions |
-| Embeddings | `nomic-embed-text` via **Ollama** | vectorisation de la KB |
-| KB | ChromaDB (local) | stockage vectoriel |
-| Sessions | SQLite | état/audit |
+| Use | Technology | Role |
+|-----|------------|------|
+| Reasoning | `qwen2.5:14b` via **Ollama** | scoring and analysis of the 13 dimensions |
+| Embeddings | `nomic-embed-text` via **Ollama** | vectorisation of the KB |
+| KB | ChromaDB (local) | vector storage |
+| Sessions | SQLite | state and audit |
 
-Tout tourne **hors ligne, sur la machine**. Le fine-tuning est une **capacité
-distincte**, hors du chemin d'inférence. La motivation d'Ollama ici est donc la
-**souveraineté / souveraineté-données** : aucun appel sortant, aucune donnée
-(santé, stratégies nationales, etc.) ne quitte l'infrastructure.
+Everything runs **offline, on the machine**. Fine-tuning is a **separate
+capability**, outside the inference path. The reason for Ollama here is therefore
+**sovereignty / data sovereignty**: no outbound call, and no data (health,
+national strategies, etc.) leaves the infrastructure.
 
-## 2. Pourquoi c'est central pour notre cas
+## 2. Why this is central for our case
 
-- **Données sensibles** : domaine santé, dossiers patients, signaux inférés.
-- **Contexte réglementaire** : protection des données (Cameroun), MINPOSTEL, et
-  potentiellement souveraineté nationale.
-- **Narratif « AI for Good » / Afrique** : un système qui fonctionne **sans
-  dépendance à des API étrangères** est un argument fort devant le jury ITU.
-- **Sandbox ITU** : peut être partiellement isolée/air-gapped ; dépendre d'API
-  externes (Voyage, DeepSeek, Groq…) peut être bloquant ou disqualifiant.
+- **Sensitive data**: health domain, patient records, inferred signals.
+- **Regulatory context**: data protection (Cameroon), MINPOSTEL, and possibly
+  national sovereignty.
+- **"AI for Good" / Africa narrative**: a system that works **without dependence
+  on foreign APIs** is a strong argument in front of the ITU jury.
+- **ITU sandbox**: it may be partly isolated or air-gapped; depending on external
+  APIs (Voyage, DeepSeek, Groq, etc.) can be blocking or disqualifying.
 
-## 3. Notre posture actuelle (audit interne)
+## 3. Our current position (internal audit)
 
-| Composant | Techno actuelle | Sortie de données ? |
-|-----------|-----------------|---------------------|
-| Vector store | **Qdrant** (self-hosted) | Non ✅ |
-| Ops (audit/CoT) | **MongoDB** (self-hosted) | Non ✅ |
-| OCR | **Tesseract** (local) | Non ✅ |
-| Chunking / ingestion | **Python local** | Non ✅ |
-| **Embeddings** | **VoyageAI** (API US) | **Oui 🔴** |
-| **LLM raisonnement** | **DeepSeek/Groq/OpenAI…** (API) | **Oui 🔴** |
-| Transcription | Groq Whisper (API) | Oui 🟠 |
+| Component | Current technology | Data leaves? |
+|-----------|--------------------|--------------|
+| Vector store | **Qdrant** (self-hosted) | No ✅ |
+| Ops (audit/CoT) | **MongoDB** (self-hosted) | No ✅ |
+| OCR | **Tesseract** (local) | No ✅ |
+| Chunking / ingestion | **Local Python** | No ✅ |
+| **Embeddings** | **VoyageAI** (US API) | **Yes 🔴** |
+| **Reasoning LLM** | **DeepSeek / Groq / OpenAI…** (API) | **Yes 🔴** |
+| Transcription | Groq Whisper (API) | Yes 🟠 |
 
-**Conclusion** : notre stockage et notre traitement de documents sont déjà
-souverains ; **ce sont les modèles (embeddings + LLM) qui font sortir la donnée.**
-C'est exactement là que se joue la question.
+**Conclusion**: our storage and document processing are already sovereign; **the
+models (embeddings and LLM) are what send data out.** That is exactly where the
+question lies.
 
-## 4. Spectre de souveraineté
+## 4. Sovereignty spectrum
 
-| Niveau | Modèle | Egress | Qualité | Coût | Ops |
-|--------|--------|--------|---------|------|-----|
-| 0 | API publique mondiale (DeepSeek/OpenAI/Voyage) | Total | ★★★★★ | Payant/token | Nul |
-| 1 | API cloud régionale/UE (Mistral, OVH, Scaleway) | Régional | ★★★★ | Payant | Faible |
-| 2 | Open-weights **self-hosted** (Ollama/vLLM) | Aucun | ★★★ | Infra (GPU/RAM) | Moyen |
-| 3 | Open-weights **on-premise dédié / air-gapped** | Aucun | ★★★ | Infra | Élevé |
-| 4 | **Fine-tuning local** d'open-weights (LoRA/QLoRA) | Aucun | ★★★★ | Infra + temps | Élevé |
+| Level | Model | Egress | Quality | Cost | Operations |
+|-------|-------|--------|---------|------|------------|
+| 0 | Global public API (DeepSeek / OpenAI / Voyage) | Total | ★★★★★ | Pay per token | None |
+| 1 | Regional or EU cloud API (Mistral, OVH, Scaleway) | Regional | ★★★★ | Paid | Low |
+| 2 | **Self-hosted** open weights (Ollama / vLLM) | None | ★★★ | Infrastructure (GPU/RAM) | Medium |
+| 3 | **Dedicated on-premise / air-gapped** open weights | None | ★★★ | Infrastructure | High |
+| 4 | **Local fine-tuning** of open weights (LoRA/QLoRA) | None | ★★★★ | Infrastructure + time | High |
 
-## 5. Options envisageables (sans implémentation)
+## 5. Options (without implementation)
 
-### A. Inférence locale via Ollama (miroir du repo ITU)
-- LLM : `qwen3.5:9b` (multimodal texte+image), `qwen2.5:14b`, `llama3.1:8b`, `gemma3:12b`, `mistral`.
-- Embeddings : `nomic-embed-text`, **`bge-m3`** (multilingue, excellent FR — préférable pour nos corpus FR/EN).
-- Pros : egress 0, gratuit, offline, déployable dans la sandbox. Cons : ~16 Go
-  RAM, latence, qualité < frontier, opérations.
+### A. Local inference via Ollama (mirror of the ITU repository)
+- LLM: `qwen3.5:9b` (multimodal text and image), `qwen2.5:14b`, `llama3.1:8b`, `gemma3:12b`, `mistral`.
+- Embeddings: `nomic-embed-text`, **`bge-m3`** (multilingual, excellent in French, preferable for our FR/EN corpora).
+- Pros: zero egress, free, offline, deployable in the sandbox. Cons: ~16 GB
+  RAM, latency, quality below frontier models, operations.
 
-### B. Serving self-hosted à l'échelle
-- **vLLM** / **TGI** / **llama.cpp** pour le débit multi-utilisateurs (GPU).
-- Pertinent si la démo gère plusieurs délégués simultanés.
+### B. Scaled self-hosted serving
+- **vLLM** / **TGI** / **llama.cpp** for multi-user throughput (GPU).
+- Relevant if the demo must handle several simultaneous users.
 
-### C. Inférence managée souveraine
-- Mistral (FR/UE), OVHcloud AI, Scaleway, ou cloud régional africain.
-- Compromis : qualité proche du frontier, egress limité à une juridiction
-  « acceptable » — à valider avec le cadre juridique camerounais.
+### C. Managed sovereign inference
+- Mistral (France/EU), OVHcloud AI, Scaleway, or an African regional cloud.
+- Trade-off: quality close to the frontier, egress limited to a jurisdiction
+  that is "acceptable", to be validated against the Cameroonian legal framework.
 
-### D. Routage hybride par sensibilité
-- Un **policy router** : données sensibles → local ; données ouvertes (bonnes
-  pratiques mondiales) → éventuellement cloud.
-- Cohérent avec notre moteur : la sensibilité est déjà un attribut de corpus
-  (`country`, `docType`) et le classifieur pourrait l'évaluer.
+### D. Hybrid routing by sensitivity
+- A **policy router**: sensitive data stays local; open data (global good
+  practices) may go to the cloud.
+- Consistent with our engine: sensitivity is already an attribute of the corpus
+  (`country`, `docType`), and a classifier could assess it.
 
-### E. Modèles open-weight (licences permissives)
-- Qwen2.5, Llama 3.1/3.3, Mistral, Gemma, **Aya** (multilingue), BGE-M3.
-- Embeddings souverains : **bge-m3**, multilingual-e5, nomic — via Ollama ou
+### E. Open-weight models (permissive licences)
+- Qwen2.5, Llama 3.1/3.3, Mistral, Gemma, **Aya** (multilingual), BGE-M3.
+- Sovereign embeddings: **bge-m3**, multilingual-e5, nomic, via Ollama or
   **TEI** (Text Embeddings Inference).
 
-### F. Fine-tuning sans exfiltration
-- **LoRA/QLoRA** sur open-weights self-hosted (`unsloth`, `peft`) ; ou via les
-  crédits sandbox ITU. Le **dataset reste on-premise** ; on ne déplace que les
-  poids initiaux (publics) et le modèle adapté.
+### F. Fine-tuning without exfiltration
+- **LoRA/QLoRA** on self-hosted open weights (`unsloth`, `peft`), or through the
+  ITU sandbox credits. The **dataset stays on-premise**; only the public initial
+  weights and the adapted model move.
 
-## 6. Ce qui changerait chez nous (impact, non implémenté)
+## 6. What would change for us (impact, not implemented)
 
-| Composant | Impact | Ampleur |
-|-----------|--------|---------|
-| `packages/agents/src/model.ts` | ajouter un provider `local` (Ollama/OpenAI-compatible) | Petit |
-| `packages/retrieval` | abstraction embeddings (Voyage → bge-m3 local) | Moyen |
-| `services/transcription` | Whisper local (`faster-whisper`) vs API | Moyen |
-| Docker | service `ollama` (+ modèles) comme dans le repo ITU | Petit |
-| **Inchangé** | Qdrant, Mongo, ingestion structure-aware, citations, audit, coordinateur | — |
+| Component | Impact | Scope |
+|-----------|--------|-------|
+| `packages/agents/src/model.ts` | add a `local` provider (Ollama / OpenAI-compatible) | Small |
+| `packages/retrieval` | embeddings abstraction (Voyage → local bge-m3) | Medium |
+| `services/transcription` | local Whisper (`faster-whisper`) instead of an API | Medium |
+| Docker | `ollama` service (+ models), as in the ITU repository | Small |
+| **Unchanged** | Qdrant, Mongo, structure-aware ingestion, citations, audit, coordinator | — |
 
-Notre `model.ts` est déjà une **factory de providers** : le point d'accroche
-existe. C'est un atout.
+Our `model.ts` is already a **provider factory**: the hook point exists. That is an asset.
 
-## 7. Recommandation (analyse)
+## 7. Recommendation (analysis)
 
-1. **Par défaut souverain** : adopter un provider `local` (Ollama, embeddings
-   **bge-m3**) comme mode par défaut pour le domaine santé, avec les providers
-   cloud **optionnels** (switch par variable d'environnement).
-2. **Router hybride** (option D) pour exploiter le cloud seulement sur les
-   contenus non sensibles.
-3. **Conserver** Qdrant/Mongo self-hosted (déjà souverains).
-4. **Fine-tuning** : LoRA/QLoRA local ou crédits sandbox ITU, dataset on-premise.
-5. **Narratif jury** : « fonctionne entièrement hors ligne dans la sandbox ITU,
-   aucune donnée de santé ne quitte l'infrastructure » — argument de souveraineté
-   fort et aligné « AI for Good ».
+1. **Sovereign by default**: adopt a `local` provider (Ollama, bge-m3 embeddings)
+   as the default mode for the health domain, with cloud providers **optional**
+   (switched by environment variable).
+2. **Hybrid routing** (option D) to use the cloud only for non-sensitive content.
+3. **Keep** Qdrant and Mongo self-hosted (already sovereign).
+4. **Fine-tuning**: local LoRA/QLoRA or ITU sandbox credits, dataset on-premise.
+5. **Jury narrative**: "runs entirely offline in the ITU sandbox; no health data
+   leaves the infrastructure": a strong sovereignty argument, aligned with
+   "AI for Good".
 
-### Table de décision
+### Decision table
 
-| Sensibilité donnée | Cible | Choix |
-|--------------------|-------|-------|
-| Santé / PII | On-premise / sandbox ITU | Local (Ollama), embeddings bge-m3 |
-| Bonnes pratiques mondiales (public) | Cloud autorisé | API permise |
-| Documents mixtes | Hybride | Router de sensibilité |
+| Data sensitivity | Target | Choice |
+|------------------|--------|--------|
+| Health / PII | On-premise / ITU sandbox | Local (Ollama), bge-m3 embeddings |
+| Global good practices (public) | Cloud allowed | API permitted |
+| Mixed documents | Hybrid | Sensitivity router |
 
-**En une phrase** : notre architecture est déjà souveraine sauf aux deux
-extrémités (embeddings + LLM) ; le passage à Ollama/bge-m3 est un changement
-**localisé** (factory de providers + un service Docker), pas une refonte — et
-c'est probablement **le choix le plus aligné** avec l'ITU si la sandbox est
-isolée.
+**In one sentence**: our architecture is already sovereign except at its two
+ends (embeddings and LLM); moving to Ollama and bge-m3 is a **localised** change
+(provider factory plus one Docker service), not a rewrite, and is probably **the
+choice most aligned** with the ITU if the sandbox is isolated.
 
-## 8. Décision appliquée (implémentée)
+## 8. Decision applied (implemented)
 
-Choix retenu : **local-first, cloud entièrement retiré.**
+Chosen option: **local-first, cloud entirely removed.**
 
-| Élément | Décision |
+| Element | Decision |
 |---------|----------|
-| LLM | **`qwen3.5:9b`** via Ollama (multimodal texte+image, 6,6 Go) ; alternatives `qwen2.5:14b`/`qwen2.5:7b` par env |
-| Embeddings | **`bge-m3`** (Ollama) — 1024-dim, multilingue FR |
-| Rerank | **TEI local** (`BAAI/bge-reranker-v2-m3`), profil compose `rerank` ; sinon RRF |
-| Transcription | **faster-whisper** local (profil `full`/`media`) |
-| Providers cloud | **supprimés** (DeepSeek, Groq, OpenAI, Anthropic, Google, Voyage) |
-| Fine-tuning | **unsloth** (LoRA/QLoRA local) — cf. `docs/ROADMAP.md` |
+| LLM | **`qwen3.5:9b`** via Ollama (multimodal text and image, 6.6 GB); alternatives `qwen2.5:14b` / `qwen2.5:7b` via environment variables |
+| Embeddings | **`bge-m3`** (Ollama): 1024-dim, multilingual, French |
+| Rerank | **local TEI** (`BAAI/bge-reranker-v2-m3`), compose profile `rerank`; otherwise RRF |
+| Transcription | **faster-whisper** local (profile `full` / `media`) |
+| Cloud providers | **removed** (DeepSeek, Groq, OpenAI, Anthropic, Google, Voyage) |
+| Fine-tuning | **unsloth** (local LoRA/QLoRA), see `docs/ROADMAP.md` |
 
-Bénéfice direct sur les métriques évaluées : **D10 `d10_m10` Data Sovereignty**
-et **D11 `d11_m06` Edge Privacy** passent au maximum (aucun mouvement de données
-hors infrastructure).
+Direct benefit on the evaluated metrics: **D10 `d10_m10` Data Sovereignty** and
+**D11 `d11_m06` Edge Privacy** reach their maximum, since no data moves outside
+the infrastructure.

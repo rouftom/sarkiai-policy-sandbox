@@ -1,68 +1,68 @@
 # Testing
 
-Trois niveaux : **unitaire** (sans infra), **intégration** (infra requise, *gated*),
-**e2e** (stack en marche, *gated*). Les tests d'intégration/e2e sont **skippés
-automatiquement** si les variables d'environnement ne sont pas définies — ce qui
-permet de les versionner sans dépendre d'une machine particulière.
+Three levels: **unit** (no infrastructure), **integration** (infrastructure
+required, *gated*), **e2e** (stack running, *gated*). Integration and e2e tests are
+**skipped automatically** when their environment variables are not set, which lets
+them live in the repository without depending on a particular machine.
 
-> ⚠️ **Cette machine de développement ne peut pas lancer l'infra** (pas de Docker
-> runtime / contraintes matérielles). Seuls les tests **unitaires** y tournent.
+> ⚠️ **This development machine cannot run the infrastructure** (no Docker
+> runtime, hardware constraints). Only the **unit** tests run here.
 
-## Unitaires (sans infra) — exécutables partout
+## Unit tests (no infrastructure): runnable anywhere
 
 ```bash
-bun run test          # turbo: bun test dans chaque package (@sps/*)
-bun test              # tout (unit + gated, ces derniers skippés)
+bun run test          # turbo: bun test in each package (@sps/*)
+bun test              # everything (unit + gated; the gated ones are skipped)
 ```
 
-Couverture : `@sps/shared` (taxonomie ITU 6/13, lenses, institutions),
-`@sps/scenarios` (release progressif, asymétrie), `@sps/readiness` (scoring 0–5,
-composite, graphe causal), `@sps/citations`, `@sps/report`, `@sps/storage`,
+Coverage: `@sps/shared` (ITU taxonomy 6/13, lenses, institutions),
+`@sps/scenarios` (progressive release, asymmetry), `@sps/readiness` (0–5 scoring,
+composite, causal graph), `@sps/citations`, `@sps/report`, `@sps/storage`,
 `@sps/retrieval` (RRF).
 
-Python (chunker, pur stdlib) :
+Python (chunker, standard library only):
 
 ```bash
 cd services/ingestion && PYTHONPATH=src python3 tests/test_chunker.py
 ```
 
-## Intégration (*gated* par env, infra requise)
+## Integration (*gated* by environment, infrastructure required)
 
-TS :
+TypeScript:
 
 ```bash
-MONGO_URL=mongodb://localhost:27017 bun run test:int          # audit (chaîne de hachage)
+MONGO_URL=mongodb://localhost:27017 bun run test:int          # audit (hash chain)
 QDRANT_URL=http://localhost:6333 OLLAMA_BASE_URL=http://localhost:11434 \
-  bun run test:int                                             # retrieval hybride
+  bun run test:int                                             # hybrid retrieval
 ```
 
-Python (pydantic/fastapi/qdrant requis — via Docker) :
+Python (pydantic / fastapi / qdrant required, via Docker):
 
 ```bash
 cd services/ingestion && PYTHONPATH=src pytest tests/ \
   -k "schemas or embeddings or qdrant_store or api"
 ```
 
-## e2e (*gated*, stack en marche)
+## e2e (*gated*, stack running)
 
 ```bash
 E2E_BASE_URL=http://localhost:8000 bun run test:e2e
 ```
 
-Vérifie `/health`, `POST /v1/scenarios/start` (agenda), la libération d'un tick
-facilitateur, et `POST /v1/readiness/report` (13 dimensions notées).
+Checks `/health`, `POST /v1/scenarios/start` (agenda), the release of one
+facilitator tick, and `POST /v1/readiness/report` (13 dimensions scored).
 
-## CI recommandée (hors de cette machine)
+## Recommended CI (outside this machine)
 
-| Job | Commande | Infra |
-|-----|----------|-------|
-| unit | `bun run typecheck && bun run test && bun run build` | aucune |
-| unit-py | `pytest services/ingestion/tests` | image Doker ingestion |
+| Job | Command | Infrastructure |
+|-----|---------|----------------|
+| unit | `bun run typecheck && bun run test && bun run build` | none |
+| unit-py | `pytest services/ingestion/tests` | ingestion Docker image |
 | integration | `bun run test:int` + `pytest -k integration` | mongo + qdrant + ollama |
-| e2e | `docker compose up -d && make models && ./scripts/seed.sh` puis `bun run test:e2e` | stack complète |
+| e2e | `docker compose up -d && make models && ./scripts/seed.sh`, then `bun run test:e2e` | full stack |
 
 ## Conventions
 
-- Tests TS : `*.test.ts` (unit), `*.integration.test.ts` (gated).
-- Tests Python : `services/<svc>/tests/test_*.py` (pytest).
-- Jamais de dépendance réseau/infra dans les tests **unitaires**.
+- TypeScript tests: `*.test.ts` (unit), `*.integration.test.ts` (gated).
+- Python tests: `services/<svc>/tests/test_*.py` (pytest).
+- Never a network or infrastructure dependency in **unit** tests.
