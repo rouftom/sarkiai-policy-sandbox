@@ -411,36 +411,6 @@
       "rights": "official-text"
     },
     {
-      "id": "cm-cybersecurity-2010",
-      "title": "Loi n° 2010/012 du 21 décembre 2010 relative à la cybersécurité et à la cybercriminalité au Cameroun",
-      "authority": "Assemblée Nationale",
-      "docType": "law",
-      "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "ai_policies"
-      ],
-      "status": "to_confirm",
-      "priority": "critical",
-      "sourceUrl": "https://www.antic.cm/",
-      "rights": "official-text"
-    },
-    {
-      "id": "cm-electronic-comms-2010",
-      "title": "Loi n° 2010/013 du 21 décembre 2010 régissant les communications électroniques au Cameroun",
-      "authority": "Assemblée Nationale",
-      "docType": "law",
-      "jurisdiction": "national",
-      "pillar": [
-        "digital_infrastructure",
-        "contextualization"
-      ],
-      "status": "to_confirm",
-      "priority": "high",
-      "sourceUrl": "https://www.art.cm/",
-      "rights": "official-text"
-    },
-    {
       "id": "cm-data-protection-authority-mandate",
       "title": "Mandat et attributions de l'autorité de protection des données (décret de création à confirmer)",
       "authority": "Autorité de protection des données",
@@ -483,21 +453,6 @@
       "status": "to_confirm",
       "priority": "high",
       "sourceUrl": "",
-      "rights": "official-text"
-    },
-    {
-      "id": "cm-malabo-convention",
-      "title": "Convention de Malabo sur la cybersécurité et la protection des données à caractère personnel (2014)",
-      "authority": "Union Africaine",
-      "docType": "treaty",
-      "jurisdiction": "regional",
-      "pillar": [
-        "data_marketplace",
-        "human_interface"
-      ],
-      "status": "verified",
-      "priority": "high",
-      "sourceUrl": "https://au.int/en/treaties",
       "rights": "official-text"
     }
   ]
