@@ -1,9 +1,8 @@
 name: ci
 
-# Typecheck and unit tests, then a dependency audit of each lockfile, on every
-# push and pull request. The e2e suite (tests/e2e) needs the running services and
-# stays out of CI, as do the Python ingestion services (no test runner is
-# installed in this image).
+# Typecheck and unit tests (TypeScript and Python), then a dependency audit of
+# each lockfile, on every push and pull request. The e2e suite (tests/e2e) needs
+# the running services and stays out of CI.
 
 on:
   push:
@@ -36,6 +35,31 @@ jobs:
 
       - name: Unit tests
         run: bun test packages apps
+
+  # The ingestion service is Python. Its unit tests mock the embedder, the
+  # vector store and the OCR call, so no Qdrant, Ollama or Tesseract is needed.
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            services/ingestion/requirements.txt
+            services/ingestion/requirements-dev.txt
+
+      - name: Install
+        run: python -m pip install --disable-pip-version-check -r services/ingestion/requirements-dev.txt
+
+      - name: Unit tests
+        working-directory: services/ingestion
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests
 
   # Each lockfile is audited on its own: the MCP sidecars sit outside the root
   # workspace. A high or critical advisory fails the check; moderate and low
