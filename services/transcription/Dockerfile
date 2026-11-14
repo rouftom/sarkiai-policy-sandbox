@@ -17,8 +17,13 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY services/transcription/app ./app
 
-# Local Whisper models are cached here (mount a volume to persist).
-RUN mkdir -p /models
+# Local Whisper models are cached here (mount a volume to persist). The
+# directory is created with the runtime user's ownership so a fresh named
+# volume starts writable.
+RUN useradd --system --create-home --user-group app \
+    && mkdir -p /models \
+    && chown -R app:app /app /models
+USER app
 
 EXPOSE 8000
 
