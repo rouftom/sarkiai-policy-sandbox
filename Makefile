@@ -92,6 +92,9 @@ seed-corpus: ## Ingest a country corpus from its manifest (COUNTRY=cm by default
 check-kb: ## Check which knowledge-base documents the repo publishes (rights review)
 	bun scripts/check-kb.ts
 
+hooks: ## Install the pre-push guard (no direct push to main or develop)
+	./scripts/install-git-hooks.sh
+
 check-provider: ## Verify Ollama models, embedding dimension and Qdrant
 	bun scripts/check-provider.ts
 
