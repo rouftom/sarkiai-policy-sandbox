@@ -11,7 +11,7 @@ provenance (`sourceUrl`) and publication rights (`rights`):
 
 | Corpus | Manifest | Documents |
 |--------|----------|-----------|
-| Cameroon (national and CEMAC) | [`country/cm/manifest.json`](country/cm/manifest.json) | 21 collected, 5 instruments still to source |
+| Cameroon (national and CEMAC) | [`country/cm/manifest.json`](country/cm/manifest.json) | 22 collected, 4 instruments still to source |
 | International references | [`global/itu/manifest.json`](global/itu/manifest.json) | 6, link-only |
 | African references | [`global/africa/manifest.json`](global/africa/manifest.json) | 10, fetched from the ITU reference repository |
 | ITU AI Readiness dimensions | [`global/itu/dimensions.json`](global/itu/dimensions.json) | 13 dimensions, 6 factors |
@@ -38,7 +38,7 @@ Documents that are not published can still be ingested locally by whoever
 holds a copy. The agents then only quote short, attributed passages, each
 linked to its source.
 
-### Published: Cameroonian documents (18)
+### Published: Cameroonian documents (19)
 
 | File | Document | Authority |
 |------|----------|-----------|
@@ -49,6 +49,7 @@ linked to its source.
 | `penal_code_2016.pdf` | Code pénal (loi n° 2016/007) | République du Cameroun |
 | `decret_2023_interconnexion.pdf` | Décret sur l'interconnexion et l'accès aux réseaux (2023) | Primature / ART |
 | `decret_certification_electronique.pdf` | Décret relatif à la certification électronique | Primature / MINPOSTEL |
+| `decret_2019_150_antic.pdf` | Décret n° 2019/150 du 22 mars 2019 portant organisation et fonctionnement de l'ANTIC (copie certifiée) | Présidence de la République |
 | `cemac_protection_droits_utilisateurs.pdf` | Directive CEMAC sur la protection des droits des utilisateurs | CEMAC |
 | `art_recueil_textes_2018.pdf` | Recueil des textes du secteur des communications électroniques (2018) | ART |
 | `compendium_textes_poste_telecom_tic_2023.pdf` | Compendium des textes Postes, Télécommunications et TIC (2023) | MINPOSTEL |
@@ -66,6 +67,13 @@ The ART 2018 compilation is distributed as a compressed copy (43 MB instead of
 were re-encoded; the 486 pages, the text layer, the pagination and the
 document metadata are identical to the source published by ART
 (https://www.art.cm/).
+
+The ANTIC decree (`decret_2019_150_antic.pdf`) is the certified copy published
+by the Presidency of the Republic. Its 20 pages are page scans, so an invisible
+text layer was added locally with Tesseract 5 (French) to make the text
+extractable without the OCR service. The scanned images, the pagination and the
+metadata are unchanged: the rendered pages are pixel-identical to the source
+file. The decree abrogates decree n° 2012/180 of 10 April 2012 (article 63).
 
 The ID4D diagnostic is © World Bank, licensed under CC BY 3.0 IGO
 (https://creativecommons.org/licenses/by/3.0/igo/). Cite the English original:
