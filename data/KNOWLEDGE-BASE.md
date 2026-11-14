@@ -61,6 +61,12 @@ linked to its source.
 | `art_observatoire_marche_telecom_2016.pdf` | Observatoire annuel 2016 du marché des communications électroniques | ART |
 | `cameroon_id_cr_ecosystem_diagnostic.txt` | Etude diagnostique du système d'ID au Cameroun, French edition of the ID4D Diagnostic of ID Systems in Cameroon (2023), text conversion | World Bank, ID4D (CC BY 3.0 IGO) |
 
+The ART 2018 compilation is distributed as a compressed copy (43 MB instead of
+66 MB) so it stays under GitHub's 50 MB warning threshold. Only the page images
+were re-encoded; the 486 pages, the text layer, the pagination and the
+document metadata are identical to the source published by ART
+(https://www.art.cm/).
+
 The ID4D diagnostic is © World Bank, licensed under CC BY 3.0 IGO
 (https://creativecommons.org/licenses/by/3.0/igo/). Cite the English original:
 World Bank. 2023. Identification for Development (ID4D): Diagnostic of ID Systems

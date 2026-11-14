@@ -284,7 +284,7 @@
       "priority": "high",
       "file": "art_recueil_textes_2018.pdf",
       "needsOcr": true,
-      "note": "486 pages — compilation de lois/décrets/arrêtés télécoms. Couche texte partielle (polices non-Unicode, 7 150 mots extraits) : OCR requis.",
+      "note": "486 pages — compilation de lois/décrets/arrêtés télécoms. Couche texte partielle (polices non-Unicode, 7 150 mots extraits) : OCR requis. Copie compressée pour la distribution : images rééchantillonnées, texte, pagination et métadonnées conservés à l'identique.",
       "sourceUrl": "https://www.art.cm/",
       "rights": "official-text"
     },
