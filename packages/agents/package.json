@@ -18,7 +18,7 @@
     "@sps/audit": "workspace:*",
     "ai": "^6.0.0",
     "@ai-sdk/openai-compatible": "^1.0.0",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "typescript": "^5.6.0"
