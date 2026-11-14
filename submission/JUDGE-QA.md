@@ -206,7 +206,7 @@ strength, not a confession.
 | Monorepo packages | 18 |
 | Tests | 240 tests, 45 files, 0 failures |
 | Build validation | `typecheck` 38/38, web build 20/20 |
-| Cameroon corpus | 26 manifest entries, **21 ingestible**, 5 `to_confirm` |
+| Cameroon corpus | 26 manifest entries, **22 ingestible**, 4 `to_confirm` |
 | OCR caveats | 8 documents (6 with no text layer, 1 partial, 1 non-Unicode font) |
 | Regional corpus ingested | 10 instruments (AU, Kigali, Windhoek, Smart Africa, Kenya ×2, Rwanda, Egypt, Zambia, Nigeria) |
 | International references | 6 catalogued, **not loaded** (Y.3172, ITU Readiness, WHO, UNESCO, Malabo, OECD) |
@@ -218,6 +218,6 @@ strength, not a confession.
 1. "Everything is deterministic." → *The reasoning is an LLM; what is
    deterministic is retrieval, citation validation, the score, the audit and the
    approvals.*
-2. "29 documents ingested." → *26 manifest entries, 21 ingestible, 5 without text.*
+2. "29 documents ingested." → *26 manifest entries, 22 ingestible, 4 without text.*
 3. "This is a legal tool." → *It is a sandbox for institutional response; the
    authority signs its own corpus before any real use.*

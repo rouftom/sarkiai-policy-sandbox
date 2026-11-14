@@ -432,19 +432,22 @@
     },
     {
       "id": "cm-antic-mandate",
-      "title": "Mandat de l'Agence Nationale des Technologies de l'Information et de la Communication (ANTIC)",
-      "authority": "ANTIC",
+      "title": "Décret n° 2019/150 du 22 mars 2019 portant organisation et fonctionnement de l'Agence Nationale des Technologies de l'Information et de la Communication (ANTIC)",
+      "authority": "Présidence de la République",
       "docType": "regulation",
       "jurisdiction": "national",
       "pillar": [
         "digital_infrastructure",
         "ai_policies"
       ],
-      "status": "to_confirm",
+      "status": "present",
       "priority": "high",
-      "sourceUrl": "https://www.antic.cm/",
+      "file": "decret_2019_150_antic.pdf",
+      "needsOcr": false,
+      "note": "20 pages, copie certifiée du décret. Couche texte OCR locale (Tesseract 5, français) ajoutée sur les images certifiées, qui restent intactes. Abroge le décret n° 2012/180 du 10 avril 2012 (art. 63).",
+      "sourceUrl": "https://www.prc.cm/fr/multimedia/documents/7284-decret-n-2019-150-du-22-03-2019-organisation-antic",
       "rights": "official-text",
-      "rightsNote": "Document public, libre d'accès comme les autres documents publics : publié sans modification."
+      "rightsNote": "Document public, libre d'accès comme les autres documents publics : copie certifiée publiée telle quelle, seule une couche texte invisible a été ajoutée."
     },
     {
       "id": "cm-national-cyber-strategy",

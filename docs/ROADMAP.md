@@ -32,7 +32,7 @@
 - `[x]` **Multimodal assistant**: local vision model (`qwen3.5:9b`), image attachments stored in MinIO (content-addressed), untrusted-context guardrails, audit hash. `POST /v1/agents/ask` + `attachments[]`.
 
 ### Sprint 1 — the Cameroon health corpus
-- `[x]` Collect real CM corpus → `data/country/cm/`: 21 documents (data-protection, cybersecurity, e-commerce and electronic-communications laws, decrees, CEMAC directive, SND30, digital and digital-health strategies). 5 instruments are still to source (constitution, health framework law, data-protection authority decree, ANTIC mandate, national cyber strategy), and the official AI strategy document is still to obtain.
+- `[x]` Collect real CM corpus → `data/country/cm/`: 22 documents (data-protection, cybersecurity, e-commerce and electronic-communications laws, decrees, CEMAC directive, SND30, digital and digital-health strategies). 4 instruments are still to source (constitution, health framework law, data-protection authority decree, national cyber strategy), and the official AI strategy document is still to obtain.
 - `[x]` Global best-practice corpus: ITU, WHO, UNESCO, OECD, Malabo (`data/global/itu/`, link-only) and 10 African strategies (`data/global/africa/`, fetched from the ITU reference repository).
 - `[ ]` Ingest + validate retrieval quality per dimension.
 - `[ ]` Replace `data/samples/*` placeholders.
