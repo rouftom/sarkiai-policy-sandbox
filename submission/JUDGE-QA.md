@@ -190,8 +190,9 @@ the computation in `packages/readiness/`. **Do not say** "official ITU".
 **To click:** `Audit trail` (what is already solid) and `Knowledge base` (what is
 missing).
 
-**To show:** the limits section of the report, if it is kept in the final
-version. It is a strength, not a confession.
+**To show:** the paragraph *"Where the solution can fail"* at the end of §5 of
+the report, which names the missing instruments and the pending OCR. It is a
+strength, not a confession.
 
 ---
 
@@ -200,10 +201,10 @@ version. It is a strength, not a confession.
 | Item | Exact value |
 |---|---|
 | Compose services | 12 long-running + 1 MinIO init job |
-| API routes | 81 |
+| API routes | 98 |
 | Web screens | 26 (19 inside the console) |
 | Monorepo packages | 18 |
-| Tests | 228 tests, 44 files, 0 failures |
+| Tests | 240 tests, 45 files, 0 failures |
 | Build validation | `typecheck` 38/38, web build 20/20 |
 | Cameroon corpus | 26 manifest entries, **21 ingestible**, 5 `to_confirm` |
 | OCR caveats | 8 documents (6 with no text layer, 1 partial, 1 non-Unicode font) |
