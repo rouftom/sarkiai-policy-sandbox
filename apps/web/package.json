@@ -33,6 +33,7 @@
     "recharts": "^2.15.4",
     "rehype-katex": "^7",
     "rehype-raw": "^7",
+    "rehype-sanitize": "^6",
     "remark-gfm": "^4",
     "remark-math": "^6",
     "tailwind-merge": "^2.5.4",
