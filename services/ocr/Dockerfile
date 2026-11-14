@@ -18,6 +18,10 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY services/ocr/app ./app
 
+# The deployed image runs unprivileged.
+RUN useradd --system --create-home --user-group app && chown -R app:app /app
+USER app
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 --start-period=15s \

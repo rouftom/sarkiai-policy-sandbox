@@ -9,6 +9,7 @@ import { auth } from './auth.js'
 import { config } from './config.js'
 import { resetDemoState } from './demo-reset.js'
 import { maintainAuditChain } from './audit-maintenance.js'
+import { MAX_PARAM_LENGTH } from './router-limits.js'
 import type { PublicOperator } from '@sps/auth'
 
 declare module 'fastify' {
@@ -20,6 +21,8 @@ declare module 'fastify' {
 
 export async function buildServer() {
   const app = Fastify({
+    // Approval links carry their token in the path; see `router-limits.ts`.
+    routerOptions: { maxParamLength: MAX_PARAM_LENGTH },
     logger: {
       level: process.env.LOG_LEVEL ?? 'info',
       // The realtime voice socket carries the session token in its query string: never log it.

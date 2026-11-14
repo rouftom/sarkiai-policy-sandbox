@@ -9,6 +9,7 @@ import {
   UI_EXTENSION_CAPABILITIES,
 } from '@mcp-ui/client'
 import { MCP_SERVERS } from '@/lib/mcp-config'
+import { readToken } from '@/lib/session'
 
 // Registry of client instances by server name
 const mcpClients: Record<string, McpClient> = {}
@@ -49,7 +50,12 @@ async function getOrCreateMcpClient(serverName: string = 'sarkiai_charts'): Prom
       const proxyUrl = new URL('/api/mcp/proxy', window.location.origin)
       proxyUrl.searchParams.set('server', serverName)
 
-      const transport = new StreamableHTTPClientTransport(proxyUrl)
+      // The proxy injects the server-side MCP key, so it only serves a signed-in
+      // operator: carry the console session on every proxied request.
+      const token = readToken()
+      const transport = new StreamableHTTPClientTransport(proxyUrl, {
+        requestInit: token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
+      })
 
       await client.connect(transport)
 

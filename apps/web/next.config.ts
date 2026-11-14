@@ -49,11 +49,66 @@ const deploymentOrigins = [
   ),
 ]
 
+/**
+ * Content-Security-Policy, limited to the two directives that matter for model
+ * output rendered in the console: `img-src` (an injected image URL can leak data
+ * in its query string) and `frame-src` (an injected frame can impersonate the
+ * UI). Other resource types keep the browser defaults.
+ *
+ * Allowed: this app, inline data and blobs, and the API host (figures the
+ * reports render). Extra hosts come from `NEXT_PUBLIC_CSP_IMG_SOURCES` and
+ * `NEXT_PUBLIC_CSP_FRAME_SOURCES` (comma-separated origins). Set
+ * `NEXT_PUBLIC_CSP_REPORT_ONLY=true` to observe violations without blocking.
+ */
+function originOfUrl(value: string | undefined): string | null {
+  const trimmed = firstNonEmpty(value)
+  if (!trimmed) return null
+  try {
+    return new URL(trimmed).origin
+  } catch {
+    return null
+  }
+}
+
+function originsOf(value: string | undefined): string[] {
+  return String(value ?? '')
+    .split(',')
+    .map((entry) => originOfUrl(entry))
+    .filter((entry): entry is string => Boolean(entry))
+}
+
+function sourceList(values: (string | null | undefined)[]): string {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))].join(' ')
+}
+
+const imgSources = sourceList([
+  "'self'",
+  'data:',
+  'blob:',
+  originOfUrl(process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'),
+  ...originsOf(process.env.NEXT_PUBLIC_CSP_IMG_SOURCES),
+])
+
+const frameSources = sourceList([
+  "'self'",
+  'data:',
+  'blob:',
+  ...originsOf(process.env.NEXT_PUBLIC_CSP_FRAME_SOURCES),
+])
+
+const cspHeader = process.env.NEXT_PUBLIC_CSP_REPORT_ONLY === 'true'
+  ? 'Content-Security-Policy-Report-Only'
+  : 'Content-Security-Policy'
+
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   async headers() {
     return [
+      {
+        source: '/:path*',
+        headers: [{ key: cspHeader, value: `img-src ${imgSources}; frame-src ${frameSources}` }],
+      },
       {
         source: '/approve/:path*',
         headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }],
