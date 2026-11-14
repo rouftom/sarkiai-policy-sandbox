@@ -1,0 +1,8 @@
+# Test-only dependencies for the ingestion service.
+#
+#   python -m pip install -r requirements-dev.txt
+#   PYTHONPATH=src python -m pytest tests
+#
+# The runtime image installs requirements.txt only; pytest never ships.
+-r requirements.txt
+pytest>=8.0.0
