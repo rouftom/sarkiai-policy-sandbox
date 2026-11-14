@@ -420,7 +420,7 @@ export async function registerAuthRoutes(app: FastifyInstance, audit: AuditServi
     try {
       const [events, chain] = await Promise.all([
         audit.listAudit(limit, operator.email),
-        audit.verifyChain(),
+        audit.verifyChainCached(),
       ])
       return { events, chain }
     } catch (error) {
