@@ -114,6 +114,12 @@ These are deliberate, documented limits rather than findings:
   no test runner is installed in this image, so their tests run locally only.
 - The MCP sidecars share one static key (`MCP_API_KEY`). It is generated per
   install and never leaves the compose network.
+- Moderate and low dependency advisories are still reported by `bun audit`:
+  KaTeX 0.16 (transitive through `rehype-katex`, which requires that major),
+  PrismJS 1.27 (transitive through the e-mail renderer), Hono and `fast-uri`
+  (transitive through the MCP SDK and AJV). None of them is reachable as a high
+  or critical path in this stack; they are tracked and upgraded when their
+  parent package allows it.
 
 ## Safe harbour
 
