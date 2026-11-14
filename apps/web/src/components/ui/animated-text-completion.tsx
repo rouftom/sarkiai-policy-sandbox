@@ -6,6 +6,7 @@ import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import dynamic from 'next/dynamic'
 import { ChevronDown } from "lucide-react"
 import { ShinyText } from '@sps/ui'
@@ -21,6 +22,21 @@ const vscDarkPlusTheme = () =>
   import('react-syntax-highlighter/dist/esm/styles/prism').then((m) => m.vscDarkPlus)
 
 const delimiter = ''
+
+/**
+ * Model output is untrusted: it can echo a web page, an uploaded document or a
+ * prompt injection. Raw HTML is parsed, then sanitized to GitHub's allowlist
+ * (no script, iframe, style, form or event handler) before KaTeX renders the
+ * math. Code keeps its `language-*` class, and math keeps the two classes
+ * KaTeX reads to choose inline or display mode.
+ */
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code ?? []), ['className', /^language-./, 'math-inline', 'math-display']],
+  },
+}
 
 interface AnimatedTextCompletionProps {
   text: string
@@ -93,7 +109,7 @@ export function AnimatedTextCompletion({ text, isLast, isStreaming }: AnimatedTe
     <div className="prose prose-sm max-w-none dark:prose-invert">
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
-        rehypePlugins={[rehypeKatex, rehypeRaw]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema], rehypeKatex]}
         components={{
           img({ src, alt }: any) {
             return (

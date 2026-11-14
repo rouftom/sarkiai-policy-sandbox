@@ -43,6 +43,7 @@ import { listMailOutbox, mailConfigured, mailFrom, sendNotificationEmail } from 
 import { buildReadinessReport } from '../readiness-report.js'
 import { defaultChatModel } from '@sps/agents'
 import { auth } from '../auth.js'
+import { RateLimiter, rateLimitHeaders, type RateLimitRule } from '../rate-limit.js'
 
 const engine = createEngine()
 const ingestion = new IngestionClient({ baseUrl: config.ingestion.baseUrl, apiKey: config.ingestion.apiKey })
@@ -281,6 +282,40 @@ function operatorOf(request: FastifyRequest) {
 }
 
 /**
+ * Routes that spend model or embedding work. They get the tighter budget: on a
+ * CPU-only install a handful of concurrent readiness runs is already the limit,
+ * and one caller should not be able to queue dozens of them.
+ */
+const EXPENSIVE_ROUTE_PREFIXES = [
+  '/v1/agents/ask',
+  '/v1/agents/route',
+  '/v1/readiness',
+  '/v1/scenarios',
+  '/v1/gazette/analyze',
+  '/v1/gazette/ingest',
+  '/v1/impact/analyze',
+  '/v1/exercise',
+  '/v1/voice/correct',
+  '/v1/voice/transcribe',
+  '/v1/kb/ingest',
+  '/v1/kb/indexes',
+  '/v1/notifications/summary-suggestion',
+]
+
+function isExpensiveRoute(method: string, route: string): boolean {
+  if (method !== 'POST') return false
+  return EXPENSIVE_ROUTE_PREFIXES.some((prefix) => route === prefix || route.startsWith(`${prefix}/`))
+}
+
+/** Counters for the authenticated surface; see `config.rateLimit`. */
+const limiter = new RateLimiter()
+const API_RULE: RateLimitRule = { max: config.rateLimit.max, windowMs: config.rateLimit.windowMs }
+const EXPENSIVE_RULE: RateLimitRule = {
+  max: config.rateLimit.expensiveMax,
+  windowMs: config.rateLimit.windowMs,
+}
+
+/**
  * Reference figure per readiness dimension (13), attached to an existing
  * document. Idempotent: a dimension whose figure already exists is skipped, so
  * the boot hatch can be left in place. The figure is a labelled SVG drawn
@@ -359,6 +394,25 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       })
     }
     request.operator = operator
+
+    // Per-caller budgets: one wide cap for the API, a tighter one for the routes
+    // that spend model work. `RATE_LIMIT_ENABLED=false` removes both.
+    if (config.rateLimit.enabled) {
+      const route = request.routeOptions.url ?? path
+      const expensive = isExpensiveRoute(request.method, route)
+      const verdict = limiter.take(
+        expensive ? EXPENSIVE_RULE : API_RULE,
+        `${expensive ? 'model' : 'api'}:${operator.email}`,
+      )
+      reply.headers(rateLimitHeaders(verdict))
+      if (!verdict.allowed) {
+        return reply.status(429).send({
+          error: 'rate_limited',
+          message: 'Too many requests. Slow down and try again.',
+          retryAfter: verdict.retryAfter,
+        })
+      }
+    }
   })
 
   // Announce the active provider in the audit chain (no-op when unchanged).
@@ -1109,7 +1163,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       audit: await engine.audit.getAuditForRun(runId, userId),
       traces: await engine.audit.getTrace(runId, userId),
       reports,
-      integrity: await engine.audit.verifyChain(),
+      integrity: await engine.audit.verifyChainCached(),
     })
   }
 
@@ -2667,7 +2721,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
   })
 
   // ── Audit ─────────────────────────────────────────────────────────────────
-  app.get('/v1/audit/chain', async () => engine.audit.verifyChain())
+  app.get('/v1/audit/chain', async () => engine.audit.verifyChainCached())
   app.get('/v1/audit/trace/:runId', async (request) => {
     const { runId } = z.object({ runId: z.string() }).parse(request.params)
     const operator = operatorOf(request)
@@ -2685,7 +2739,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       audit: await engine.audit.getAuditForRun(runId, operator.email),
       traces: await engine.audit.getTrace(runId, operator.email),
       reports: await engine.reports.getReports(runId, operator.email),
-      integrity: await engine.audit.verifyChain(),
+      integrity: await engine.audit.verifyChainCached(),
     })
 
     if (format.format === 'markdown') {

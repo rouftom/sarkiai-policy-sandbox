@@ -35,6 +35,37 @@ import { buildScenario, maturityLabel } from './scoring'
 export * from './causal'
 export * from './scoring'
 
+/**
+ * Runs `task` over `items` with at most `limit` in flight, keeping the input
+ * order in the settled results. Used for the dimension fan-out: the same
+ * behaviour as `Promise.allSettled`, only bounded.
+ */
+export async function settlePool<T, R>(
+  items: readonly T[],
+  limit: number,
+  task: (item: T) => Promise<R>,
+): Promise<Array<PromiseSettledResult<R>>> {
+  const results: Array<PromiseSettledResult<R>> = new Array(items.length)
+  let next = 0
+
+  const worker = async (): Promise<void> => {
+    for (;;) {
+      const index = next
+      next += 1
+      if (index >= items.length) return
+      try {
+        results[index] = { status: 'fulfilled', value: await task(items[index]!) }
+      } catch (error) {
+        results[index] = { status: 'rejected', reason: error }
+      }
+    }
+  }
+
+  const workers = Math.max(1, Math.min(limit, items.length))
+  await Promise.all(Array.from({ length: workers }, () => worker()))
+  return results
+}
+
 export interface ReadinessInput {
   country: string
   domain: Domain
@@ -54,6 +85,11 @@ export interface ReadinessInput {
    * order a lead agent decides (`orchestrated`, see `lead`).
    */
   concurrency?: 'parallel' | 'sequential' | 'orchestrated'
+  /**
+   * In parallel mode, how many dimensions run at once (default 4). Thirteen cells
+   * at once on a CPU-only install is an avoidable burst.
+   */
+  dimensionConcurrency?: number
   /** Orchestrated mode: the most decisions the lead may take (default 20). */
   maxDecisions?: number
   /** Orchestrated mode: the lead agent's next decision, given what is scored so far. */
@@ -415,7 +451,9 @@ Score maturity on 0–5 (0 Not Started, 3 Established, 5 Leading). Compare COUNT
       }
     } else {
       // In parallel, every dimension runs to its end: one failure does not discard the others.
-      const outcomes = await Promise.allSettled(dimensions.map((dimension) => evaluateOne(dimension)))
+      // The fan-out is bounded: 13 cells at once on a CPU-only install is a burst.
+      const dimensionLimit = Math.max(1, input.dimensionConcurrency ?? 4)
+      const outcomes = await settlePool(dimensions, dimensionLimit, (dimension) => evaluateOne(dimension))
       const failed = outcomes.find((outcome): outcome is PromiseRejectedResult => outcome.status === 'rejected')
       if (failed) throw new ReadinessInterrupted((failed.reason as Error).message, [...scores])
     }

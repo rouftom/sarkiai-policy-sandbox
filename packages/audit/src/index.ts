@@ -6,6 +6,7 @@
 
 import { createHash } from 'node:crypto'
 import { MongoClient, type Collection, type Document } from 'mongodb'
+import { mongoPoolOptions } from '@sps/shared'
 import type { AuditRecord, Citation, CoTTrace, WorkflowLens } from '@sps/shared'
 
 export interface AuditConfig {
@@ -81,6 +82,18 @@ export class AuditService {
    * chain, which the verifier then reports as broken.
    */
   private appendQueue: Promise<unknown> = Promise.resolve()
+  /**
+   * The compound index that serves the console's reads: one operator's newest
+   * records first. Created once per process, on the first read, so a cold start
+   * never pays twice.
+   */
+  private indexesReady: Promise<boolean> | null = null
+  /**
+   * The chain verdict is O(all records). Records are append-only and every
+   * append moves the shared `head` document, so the cached verdict is only
+   * reused while that head is unchanged.
+   */
+  private chainCache: { head: string | null; verdict: ChainVerdict } | null = null
 
   constructor(private readonly config: AuditConfig) {
     this.auditCol = config.auditCollection ?? 'audit_logs'
@@ -89,7 +102,7 @@ export class AuditService {
 
   private async db(): Promise<{ audit: Collection<Document>; cot: Collection<Document>; head: Collection<Document> }> {
     if (!this.client) {
-      this.client = new MongoClient(this.config.mongodbUri)
+      this.client = new MongoClient(this.config.mongodbUri, mongoPoolOptions())
       await this.client.connect()
     }
     const db = this.client.db(this.config.dbName)
@@ -202,17 +215,55 @@ export class AuditService {
   }
 
   /**
+   * The index that makes the console's read an index scan instead of a
+   * collection scan. Best effort: a failure is reported once and never blocks
+   * the audit feed.
+   */
+  async ensureReadIndexes(): Promise<boolean> {
+    if (!this.indexesReady) {
+      this.indexesReady = (async () => {
+        try {
+          const { audit } = await this.db()
+          await audit.createIndex({ userId: 1, ts: -1 }, { name: 'audit_user_ts' })
+          return true
+        } catch (error) {
+          console.warn('[audit] audit_user_ts index unavailable; reads will be slower', error)
+          return false
+        }
+      })()
+    }
+    return this.indexesReady
+  }
+
+  /**
    * Newest-first slice of the chain, for the console's audit page. Scoped to
    * one operator: the collection holds every operator's records, and a shared
    * audit screen must never show another operator's work. The chain itself is
    * still verified end-to-end (hashes link records across operators).
    */
   async listAudit(limit = 50, userId?: string): Promise<AuditRecord[]> {
+    await this.ensureReadIndexes()
     const { audit } = await this.db()
     const size = Math.min(Math.max(limit, 1), 500)
     const filter = userId ? { userId } : {}
     const docs = await audit.find(filter).sort({ ts: -1 }).limit(size).toArray()
     return docs as unknown as AuditRecord[]
+  }
+
+  /**
+   * Cached chain verdict. Records are append-only and every append moves the
+   * shared `head` document, so an unchanged head means the cached verdict is
+   * still the answer. A direct edit that does not move the head is detected on
+   * the next append, not before.
+   */
+  async verifyChainCached(): Promise<ChainVerdict> {
+    const { head } = await this.db()
+    const current = await head.findOne({ _id: 'head' as never })
+    const hash = (current?.hash as string | null | undefined) ?? null
+    if (this.chainCache?.head === hash) return this.chainCache.verdict
+    const verdict = await this.verifyChain()
+    this.chainCache = { head: hash, verdict }
+    return verdict
   }
 
   /**
