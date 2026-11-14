@@ -19,7 +19,7 @@
       "priority": "critical",
       "file": "loi_2024_protection_donnees_personnelles.pdf",
       "note": "Copie certifiée scannée avec couche OCR partielle ; numéro de loi à confirmer.",
-      "sourceUrl": "",
+      "sourceUrl": "https://prc.cm/en/multimedia/documents/10271-law-n-2024-017-of-23-12-2024-web",
       "rights": "official-text"
     },
     {
@@ -55,7 +55,7 @@
       "status": "present",
       "priority": "high",
       "file": "plan_strategique_cameroun_numerique_2020.pdf",
-      "sourceUrl": "",
+      "sourceUrl": "https://www.minpostel.gov.cm/index.php/fr/les-grands-chantiers/138-plan-strategique-cameroun-numerique-2020",
       "rights": "official-text"
     },
     {
@@ -75,7 +75,7 @@
       "file": "psnsn_sante_numerique_2026_2030.pdf",
       "needsOcr": true,
       "note": "114 pages, scanné (aucune couche texte) — OCR requis.",
-      "sourceUrl": "",
+      "sourceUrl": "https://www.minsante.cm/site/sites/default/files/PSNSN%202026-2030%20Fr.pdf",
       "rights": "official-text"
     },
     {
@@ -93,7 +93,7 @@
       "file": "compact_national_sante_2023.pdf",
       "needsOcr": true,
       "note": "Partie du texte extraite avec police non-unicode (garbled) — OCR recommandé.",
-      "sourceUrl": "",
+      "sourceUrl": "https://www.afro.who.int/sites/default/files/2025-03/Compact%20national%20French-1.pdf",
       "rights": "official-text",
       "rightsNote": "Public document of the Ministry of Public Health (Minsanté), freely accessible like the other public documents: published unchanged."
     },
@@ -341,7 +341,7 @@
       "file": "normes_standards_sr_pf_sante.pdf",
       "needsOcr": true,
       "note": "164 pages, scanné — OCR requis.",
-      "sourceUrl": "",
+      "sourceUrl": "https://www.minsante.cm/site/sites/default/files/Normes%20et%20standard%20SR_Final.pdf",
       "rights": "official-text"
     },
     {
@@ -359,7 +359,7 @@
       "file": "penal_code_2016.pdf",
       "needsOcr": true,
       "note": "139 pages, scanné — OCR requis.",
-      "sourceUrl": "",
+      "sourceUrl": "https://www.prc.cm/fr/actualites/actes/lois/1828-loi-n-2016-007-du-12-juillet-2016-portant-code-penal",
       "rights": "official-text",
       "rightsNote": "Publish only the text promulgated by Law No. 2016/007 of 12 July 2016 (official gazette or government copy), never a publisher's annotated edition."
     },
