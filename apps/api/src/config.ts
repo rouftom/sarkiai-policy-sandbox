@@ -190,6 +190,17 @@ export const config = {
     secret: env('APPROVAL_SECRET') || env('SESSION_SECRET'),
   },
 
+  // Per-caller request budgets. `RATE_LIMIT_MAX` covers the authenticated API
+  // as a whole, `RATE_LIMIT_EXPENSIVE_MAX` the routes that spend model work.
+  // Counters are in-process: one instance today, and `RATE_LIMIT_ENABLED=false`
+  // is the escape hatch if a console workflow ever needs a higher burst.
+  rateLimit: {
+    enabled: env('RATE_LIMIT_ENABLED', 'true') !== 'false',
+    windowMs: Number(env('RATE_LIMIT_WINDOW_MS', '60000')) || 60_000,
+    max: Number(env('RATE_LIMIT_MAX', '240')) || 240,
+    expensiveMax: Number(env('RATE_LIMIT_EXPENSIVE_MAX', '20')) || 20,
+  },
+
   // Transactional e-mail. Console mode: messages are written to the log and the
   // in-API outbox, never sent over the network. `from` labels them.
   mail: {
