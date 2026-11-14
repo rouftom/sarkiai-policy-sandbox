@@ -38,3 +38,13 @@ docker run --rm -p 8001:8000 --env-file .env \
 ```
 
 Or, from the repo root: `make ingestion` (starts Qdrant + ingestion).
+
+## Tests
+
+The unit tests need no Qdrant, Ollama or OCR service: the embedder and the
+vector store are mocked.
+
+```bash
+python -m pip install -r services/ingestion/requirements-dev.txt
+cd services/ingestion && PYTHONPATH=src python -m pytest -q tests
+```

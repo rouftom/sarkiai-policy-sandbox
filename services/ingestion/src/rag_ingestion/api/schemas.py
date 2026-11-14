@@ -34,7 +34,7 @@ class IngestTaxonomy(BaseModel):
 
 
 class TextIngestRequest(IngestTaxonomy):
-    text: str = Field(..., description="Raw document text")
+    text: str = Field(..., min_length=1, description="Raw document text")
     filename: str = Field(..., description="Document name (grouping key)")
     organizationId: Optional[str] = None
     sourceUrl: Optional[str] = None
